@@ -179,10 +179,10 @@
           <p>Keep the shelves organised, support learners and see what needs attention today.</p>
         </div>
         <div class="admin-command-actions" aria-label="Dashboard quick actions">
-          <button class="admin-action-primary" type="button" onclick="AMG.switchTab('booksAdminTab',document.querySelector('[onclick*=\\"booksAdminTab\\"]'))"><span aria-hidden="true">＋</span> Add a book</button>
-          <button type="button" onclick="AMG.switchTab('borrowRequestsTab',document.querySelector('[onclick*=\\"borrowRequestsTab\\"]'))"><span aria-hidden="true">↗</span> Review requests</button>
-          <button type="button" onclick="AMG.switchTab('attendanceTab',document.querySelector('[onclick*=\\"attendanceTab\\"]'))"><span aria-hidden="true">◎</span> Take attendance</button>
-          <button type="button" onclick="AMG.switchTab('statisticsTab',document.querySelector('[onclick*=\\"statisticsTab\\"]'))"><span aria-hidden="true">▥</span> View insights</button>
+          <button class="admin-action-primary" type="button" onclick="AMG.switchTab('booksAdminTab',document.getElementById('booksAdminTabButton'))"><span aria-hidden="true">＋</span> Add a book</button>
+          <button type="button" onclick="AMG.switchTab('borrowRequestsTab',document.getElementById('borrowRequestsTabButton'))"><span aria-hidden="true">↗</span> Review requests</button>
+          <button type="button" onclick="AMG.switchTab('attendanceTab',document.getElementById('attendanceTabButton'))"><span aria-hidden="true">◎</span> Take attendance</button>
+          <button type="button" onclick="AMG.switchTab('statisticsTab',document.getElementById('statisticsTabButton'))"><span aria-hidden="true">▥</span> View insights</button>
         </div>
         <div class="admin-hero-foot"><span><i></i> Library operations</span><span>One workspace. Every important task.</span></div>
       </div>
@@ -190,14 +190,14 @@
       <div class="admin-stats-heading"><div><p class="eyebrow">LIVE OVERVIEW</p><h3>Library snapshot</h3></div><span>Figures update from available library records</span></div>
       <div class="stats-grid admin-stats-grid" id="adminStats"></div>
       <div class="tabs admin-tabs" role="tablist">
-        <button class="tab-btn active" onclick="AMG.switchTab('borrowRequestsTab',this)">Borrow requests</button>
+        <button id="borrowRequestsTabButton" class="tab-btn active" onclick="AMG.switchTab('borrowRequestsTab',this)">Borrow requests</button>
         <button class="tab-btn" onclick="AMG.switchTab('pendingLearnersTab',this)">Learner approvals</button>
         <button class="tab-btn" onclick="AMG.switchTab('allLearnersTab',this)">Members & cards</button>
-        <button class="tab-btn" onclick="AMG.switchTab('booksAdminTab',this)">Book inventory</button>
-        <button class="tab-btn" onclick="AMG.switchTab('attendanceTab',this)">Attendance</button>
+        <button id="booksAdminTabButton" class="tab-btn" onclick="AMG.switchTab('booksAdminTab',this)">Book inventory</button>
+        <button id="attendanceTabButton" class="tab-btn" onclick="AMG.switchTab('attendanceTab',this)">Attendance</button>
         <button class="tab-btn" onclick="AMG.switchTab('ebooksTab',this)">E-books</button>
         <button class="tab-btn" onclick="AMG.switchTab('newsAdminTab',this)">News & events</button>
-        <button class="tab-btn" onclick="AMG.switchTab('statisticsTab',this)">Statistics</button>
+        <button id="statisticsTabButton" class="tab-btn" onclick="AMG.switchTab('statisticsTab',this)">Statistics</button>
       </div>
       <div id="borrowRequestsTab" class="tab-content active"><h3>Borrowing requests</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Learner</th><th>Book</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody id="borrowRequestsTable"></tbody></table></div></div>
       <div id="pendingLearnersTab" class="tab-content"><h3>Learners awaiting approval</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Name</th><th>School</th><th>Level</th><th>Guardian contact</th><th>Actions</th></tr></thead><tbody id="pendingLearnersTable"></tbody></table></div></div>
