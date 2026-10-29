@@ -114,3 +114,6 @@ button { cursor: pointer; }
   .site-footer { padding:1rem; }
   .modal-content { padding:1.25rem; width:100%; }
 }
+
+/* Long unique Firebase UIDs remain readable on membership cards. */
+.library-card .library-number { font-size: .72rem; letter-spacing: .5px; overflow-wrap: anywhere; }
