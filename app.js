@@ -231,9 +231,14 @@ async function register(event) {
   }
 }
 async function makeUniqueMemberNumber() {
-  // Random component avoids predictable sequential IDs; Firestore rules restrict who can create profiles.
+  // Check the generated identifier against Firestore before using it.
   const prefix = "AMG-" + new Date().getFullYear() + "-";
-  return prefix + Math.random().toString(36).slice(2,8).toUpperCase();
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const candidate = prefix + Math.random().toString(36).slice(2,8).toUpperCase();
+    const match = await getDocs(query(collection(state.db,"users"),where("libraryNumber","==",candidate),limit(1)));
+    if (match.empty) return candidate;
+  }
+  throw new Error("Could not allocate a unique library number. Please try again.");
 }
 async function resetPassword() {
   if (!requireFirebase()) return;
@@ -305,7 +310,7 @@ function renderBooks() {
   const stars = starredIds();
   const books = state.books.filter(book => {
     const text = [book.title,book.author,book.category,book.description].join(" ").toLowerCase();
-    return (!search || text.includes(search)) && (category==="All"||book.category===category) && (category!=="Starred"||stars.includes(book.id));
+    return (!search || text.includes(search)) && (category==="All" || category==="Starred" || book.category===category) && (category!=="Starred" || stars.includes(book.id));
   });
   grid.replaceChildren();
   if (!books.length) { grid.append(node("div",state.books.length?"No books match your search.":"The library catalogue is empty. The librarian can register books from the Librarian Desk.","empty-state")); return; }
