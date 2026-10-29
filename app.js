@@ -213,6 +213,8 @@ async function register(event) {
       starredBookIds:[], createdAt:serverTimestamp(), updatedAt:serverTimestamp()
     };
     await setDoc(doc(state.db,"users",credential.user.uid), profile);
+    state.profile = { ...profile, createdAt:new Date(), updatedAt:new Date() };
+    updateAuthUI();
     const photo = form.get("photo");
     if (photo instanceof File && photo.size > 0) {
       if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) throw new Error("Profile photo must be an image smaller than 5 MB.");
@@ -220,6 +222,8 @@ async function register(event) {
       await uploadBytes(target, photo, {contentType:photo.type});
       const photoURL = await getDownloadURL(target);
       await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
+      profile.photoURL = photoURL;
+      state.profile.photoURL = photoURL;
     }
     event.currentTarget.reset();
     closeAuthModal();
