@@ -689,7 +689,8 @@ function renderBarChart(containerId, entries) {
 }
 function renderStatistics() {
   const pending=state.requests.filter(r=>r.status==="Pending").length, approved=state.requests.filter(r=>r.status==="Approved").length, declined=state.requests.filter(r=>r.status==="Declined").length;
-  setStats("statisticsSummary",[["Registered members",state.members.length],["Approved members",state.members.filter(m=>m.isApproved).length],["Book titles",state.books.length],["Copies in stock",state.books.reduce((n,b)=>n+Number(b.available||0),0)],["Active loans",state.loans.filter(l=>l.status==="Borrowed").length],["Attendance records",state.attendance.length]]);
+  const approvalRate=state.requests.length?Math.round(approved/state.requests.length*100):0;
+  setStats("statisticsSummary",[["Registered members",state.members.length],["Approved members",state.members.filter(m=>m.isApproved).length],["Book titles",state.books.length],["Copies in stock",state.books.reduce((n,b)=>n+Number(b.available||0),0)],["Active loans",state.loans.filter(l=>l.status==="Borrowed").length],["Borrow approval rate",approvalRate+"%"],["Attendance records",state.attendance.length]]);
   renderBarChart("borrowChart",[["Pending",pending],["Approved",approved],["Declined",declined],["Returned",state.requests.filter(r=>r.status==="Returned").length]]);
   const levels={}; state.members.forEach(m=>{const key=m.eduLevel||"Unspecified"; levels[key]=(levels[key]||0)+1;});
   renderBarChart("educationChart",Object.entries(levels).sort((a,b)=>b[1]-a[1]));
