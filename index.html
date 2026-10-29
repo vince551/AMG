@@ -8,7 +8,9 @@
       try {
         var screenWidth = Math.min(window.screen.width || 9999, window.screen.height || 9999);
         var touchDevice = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-        if (touchDevice && screenWidth <= 600) document.documentElement.classList.add("amg-compact-device");
+        var layoutWidth = window.innerWidth || document.documentElement.clientWidth || 9999;
+        /* Apply compact overrides only when Chrome is forcing a desktop-width viewport on a phone. */
+        if (touchDevice && screenWidth <= 600 && layoutWidth > 600) document.documentElement.classList.add("amg-compact-device");
       } catch (_) {}
     })();
   </script>
