@@ -172,8 +172,23 @@
           <div class="occupancy-footer"><span><i class="occupancy-dot"></i> Currently in library</span><button onclick="AMG.switchTab('attendanceTab',this)">Manage attendance ↗</button></div>
         </section>
       </div>
+      <div class="admin-command-hero">
+        <div class="admin-command-copy">
+          <p class="eyebrow">AMG LIBRARY · CONTROL CENTRE</p>
+          <h3>Your library, at a glance.</h3>
+          <p>Keep the shelves organised, support learners and see what needs attention today.</p>
+        </div>
+        <div class="admin-command-actions" aria-label="Dashboard quick actions">
+          <button class="admin-action-primary" type="button" onclick="AMG.switchTab('booksAdminTab',document.querySelector('[onclick*=\\"booksAdminTab\\"]'))"><span aria-hidden="true">＋</span> Add a book</button>
+          <button type="button" onclick="AMG.switchTab('borrowRequestsTab',document.querySelector('[onclick*=\\"borrowRequestsTab\\"]'))"><span aria-hidden="true">↗</span> Review requests</button>
+          <button type="button" onclick="AMG.switchTab('attendanceTab',document.querySelector('[onclick*=\\"attendanceTab\\"]'))"><span aria-hidden="true">◎</span> Take attendance</button>
+          <button type="button" onclick="AMG.switchTab('statisticsTab',document.querySelector('[onclick*=\\"statisticsTab\\"]'))"><span aria-hidden="true">▥</span> View insights</button>
+        </div>
+        <div class="admin-hero-foot"><span><i></i> Library operations</span><span>One workspace. Every important task.</span></div>
+      </div>
       <div class="notice notice-success">Librarian access is granted through Firebase custom claims. A visible button alone never grants administrative permissions.</div>
-      <div class="stats-grid" id="adminStats"></div>
+      <div class="admin-stats-heading"><div><p class="eyebrow">LIVE OVERVIEW</p><h3>Library snapshot</h3></div><span>Figures update from available library records</span></div>
+      <div class="stats-grid admin-stats-grid" id="adminStats"></div>
       <div class="tabs admin-tabs" role="tablist">
         <button class="tab-btn active" onclick="AMG.switchTab('borrowRequestsTab',this)">Borrow requests</button>
         <button class="tab-btn" onclick="AMG.switchTab('pendingLearnersTab',this)">Learner approvals</button>
