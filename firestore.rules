@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function librarian() {
+      return signedIn() && request.auth.token.librarian == true;
+    }
+    function own(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow create: if own(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.role == 'learner'
+        && request.resource.data.isApproved == false
+        && request.resource.data.fullName is string
+        && request.resource.data.fullName.size() >= 2
+        && request.resource.data.libraryNumber is string;
+      allow read: if own(uid) || librarian();
+      // Learners can only update their own safe profile fields, never role,
+      // approval status, library number, guardian data or account identity.
+      allow update: if librarian() || (own(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['photoURL', 'starredBookIds', 'updatedAt'])
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.isApproved == resource.data.isApproved);
+      allow delete: if librarian();
+    }
+
+    match /books/{bookId} {
+      allow read: if true;
+      allow create, update, delete: if librarian();
+    }
+
+    match /borrowRequests/{requestId} {
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'Pending'
+        && request.resource.data.bookId is string;
+      allow read: if librarian()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow update, delete: if librarian();
+    }
+
+    match /loans/{loanId} {
+      allow read: if librarian()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow create, update, delete: if librarian();
+    }
+
+    match /attendance/{attendanceId} {
+      allow read, create, update, delete: if librarian();
+    }
+
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow create, update, delete: if librarian();
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if librarian();
+    }
+
+    match /ebooks/{ebookId} {
+      allow read: if signedIn();
+      allow create, update, delete: if librarian();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if librarian();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
