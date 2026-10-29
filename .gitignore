@@ -7,3 +7,4 @@ service-account*.json
 .firebase/
 .vercel/
 .DS_Store
+dist/
