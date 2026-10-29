@@ -333,7 +333,7 @@ function makeUniqueMemberNumber(uid) {
   // the private member directory from the browser.
   return "AMG-" + new Date().getFullYear() + "-" + uid.toUpperCase();
 }
-async async function resetPassword() {
+async function resetPassword() {
   if (!requireFirebase()) return;
   const loginName = $("loginForm").elements.loginName.value.trim();
   const email = loginName.toLowerCase() === "librarian" ? String(firebaseConfig.librarianEmail || "").trim() : loginName;
