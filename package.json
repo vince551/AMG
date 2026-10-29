@@ -1,0 +1,12 @@
+{
+  "name": "amg-library",
+  "private": true,
+  "version": "2.0.0",
+  "description": "AMG Library web portal",
+  "scripts": {
+    "set-librarian": "node scripts/set-librarian-claim.cjs"
+  },
+  "devDependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}
