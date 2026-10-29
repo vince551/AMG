@@ -220,3 +220,5 @@ body { background: linear-gradient(180deg,#f7fbff 0%,#f3f8f6 100%); }
   .brand-mark { width:36px; height:36px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } *,*::before,*::after { transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+
+.brand-logo { display:block; width:38px; height:38px; flex:0 0 38px; object-fit:cover; border-radius:10px; }
