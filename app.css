@@ -843,3 +843,28 @@ button:focus-visible {
 #registrationNextBtn { width:100%; margin-top:.35rem; }
 @media(max-width:760px) { .home-purpose-grid { grid-template-columns:1fr; } .home-feature-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .journey-grid, .values-grid { grid-template-columns:1fr; } .home-cta { align-items:stretch; } .home-cta .hero-actions { flex-direction:column; align-items:stretch; width:100%; } .home-cta .hero-actions .btn { width:100%; } }
 @media(max-width:430px) { .home-feature-grid { grid-template-columns:1fr; } .registration-actions { grid-template-columns:1fr; } .camera-picker { align-items:flex-start; flex-direction:column; } .avatar-preview-row { align-items:flex-start; } }
+
+
+/* Keep the added home-page sections readable in the switchable dark theme. */
+[data-theme="dark"] .home-intro h2,
+[data-theme="dark"] .home-services h2,
+[data-theme="dark"] .home-journey h2,
+[data-theme="dark"] .home-levels h2,
+[data-theme="dark"] .home-values h2,
+[data-theme="dark"] .home-feature h3,
+[data-theme="dark"] .journey-grid h3,
+[data-theme="dark"] .values-grid h3,
+[data-theme="dark"] .purpose-card h2 { color:var(--text-main); }
+[data-theme="dark"] .purpose-card,
+[data-theme="dark"] .home-feature,
+[data-theme="dark"] .values-grid article { background:var(--surface-color); border-color:var(--border-color); }
+[data-theme="dark"] .mission-card,
+[data-theme="dark"] .vision-card,
+[data-theme="dark"] .journey-grid article { background:var(--surface-color); }
+[data-theme="dark"] .purpose-card > p:last-child,
+[data-theme="dark"] .home-feature p,
+[data-theme="dark"] .journey-grid p,
+[data-theme="dark"] .values-grid p { color:var(--text-muted); }
+[data-theme="dark"] .level-chips span { background:#123b31; border-color:#286653; color:#c9f5e3; }
+[data-theme="dark"] .purpose-icon,
+[data-theme="dark"] .home-feature > span { background:#123b31; }
