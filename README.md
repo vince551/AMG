@@ -16,7 +16,7 @@ The Firebase client configuration is intentionally a placeholder. Do not use thi
    firebase use YOUR_FIREBASE_PROJECT_ID
    firebase deploy --only firestore:rules,storage
    ```
-5. Register the librarian account in the app and sign in once.
+5. Create the staff account in Firebase Authentication using the librarian email you will set in `firebase-config.js`. For the requested write-up credentials, the login screen accepts the username **Librarian**; set the Firebase Auth password to **AMG@2026** when provisioning the account. This username is only a display/login alias: authentication still happens through Firebase, not a hardcoded password in browser code. After first access, rotate the default password to a unique strong password.
 6. On a trusted local machine, download a service-account JSON to a location outside this repository. Set `GOOGLE_APPLICATION_CREDENTIALS` to that file path and run:
    ```bash
    npm install
@@ -27,7 +27,7 @@ The Firebase client configuration is intentionally a placeholder. Do not use thi
    npm run set-librarian -- librarian@example.com
    ```
    Replace the email with the actual librarian account. Sign out and sign in again to refresh the custom claim. Never commit or share the service-account file.
-7. The librarian can then approve learners and register books.
+7. Set `librarianEmail` in `firebase-config.js` to the same staff account email. The `firebase-config.js` value is a public identifier, not a secret. Run the command below to grant the account the librarian custom claim. Sign out and sign in again to refresh the claim. The librarian can then approve learners and register books.
 
 ## Features
 - Learner registration with school, level, gender and parent/guardian details.
