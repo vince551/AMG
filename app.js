@@ -535,6 +535,45 @@ function addCell(row,text) { row.append(node("td",text)); }
 function addAction(row,label,handler,className="btn btn-sm btn-outline") {
   const td=node("td"); const button=node("button",label,className); button.type="button"; button.addEventListener("click",handler); td.append(button); row.append(td);
 }
+function renderDashboardOverview() {
+  const date = $("adminWelcomeDate");
+  if (date) date.textContent = new Intl.DateTimeFormat("en-KE", {weekday:"long", day:"numeric", month:"long", year:"numeric"}).format(new Date());
+  const inside = state.attendance.filter(item => item.status === "In library").length;
+  const capacity = Math.max(1, Number(state.capacity) || 100);
+  setText("dashboardOccupancyCount", inside);
+  setText("dashboardOccupancyCapacity", "of " + capacity + " places used");
+  const bar = $("dashboardOccupancyBar");
+  if (bar) {
+    bar.style.width = Math.min(100, Math.round(inside / capacity * 100)) + "%";
+    bar.classList.toggle("at-capacity", inside >= capacity);
+  }
+  const list = $("adminPriorityList");
+  if (!list) return;
+  list.replaceChildren();
+  const pendingRequests = state.requests.filter(item => item.status === "Pending").length;
+  const pendingMembers = state.members.filter(item => !item.isApproved).length;
+  const lowStock = state.books.filter(book => Number(book.available || 0) <= 1).length;
+  const priorities = [
+    {icon:"↗", title:"Borrow requests", detail:"Requests waiting for a decision", count:pendingRequests, tab:"borrowRequestsTab", tone:"blue"},
+    {icon:"✓", title:"Learner approvals", detail:"Membership applications to review", count:pendingMembers, tab:"pendingLearnersTab", tone:"green"},
+    {icon:"▤", title:"Low-stock titles", detail:"Books with one or fewer copies available", count:lowStock, tab:"booksAdminTab", tone:"amber"}
+  ];
+  priorities.forEach(item => {
+    const row = node("div", null, "admin-priority-row");
+    const icon = node("span", item.icon, "priority-icon priority-" + item.tone);
+    const copy = node("span", null, "priority-copy");
+    copy.append(node("b", item.title), node("small", item.detail));
+    const count = node("span", item.count, "priority-count" + (item.count ? " has-work" : ""));
+    const action = node("button", "Open →", "priority-open");
+    action.type = "button";
+    action.addEventListener("click", () => {
+      const tabButton = document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="' + item.tab + '"]');
+      switchTab(item.tab, tabButton || null);
+    });
+    row.append(icon, copy, count, action);
+    list.append(row);
+  });
+}
 function renderAdminTables() {
   const reqTable=$("borrowRequestsTable"); reqTable.replaceChildren();
   state.requests.forEach(req=>{
@@ -561,6 +600,7 @@ function renderAdminTables() {
     addAction(row,"View / download card",()=>viewMemberCard(member)); all.append(row);
   });
   setStats("adminStats",[["Members",state.members.length],["Awaiting approval",state.members.filter(m=>!m.isApproved).length],["Book titles",state.books.length],["Pending requests",state.requests.filter(r=>r.status==="Pending").length],["Currently in library",state.attendance.filter(a=>a.status==="In library").length],["Available copies",state.books.reduce((n,b)=>n+Number(b.available||0),0)]]);
+  renderDashboardOverview();
 }
 async function approveLearner(uid) {
   if(!state.librarian) return;
