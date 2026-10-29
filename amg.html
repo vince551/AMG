@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AMG Library Portal</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="nav-brand" onclick="showSection('heroSection')">
+      <span>📚</span> AMG LIBRARY
+    </div>
+    
+    <nav class="nav-links">
+      <button class="nav-btn" onclick="showSection('heroSection')">Home</button>
+      <button class="nav-btn" onclick="showSection('libShelfSection')">Lib Shelf</button>
+      <button class="nav-btn hidden" id="navProfileBtn" onclick="showSection('profileSection')">My Profile</button>
+      <button class="nav-btn portal-switch-btn" id="portalToggleBtn" onclick="togglePortalView()">
+        🔄 Switch to Librarian Portal
+      </button>
+
+      <!-- BECOME A MEMBER DROPDOWN -->
+      <div class="dropdown" id="memberDropdown">
+        <button class="btn btn-primary" onclick="toggleDropdown()">Become a Member ▾</button>
+        <div class="dropdown-content" id="dropdownMenu">
+          <a href="#" onclick="openAuthModal('login')">Log In</a>
+          <a href="#" onclick="openAuthModal('register')">Register</a>
+        </div>
+      </div>
+
+      <!-- LOGGED IN USER STATE -->
+      <div class="user-badge hidden" id="userBadge">
+        <span id="navUserName">Learner</span>
+        <button class="btn btn-sm btn-outline" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+
+    <!-- HERO / INFORMATION SECTION -->
+    <section id="heroSection" class="section active">
+      <div class="hero">
+        <h1>Welcome to AMG Library</h1>
+        <p>Empowering learners from Primary to University with thousands of books, digital resources, and a state-of-the-art interactive catalog.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" onclick="showSection('libShelfSection')">Explore Books</button>
+          <button class="btn btn-secondary btn-lg" onclick="openAuthModal('register')">Join AMG Library Today</button>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <span class="icon">📖</span>
+          <h3>Extensive Collection</h3>
+          <p>From early learning (PP) storybooks to advanced academic research papers for university students.</p>
+        </div>
+        <div class="info-card">
+          <span class="icon">🏷️</span>
+          <h3>Digital Membership Card</h3>
+          <p>Get your official branded AMG Library card with an auto-generated unique student barcode.</p>
+        </div>
+        <div class="info-card">
+          <span class="icon">⚡</span>
+          <h3>Seamless Borrowing</h3>
+          <p>Request books online, keep track of loans, and receive instant approval from our librarians.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIB SHELF SECTION -->
+    <section id="libShelfSection" class="section">
+      <div class="section-header">
+        <h2>Lib Shelf</h2>
+        <p>Explore, star your favorite titles, and submit borrowing requests.</p>
+      </div>
+
+      <!-- SEARCH & FILTER TOOLBAR -->
+      <div class="toolbar">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search books by title or author..." oninput="filterBooks()">
+        <div class="category-pills" id="categoryPills">
+          <button class="pill active" onclick="filterCategory('All')">All</button>
+          <button class="pill" onclick="filterCategory('Primary (PP - Grade 8)')">Primary</button>
+          <button class="pill" onclick="filterCategory('High School')">High School</button>
+          <button class="pill" onclick="filterCategory('University')">University</button>
+          <button class="pill" onclick="filterCategory('General / Fiction')">Fiction</button>
+          <button class="pill" onclick="filterCategory('Starred')">⭐ Starred</button>
+        </div>
+      </div>
+
+      <div class="book-grid" id="bookGrid"></div>
+    </section>
+
+    <!-- PROFILE SECTION -->
+    <section id="profileSection" class="section">
+      <div class="section-header">
+        <h2>Learner Profile & Card</h2>
+        <p>Download your official AMG Library membership pass.</p>
+      </div>
+
+      <div class="profile-layout">
+        <!-- CARD DISPLAY -->
+        <div class="card-preview-wrapper">
+          <div id="learnerProfileCard" class="library-card">
+            <div class="card-header">
+              <div class="brand">
+                <span class="brand-logo">📚</span>
+                <div>
+                  <div class="brand-title">AMG LIBRARY</div>
+                  <div class="brand-subtitle">Official Student Membership</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <img id="cardImage" src="https://via.placeholder.com/100" alt="Learner Photo" class="card-photo">
+              <div class="card-info">
+                <h3 id="cardFullName">Learner Name</h3>
+                <p><strong>School:</strong> <span id="cardSchool">N/A</span></p>
+                <p><strong>Level of Study:</strong> <span id="cardStudyLevel">N/A</span></p>
+                <p><strong>Edu Level:</strong> <span id="cardEduLevel" class="badge">N/A</span></p>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div id="barcodeContainer" class="barcode-box"></div>
+              <div id="cardLibraryNum" class="library-number">AMG-000000</div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="downloadCard('learnerProfileCard')">📥 Download Profile Card</button>
+        </div>
+
+        <!-- LOANED BOOKS SUMMARY -->
+        <div class="my-loans-box">
+          <h3>My Active Loans & Requests</h3>
+          <div id="myLoansList" class="loans-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRARIAN PORTAL -->
+    <section id="librarianSection" class="section">
+      <div class="section-header">
+        <h2>Librarian Desk & Management Portal</h2>
+        <p>Approve learners, process borrowing requests, and view member cards.</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('borrowRequestsTab')">Borrow Requests</button>
+        <button class="tab-btn" onclick="switchTab('pendingLearnersTab')">Learner Approvals</button>
+        <button class="tab-btn" onclick="switchTab('allLearnersTab')">All Registered Learners</button>
+      </div>
+
+      <!-- TAB: BORROW REQUESTS -->
+      <div id="borrowRequestsTab" class="tab-content active">
+        <h3>Pending Borrowing Requests</h3>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Learner</th>
+                <th>Book Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="borrowRequestsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: LEARNER APPROVALS -->
+      <div id="pendingLearnersTab" class="tab-content">
+        <h3>Learners Awaiting Registration Approval</h3>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>School</th>
+                <th>Edu Level</th>
+                <th>Guardian Contact</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pendingLearnersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: ALL LEARNERS -->
+      <div id="allLearnersTab" class="tab-content">
+        <h3>Registered Members Directory</h3>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Library #</th>
+                <th>Full Name</th>
+                <th>Edu Level</th>
+                <th>Guardian</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="allLearnersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- AUTH MODAL (LOGIN & REGISTRATION) -->
+  <div id="authModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeAuthModal()">&times;</span>
+
+      <!-- REGISTRATION FORM -->
+      <div id="registerFormContainer" class="auth-box">
+        <h2>Register as AMG Library Member</h2>
+
+        <!-- STEP 1: LEARNER DETAILS -->
+        <div id="regStep1" class="step-container active">
+          <h3>Step 1: Learner Details</h3>
+          
+          <label>Full Name</label>
+          <input type="text" id="regFullName" required placeholder="John Doe">
+
+          <label>Gender</label>
+          <select id="regGender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label>School</label>
+          <input type="text" id="regSchool" required placeholder="Academy / High School Name">
+
+          <label>Level of Study (e.g., Grade 5, Form 2, Year 1)</label>
+          <input type="text" id="regStudyLevel" required placeholder="e.g. Form 3">
+
+          <label>Education Level</label>
+          <select id="regEduLevel">
+            <option value="PP">PP (Pre-Primary)</option>
+            <option value="Primary">Primary</option>
+            <option value="Junior Secondary">Junior Secondary</option>
+            <option value="Senior Secondary">Senior Secondary</option>
+            <option value="University">University</option>
+          </select>
+
+          <label>Password</label>
+          <input type="password" id="regPassword" required placeholder="Choose a secure password">
+
+          <button class="btn btn-primary" onclick="goToStep2()">Next ➔</button>
+        </div>
+
+        <!-- STEP 2: GUARDIAN DETAILS -->
+        <div id="regStep2" class="step-container">
+          <h3>Step 2: Parent or Guardian Details</h3>
+
+          <label>Parent/Guardian Full Name</label>
+          <input type="text" id="regGuardianName" required placeholder="Jane Doe">
+
+          <label>Relationship</label>
+          <select id="regGuardianRelation">
+            <option value="Mother">Mother</option>
+            <option value="Father">Father</option>
+            <option value="Guardian">Guardian</option>
+          </select>
+
+          <label>Parent/Guardian Phone Number</label>
+          <input type="tel" id="regGuardianPhone" required placeholder="+254 700 000000">
+
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="goToStep1()">Back</button>
+            <button class="btn btn-primary" onclick="completeRegistration()">Complete Registration</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginFormContainer" class="auth-box hidden">
+        <h2>Member Log In</h2>
+        <label>Full Name</label>
+        <input type="text" id="loginFullName" required placeholder="Enter full name">
+
+        <label>Password</label>
+        <input type="password" id="loginPassword" required placeholder="Enter password">
+
+        <button class="btn btn-primary" onclick="performLogin()">Log In</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL FOR LIBRARIAN TO VIEW/DOWNLOAD CARD -->
+  <div id="librarianCardModal" class="modal">
+    <div class="modal-content card-modal-content">
+      <span class="close-btn" onclick="closeLibrarianCardModal()">&times;</span>
+      <h3>Learner Profile Card</h3>
+      
+      <div id="librarianProfileCardTarget" class="library-card">
+        <div class="card-header">
+          <div class="brand">
+            <span class="brand-logo">📚</span>
+            <div>
+              <div class="brand-title">AMG LIBRARY</div>
+              <div class="brand-subtitle">Official Student Membership</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <img id="libModalCardImage" src="https://via.placeholder.com/100" alt="Learner Photo" class="card-photo">
+          <div class="card-info">
+            <h3 id="libModalCardFullName">Learner Name</h3>
+            <p><strong>School:</strong> <span id="libModalCardSchool">N/A</span></p>
+            <p><strong>Level of Study:</strong> <span id="libModalCardStudyLevel">N/A</span></p>
+            <p><strong>Edu Level:</strong> <span id="libModalCardEduLevel" class="badge">N/A</span></p>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div id="libModalBarcodeContainer" class="barcode-box"></div>
+          <div id="libModalCardLibraryNum" class="library-number">AMG-000000</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary mt-1" onclick="downloadCard('librarianProfileCardTarget')">📥 Download Card</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
