@@ -203,7 +203,7 @@ async function register(event) {
   try {
     credential = await createUserWithEmailAndPassword(state.auth, email, password);
     await updateProfile(credential.user, {displayName:fullName});
-    const libraryNumber = await makeUniqueMemberNumber();
+    const libraryNumber = makeUniqueMemberNumber(credential.user.uid);
     const profile = {
       uid:credential.user.uid, fullName, email,
       gender:String(form.get("gender")), school:String(form.get("school")).trim(),
@@ -230,15 +230,10 @@ async function register(event) {
     showToast("Registration could not be completed: "+errorMessage(error), "error");
   }
 }
-async function makeUniqueMemberNumber() {
-  // Check the generated identifier against Firestore before using it.
-  const prefix = "AMG-" + new Date().getFullYear() + "-";
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const candidate = prefix + Math.random().toString(36).slice(2,8).toUpperCase();
-    const match = await getDocs(query(collection(state.db,"users"),where("libraryNumber","==",candidate),limit(1)));
-    if (match.empty) return candidate;
-  }
-  throw new Error("Could not allocate a unique library number. Please try again.");
+function makeUniqueMemberNumber(uid) {
+  // The full Firebase Auth UID makes the member number unique without querying
+  // the private member directory from the browser.
+  return "AMG-" + new Date().getFullYear() + "-" + uid.toUpperCase();
 }
 async function resetPassword() {
   if (!requireFirebase()) return;
