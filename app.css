@@ -1821,3 +1821,54 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 @media (max-width:420px) {
   .navbar .nav-links { right:.55rem; width:min(calc(100vw - 1.1rem),320px); }
 }
+
+/* Small-screen fallback for Android browsers forced into Desktop site mode.
+   The class is only added on touch devices with a physically narrow screen. */
+html.amg-compact-device, html.amg-compact-device body { width:100%; max-width:100%; min-width:0; overflow-x:hidden; }
+html.amg-compact-device *, html.amg-compact-device *::before, html.amg-compact-device *::after { box-sizing:border-box; }
+html.amg-compact-device .navbar { position:sticky; top:0; z-index:1100; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:.55rem .7rem; padding:.65rem .8rem; }
+html.amg-compact-device .navbar .nav-brand { min-width:0; max-width:100%; white-space:normal; }
+html.amg-compact-device .mobile-nav-toggle { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; min-height:42px; padding:.55rem .7rem; border:1px solid #b9dfcd; border-radius:12px; background:#edf8f2; color:#075d43; font-weight:800; }
+html.amg-compact-device .navbar .nav-links { display:none; position:absolute; top:calc(100% + .45rem); right:.55rem; left:auto; grid-column:auto; width:min(calc(100vw - 1.1rem),320px); max-height:72vh; overflow-y:auto; flex-direction:column; align-items:stretch; gap:.35rem; margin:0; padding:.65rem; border:1px solid #dcebe5; border-radius:18px; background:#fff; box-shadow:0 20px 48px #0c302f30; }
+html.amg-compact-device .navbar.mobile-nav-open .nav-links { display:flex; }
+html.amg-compact-device .navbar .nav-links > * { width:100%; max-width:100%; min-width:0; flex:0 0 auto; }
+html.amg-compact-device .navbar .nav-links .nav-btn, html.amg-compact-device .navbar .nav-links .dropdown > button { width:100%; min-height:44px; white-space:normal; text-align:left; }
+html.amg-compact-device .navbar .nav-links .dropdown { width:100%; }
+html.amg-compact-device .navbar .nav-links .dropdown-content { position:static; display:none; width:100%; max-width:100%; min-width:0; margin-top:.35rem; box-shadow:none; }
+html.amg-compact-device .navbar .nav-links .dropdown-content.show { display:block; }
+html.amg-compact-device .container { width:auto; max-width:100%; min-width:0; margin:.7rem auto; padding:0 .65rem; }
+html.amg-compact-device .section, html.amg-compact-device .panel, html.amg-compact-device .toolbar, html.amg-compact-device #heroSection, html.amg-compact-device #libShelfSection, html.amg-compact-device #profileSection, html.amg-compact-device #newsSection, html.amg-compact-device #librarianSection { min-width:0; max-width:100%; }
+html.amg-compact-device .panel { padding:.85rem; }
+html.amg-compact-device #heroSection .hero-editorial { display:grid; grid-template-columns:minmax(0,1fr); gap:1.2rem; padding:1.2rem .9rem 1rem; }
+html.amg-compact-device #heroSection .hero-copy, html.amg-compact-device #heroSection .hero-editorial .hero-gallery { min-width:0; width:100%; }
+html.amg-compact-device #heroSection .hero-copy h1 { font-size:clamp(2rem,9vw,3rem); overflow-wrap:anywhere; }
+html.amg-compact-device #heroSection .hero-copy .hero-actions { display:grid; grid-template-columns:minmax(0,1fr); }
+html.amg-compact-device #heroSection .hero-copy .hero-actions .btn { width:100%; min-width:0; white-space:normal; }
+html.amg-compact-device #heroSection .hero-editorial .hero-gallery { grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); grid-template-rows: minmax(115px,38vw) minmax(85px,27vw) auto; gap:.45rem; }
+html.amg-compact-device #heroSection .hero-editorial .hero-gallery img:first-child { grid-column:1; grid-row:1 / 3; height:100%; }
+html.amg-compact-device #heroSection .hero-editorial .hero-gallery img:nth-child(2) { grid-column:2; grid-row:1; }
+html.amg-compact-device #heroSection .hero-editorial .hero-gallery img:nth-child(3) { grid-column:2; grid-row:2; }
+html.amg-compact-device #heroSection .featured-books-grid, html.amg-compact-device #heroSection .home-feature-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+html.amg-compact-device #heroSection .home-purpose-grid, html.amg-compact-device #heroSection .values-grid, html.amg-compact-device #heroSection .journey-grid, html.amg-compact-device #heroSection .announcement-grid { grid-template-columns:minmax(0,1fr); }
+html.amg-compact-device .toolbar { display:flex; flex-direction:column; align-items:stretch; }
+html.amg-compact-device .toolbar input, html.amg-compact-device .toolbar select, html.amg-compact-device #categoryFilter { width:100%; min-width:0; max-width:100%; }
+html.amg-compact-device .book-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; }
+html.amg-compact-device .book-card, html.amg-compact-device .book-details, html.amg-compact-device .book-cover { min-width:0; max-width:100%; }
+html.amg-compact-device .book-details { padding:.7rem; }
+html.amg-compact-device .book-actions { flex-direction:column; align-items:stretch; }
+html.amg-compact-device .book-actions .btn { width:100%; white-space:normal; }
+html.amg-compact-device .profile-layout, html.amg-compact-device .form-grid, html.amg-compact-device .inline-form { display:grid; grid-template-columns:minmax(0,1fr); }
+html.amg-compact-device .form-grid > *, html.amg-compact-device .inline-form > * { width:100%; min-width:0; }
+html.amg-compact-device .stats-grid, html.amg-compact-device #librarianSection .admin-stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+html.amg-compact-device #librarianSection .admin-welcome, html.amg-compact-device #librarianSection .admin-overview-grid { grid-template-columns:minmax(0,1fr); }
+html.amg-compact-device #librarianSection .admin-quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+html.amg-compact-device #librarianSection .admin-tabs { display:none; }
+html.amg-compact-device #librarianSection .admin-mobile-tab-picker { display:flex; flex-direction:column; gap:.45rem; }
+html.amg-compact-device #librarianSection .admin-mobile-tab-picker select { width:100%; min-width:0; }
+html.amg-compact-device #librarianSection .tab-content { min-width:0; padding:.7rem; overflow:hidden; }
+html.amg-compact-device #librarianSection .data-table, html.amg-compact-device #librarianSection table { display:block; width:100%; max-width:100%; overflow-x:auto; }
+html.amg-compact-device #librarianSection .data-table th, html.amg-compact-device #librarianSection .data-table td, html.amg-compact-device #librarianSection table th, html.amg-compact-device #librarianSection table td { white-space:nowrap; }
+html.amg-compact-device .modal { align-items:flex-start; padding:.45rem; }
+html.amg-compact-device .modal-content { width:100%; max-width:100%; max-height:calc(100dvh - .9rem); }
+html.amg-compact-device .site-footer { padding:1rem .7rem; gap:.7rem; }
+@media (max-width:420px) { html.amg-compact-device #heroSection .featured-books-grid, html.amg-compact-device .book-grid, html.amg-compact-device #librarianSection .admin-quick-grid { grid-template-columns:minmax(0,1fr); } }
