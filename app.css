@@ -725,3 +725,67 @@ button:focus-visible {
 @media (max-width: 600px) {
   .theme-toggle { width: 100%; }
 }
+
+
+/* Keep the theme control with floating utility/social actions, not in the navbar. */
+.theme-toggle-float {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 1200;
+  width: 54px;
+  height: 54px;
+  min-height: 54px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,.75);
+  border-radius: 50%;
+  background: linear-gradient(145deg,#087f5b,#1557b0);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(15,48,72,.28);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.theme-toggle-float #themeIcon { font-size: 1.45rem; line-height: 1; }
+.theme-toggle-float #themeLabel {
+  position: absolute;
+  right: 64px;
+  padding: .45rem .7rem;
+  border-radius: 8px;
+  background: #10243a;
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transform: translateX(4px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.theme-toggle-float:hover,
+.theme-toggle-float:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(15,48,72,.34);
+}
+.theme-toggle-float:hover #themeLabel,
+.theme-toggle-float:focus-visible #themeLabel { opacity: 1; transform: translateX(0); }
+:root[data-theme="dark"] .theme-toggle-float {
+  background: linear-gradient(145deg,#28b887,#286bc0);
+  border-color: #b7f2df;
+  color: #fff;
+}
+@media(max-width:600px) {
+  .theme-toggle-float {
+    right: 14px;
+    bottom: 16px;
+    width: 50px;
+    height: 50px;
+    min-height: 50px;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .theme-toggle-float, .theme-toggle-float #themeLabel { transition: none; }
+}
