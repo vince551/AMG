@@ -137,6 +137,41 @@
 
     <section id="librarianSection" class="section">
       <div class="section-header"><p class="eyebrow">STAFF WORKSPACE</p><h2 id="librarianHeading">Librarian Desk</h2><p>Manage membership, catalogue, circulation, e-books, attendance and library statistics.</p></div>
+      <section class="admin-welcome" aria-labelledby="adminWelcomeTitle">
+        <div class="admin-welcome-copy">
+          <span class="admin-live"><i></i> LIBRARY OPERATIONS</span>
+          <h2 id="adminWelcomeTitle">Your library, at a glance.</h2>
+          <p>Keep books moving, welcome learners and stay on top of the day’s priorities.</p>
+          <div class="admin-welcome-actions">
+            <button class="btn btn-primary" onclick="AMG.switchTab('booksAdminTab',this)">＋ Add a book</button>
+            <button class="btn admin-ghost" onclick="AMG.switchTab('attendanceTab',this)">⌁ Open attendance</button>
+          </div>
+        </div>
+        <div class="admin-welcome-art" aria-hidden="true">
+          <div class="admin-art-orbit orbit-one"></div><div class="admin-art-orbit orbit-two"></div>
+          <div class="admin-art-book book-back"></div><div class="admin-art-book book-front"><span>AMG</span><b>READ<br>GROW<br>LEAD</b><small>LIBRARY · EST.</small></div>
+          <div class="admin-art-spark spark-one">✦</div><div class="admin-art-spark spark-two">✧</div>
+        </div>
+        <div class="admin-date-strip"><span>STAFF CONSOLE</span><span id="adminWelcomeDate">Library management workspace</span></div>
+      </section>
+      <div class="admin-quick-grid" aria-label="Quick library actions">
+        <button class="admin-quick-card" onclick="AMG.switchTab('borrowRequestsTab',this)"><span class="admin-quick-icon quick-blue">↗</span><span><b>Circulation desk</b><small>Review and process requests</small></span><strong>→</strong></button>
+        <button class="admin-quick-card" onclick="AMG.switchTab('pendingLearnersTab',this)"><span class="admin-quick-icon quick-green">✓</span><span><b>Member approvals</b><small>Welcome new learners</small></span><strong>→</strong></button>
+        <button class="admin-quick-card" onclick="AMG.switchTab('ebooksTab',this)"><span class="admin-quick-icon quick-violet">▤</span><span><b>Digital library</b><small>Publish reading resources</small></span><strong>→</strong></button>
+        <button class="admin-quick-card" onclick="AMG.switchTab('statisticsTab',this)"><span class="admin-quick-icon quick-amber">⌁</span><span><b>Library insights</b><small>Explore usage and trends</small></span><strong>→</strong></button>
+      </div>
+      <div class="admin-overview-grid">
+        <section class="admin-overview-panel">
+          <div class="admin-panel-heading"><div><span class="admin-kicker">YOUR PRIORITIES</span><h3>Daily operations</h3></div><span class="admin-panel-mark">01</span></div>
+          <div id="adminPriorityList" class="admin-priority-list"><p class="muted">Your live library priorities will appear when dashboard data loads.</p></div>
+        </section>
+        <section class="admin-overview-panel admin-occupancy-panel">
+          <div class="admin-panel-heading"><div><span class="admin-kicker">SPACE & SAFETY</span><h3>Library occupancy</h3></div><span class="admin-panel-mark">02</span></div>
+          <div class="occupancy-number"><strong id="dashboardOccupancyCount">—</strong><span id="dashboardOccupancyCapacity">of — seats used</span></div>
+          <div class="occupancy-track"><span id="dashboardOccupancyBar"></span></div>
+          <div class="occupancy-footer"><span><i class="occupancy-dot"></i> Currently in library</span><button onclick="AMG.switchTab('attendanceTab',this)">Manage attendance ↗</button></div>
+        </section>
+      </div>
       <div class="notice notice-success">Librarian access is granted through Firebase custom claims. A visible button alone never grants administrative permissions.</div>
       <div class="stats-grid" id="adminStats"></div>
       <div class="tabs admin-tabs" role="tablist">
