@@ -62,11 +62,38 @@
           <img src="AMG.images/toto.jpg" alt="Learning for young readers" loading="lazy">
         </div>
       </div>
-      <div class="info-grid">
-        <article class="info-card"><span class="icon">📖</span><h3>Discover books</h3><p>Search the library catalogue and browse by learning level or category.</p></article>
-        <article class="info-card"><span class="icon">🎫</span><h3>Digital membership card</h3><p>Get a membership card with a unique library number, barcode and QR code.</p></article>
-        <article class="info-card"><span class="icon">⚡</span><h3>Simple borrowing</h3><p>Request books online and track the status of each request and loan.</p></article>
+      <section class="home-intro panel" aria-labelledby="aboutAmgTitle">
+        <p class="eyebrow">ABOUT AMG LIBRARY</p><h2 id="aboutAmgTitle">A welcoming space to learn, read and grow</h2>
+        <p>AMG Library connects learners with books, digital learning resources and a supportive reading community. From early learning to university, we help every member discover knowledge, build confidence and develop lifelong learning habits.</p>
+      </section>
+      <div class="home-purpose-grid">
+        <article class="purpose-card mission-card"><span class="purpose-icon">🎯</span><p class="eyebrow">OUR MISSION</p><h2>Make knowledge accessible</h2><p>To provide an inclusive, learner-centred library where people of every learning level can access useful books, reliable resources and opportunities to grow through reading.</p></article>
+        <article class="purpose-card vision-card"><span class="purpose-icon">🌍</span><p class="eyebrow">OUR VISION</p><h2>A community of confident readers</h2><p>To nurture curious, informed and empowered learners who use knowledge, creativity and lifelong reading to build brighter futures for themselves and their communities.</p></article>
       </div>
+      <section class="home-services panel" aria-labelledby="servicesTitle">
+        <div class="section-header"><p class="eyebrow">WHAT YOU CAN DO HERE</p><h2 id="servicesTitle">More than a bookshelf</h2><p>Practical library services designed around the learner.</p></div>
+        <div class="home-feature-grid">
+          <article class="home-feature"><span>📚</span><h3>Explore the Lib Shelf</h3><p>Search books by title, author or category and discover your next read.</p></article>
+          <article class="home-feature"><span>🎫</span><h3>Digital membership</h3><p>Receive a member card with a unique library number, barcode and QR code.</p></article>
+          <article class="home-feature"><span>🔄</span><h3>Book borrowing</h3><p>Request available books and follow the status of requests and loans.</p></article>
+          <article class="home-feature"><span>💻</span><h3>Digital resources</h3><p>Access e-books and learning materials shared by the library.</p></article>
+          <article class="home-feature"><span>📈</span><h3>Learning activity</h3><p>Keep track of your library activity and build consistent reading habits.</p></article>
+          <article class="home-feature"><span>🤝</span><h3>Community updates</h3><p>Stay informed about announcements, reading activities and library events.</p></article>
+        </div>
+      </section>
+      <section class="home-journey panel" aria-labelledby="journeyTitle">
+        <div class="section-header"><p class="eyebrow">GETTING STARTED</p><h2 id="journeyTitle">Your library journey in three steps</h2></div>
+        <div class="journey-grid"><article><span class="journey-number">01</span><h3>Register</h3><p>Share your learner and parent or guardian details to request membership.</p></article><article><span class="journey-number">02</span><h3>Get approved</h3><p>The librarian reviews your request before borrowing features are unlocked.</p></article><article><span class="journey-number">03</span><h3>Read and grow</h3><p>Explore the catalogue, request books and keep your membership card handy.</p></article></div>
+      </section>
+      <section class="home-levels panel" aria-labelledby="levelsTitle">
+        <div class="section-header"><p class="eyebrow">LEARNING FOR EVERY STAGE</p><h2 id="levelsTitle">A place for every learner</h2><p>Explore resources that support different stages of education.</p></div>
+        <div class="level-chips"><span>PP & Pre-Primary</span><span>Primary</span><span>Junior Secondary</span><span>Senior Secondary</span><span>High School</span><span>University</span><span>General Reading</span></div>
+      </section>
+      <section class="home-values panel" aria-labelledby="valuesTitle">
+        <div class="section-header"><p class="eyebrow">OUR COMMITMENT</p><h2 id="valuesTitle">A library built around learners</h2></div>
+        <div class="values-grid"><article><h3>Inclusive access</h3><p>Learning should welcome people from different backgrounds and at different stages.</p></article><article><h3>Curiosity and discovery</h3><p>We encourage questions, exploration and the joy of finding something new in a book.</p></article><article><h3>Responsibility and care</h3><p>Members and staff share responsibility for respecting books, people and library spaces.</p></article></div>
+      </section>
+      <section class="home-cta"><div><p class="eyebrow">START YOUR NEXT CHAPTER</p><h2>There is always something new to discover.</h2><p>Join the AMG Library community and make reading part of your growth.</p></div><div class="hero-actions"><button class="btn btn-primary btn-lg" onclick="AMG.showSection('libShelfSection')">Browse books</button><button class="btn btn-secondary btn-lg" onclick="AMG.openAuthModal('register')">Join the library</button></div></section>
       <section class="panel" aria-labelledby="announcementsTitle">
         <div class="section-header"><h2 id="announcementsTitle">Library announcements</h2><p>Latest news and notices from AMG Library.</p></div>
         <div id="homeAnnouncements" class="announcement-grid"><p class="muted">Announcements will appear here when the library database is connected.</p></div>
@@ -154,9 +181,11 @@
       <div class="auth-form-panel">
       <div class="auth-tabs"><button id="loginModeBtn" class="pill active" onclick="AMG.setAuthMode('login')">Log In</button><button id="registerModeBtn" class="pill" onclick="AMG.setAuthMode('register')">Register</button></div>
       <h2 id="authTitle">Member Log In</h2>
-      <p class="muted auth-help">Use your registered email and password. Your full name is shown on your member profile and card.</p>
-      <form id="loginForm" class="form-stack"><label>Email address<input name="email" type="email" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required minlength="8"></label><button class="btn btn-primary">Log In</button><button class="text-button" type="button" onclick="AMG.resetPassword()">Forgot password?</button></form>
+      <p class="muted auth-help">Enter the librarian username or member account identifier and password. Passwords are verified by Firebase Authentication.</p>
+      <form id="loginForm" class="form-stack"><label>Name / username (member email also accepted)<input name="loginName" type="text" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button class="btn btn-primary">Log In</button><button class="text-button" type="button" onclick="AMG.resetPassword()">Forgot password?</button></form>
       <form id="registerForm" class="form-stack hidden">
+        <div id="registrationStepOne" class="registration-step">
+        <div class="step-progress"><span class="step-dot active">1</span><span class="step-line"></span><span class="step-dot">2</span><span class="step-caption">Learner details · Step 1 of 2</span></div>
         <h3>Step 1 — Learner details</h3>
         <label>Full name<input name="fullName" required minlength="2" maxlength="120" autocomplete="name"></label>
         <label>Email address<input name="email" type="email" required autocomplete="email"></label>
@@ -165,12 +194,21 @@
         <label>Level of study (e.g. Form 3, Grade 5, Year 1)<input name="studyLevel" required maxlength="80"></label>
         <label>Education level<select name="eduLevel"><option>PP / Pre-Primary</option><option>Primary</option><option>Junior Secondary</option><option>Senior Secondary</option><option>High School</option><option>University</option></select></label>
         <label>Password (at least 8 characters)<input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+        <button class="btn btn-primary" type="button" id="registrationNextBtn" onclick="AMG.nextRegistrationStep()">Continue to parent / guardian details →</button>
+        </div>
+        <div id="registrationStepTwo" class="registration-step hidden" aria-hidden="true">
+        <div class="step-progress"><span class="step-dot complete">✓</span><span class="step-line complete"></span><span class="step-dot active">2</span><span class="step-caption">Parent / guardian · Step 2 of 2</span></div>
         <h3>Step 2 — Parent or guardian</h3>
         <label>Parent / guardian full name<input name="guardianName" required maxlength="120"></label>
         <label>Relationship<select name="guardianRelation"><option>Mother</option><option>Father</option><option>Guardian</option></select></label>
         <label>Parent / guardian phone number<input name="guardianPhone" type="tel" required maxlength="30" placeholder="+254 7XX XXX XXX"></label>
-        <label>Profile photo (optional)<input name="photo" type="file" accept="image/*"></label>
-        <button class="btn btn-primary">Submit registration for approval</button>
+        <fieldset class="avatar-fieldset"><legend>Choose a profile picture (optional)</legend><p class="muted">Take a photo with your camera, or choose an avatar instead.</p>
+          <label class="camera-picker">📷 Take a photo<input name="photo" type="file" accept="image/*" capture="user"></label>
+          <label>Or choose an avatar<select name="avatarChoice" id="avatarChoice"><option value="scholar">Scholar</option><option value="reader">Book lover</option><option value="explorer">Explorer</option><option value="creative">Creative learner</option><option value="classic">Classic portrait</option></select></label>
+          <div class="avatar-preview-row"><img id="avatarPreview" src="https://api.dicebear.com/9.x/avataaars/svg?seed=AMG-Scholar" alt="Selected avatar preview"><span class="muted">You can use this avatar without uploading a photo.</span></div>
+        </fieldset>
+        <div class="registration-actions"><button class="btn btn-outline" type="button" onclick="AMG.previousRegistrationStep()">← Back</button><button class="btn btn-primary" type="submit">Submit registration for approval</button></div>
+        </div>
       </form>
       </div>
     </div>
