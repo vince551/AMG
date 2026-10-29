@@ -307,15 +307,15 @@ async function register(event) {
       const target = storageRef(state.storage, "member-photos/"+credential.user.uid+"/"+photo.name.replace(/[^a-zA-Z0-9._-]/g,"_"));
       await uploadBytes(target, photo, {contentType:photo.type});
       const photoURL = await getDownloadURL(target);
-      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,avatarChoice:null,updatedAt:serverTimestamp()});
+      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
       profile.photoURL = photoURL; state.profile.photoURL = photoURL;
     } else {
       const choice = String(form.get("avatarChoice") || "scholar");
       const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
       const photoURL = "https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[choice] || seeds.scholar);
-      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,avatarChoice:choice,updatedAt:serverTimestamp()});
-      profile.photoURL = photoURL; profile.avatarChoice = choice;
-      state.profile.photoURL = photoURL; state.profile.avatarChoice = choice;
+      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
+      profile.photoURL = photoURL;
+      state.profile.photoURL = photoURL;
     }
     event.currentTarget.reset();
     setRegistrationStep(1);
