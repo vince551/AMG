@@ -51,20 +51,38 @@
   <button id="themeToggle" class="theme-toggle theme-toggle-float" type="button" onclick="AMG.toggleTheme()" aria-label="Switch to dark theme" aria-pressed="false" title="Switch theme"><span id="themeIcon" aria-hidden="true">☾</span><span id="themeLabel">Dark mode</span></button>
 
     <section id="heroSection" class="section active">
-      <div class="hero">
-        <p class="eyebrow">AMG LIBRARY · YOUR LEARNING PARTNER</p>
-        <h1>Learn. Discover. Grow.</h1>
-        <p>Discover books, access digital resources, track your library activity and grow your knowledge — from PP to university.</p>
-        <div class="hero-actions">
-          <button class="btn btn-primary btn-lg" onclick="AMG.showSection('libShelfSection')">Explore the Lib Shelf</button>
-          <button class="btn btn-secondary btn-lg" onclick="AMG.openAuthModal('register')">Become a Member</button>
+      <div class="hero hero-editorial">
+        <div class="hero-copy">
+          <p class="eyebrow">AMG LIBRARY · YOUR GATEWAY TO KNOWLEDGE</p>
+          <h1>Open a Book.<br><span>Unlock a World.</span></h1>
+          <p class="hero-description">Discover books, explore new ideas and build a lifelong love of learning with AMG Library — from PP to university.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-lg" onclick="AMG.showSection('libShelfSection')">Explore the Library <span aria-hidden="true">→</span></button>
+            <button class="btn btn-secondary btn-lg" onclick="AMG.openAuthModal('login')">Learner Sign In</button>
+          </div>
+          <div class="hero-proof" aria-label="AMG Library benefits">
+            <span><i aria-hidden="true">✓</i> Discover books</span>
+            <span><i aria-hidden="true">✓</i> Access learning resources</span>
+            <span><i aria-hidden="true">✓</i> Grow through reading</span>
+          </div>
         </div>
         <div class="hero-gallery" aria-label="Learning at AMG Library">
           <img src="AMG.images/learn.jpg" alt="Learners discovering new knowledge" fetchpriority="high">
           <img src="AMG.images/soma.jpg" alt="Reading and study resources" loading="lazy">
           <img src="AMG.images/toto.jpg" alt="Learning for young readers" loading="lazy">
+          <div class="hero-image-note"><span class="hero-note-icon" aria-hidden="true">✦</span><span><strong>Every page opens a possibility.</strong><small>Learn · Discover · Grow</small></span></div>
         </div>
+        <div class="hero-bottom-line"><span>KNOWLEDGE FOR EVERY LEARNER</span><span>AMG LIBRARY <b>✳</b> LEARN. DISCOVER. GROW.</span></div>
       </div>
+      <section class="home-featured-section" aria-labelledby="featuredBooksTitle">
+        <div class="featured-heading">
+          <div><p class="eyebrow">FIND YOUR NEXT READ</p><h2 id="featuredBooksTitle">Stories, ideas and knowledge await.</h2><p>Explore books from the AMG Library catalogue.</p></div>
+          <button class="text-link-button" type="button" onclick="AMG.showSection('libShelfSection')">Browse all books <span aria-hidden="true">↗</span></button>
+        </div>
+        <div id="homeFeaturedBooks" class="featured-books-grid" aria-live="polite">
+          <p class="featured-empty">The featured collection will appear here when books are available in the library catalogue.</p>
+        </div>
+      </section>
       <section class="home-intro panel" aria-labelledby="aboutAmgTitle">
         <p class="eyebrow">ABOUT AMG LIBRARY</p><h2 id="aboutAmgTitle">A welcoming space to learn, read and grow</h2>
         <p>AMG Library connects learners with books, digital learning resources and a supportive reading community. From early learning to university, we help every member discover knowledge, build confidence and develop lifelong learning habits.</p>
