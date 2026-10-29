@@ -1,4 +1,5 @@
 # AMG Library
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/fdcaf279-c6fb-418e-968d-ab078e0bae8b" />
 
 Responsive library web app for learner membership, catalogue search, borrowing, librarian circulation, membership cards, attendance, e-books, announcements and statistics.
 
