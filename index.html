@@ -143,8 +143,8 @@
           <h2 id="adminWelcomeTitle">Your library, at a glance.</h2>
           <p>Keep books moving, welcome learners and stay on top of the day’s priorities.</p>
           <div class="admin-welcome-actions">
-            <button class="btn btn-primary" onclick="AMG.switchTab('booksAdminTab',this)">＋ Add a book</button>
-            <button class="btn admin-ghost" onclick="AMG.switchTab('attendanceTab',this)">⌁ Open attendance</button>
+            <button class="btn btn-primary" onclick="AMG.switchTab('booksAdminTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="booksAdminTab"]'))">＋ Add a book</button>
+            <button class="btn admin-ghost" onclick="AMG.switchTab('attendanceTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="attendanceTab"]'))">⌁ Open attendance</button>
           </div>
         </div>
         <div class="admin-welcome-art" aria-hidden="true">
@@ -155,10 +155,10 @@
         <div class="admin-date-strip"><span>STAFF CONSOLE</span><span id="adminWelcomeDate">Library management workspace</span></div>
       </section>
       <div class="admin-quick-grid" aria-label="Quick library actions">
-        <button class="admin-quick-card" onclick="AMG.switchTab('borrowRequestsTab',this)"><span class="admin-quick-icon quick-blue">↗</span><span><b>Circulation desk</b><small>Review and process requests</small></span><strong>→</strong></button>
-        <button class="admin-quick-card" onclick="AMG.switchTab('pendingLearnersTab',this)"><span class="admin-quick-icon quick-green">✓</span><span><b>Member approvals</b><small>Welcome new learners</small></span><strong>→</strong></button>
-        <button class="admin-quick-card" onclick="AMG.switchTab('ebooksTab',this)"><span class="admin-quick-icon quick-violet">▤</span><span><b>Digital library</b><small>Publish reading resources</small></span><strong>→</strong></button>
-        <button class="admin-quick-card" onclick="AMG.switchTab('statisticsTab',this)"><span class="admin-quick-icon quick-amber">⌁</span><span><b>Library insights</b><small>Explore usage and trends</small></span><strong>→</strong></button>
+        <button class="admin-quick-card" onclick="AMG.switchTab('borrowRequestsTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="borrowRequestsTab"]'))"><span class="admin-quick-icon quick-blue">↗</span><span><b>Circulation desk</b><small>Review and process requests</small></span><strong>→</strong></button>
+        <button class="admin-quick-card" onclick="AMG.switchTab('pendingLearnersTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="pendingLearnersTab"]'))"><span class="admin-quick-icon quick-green">✓</span><span><b>Member approvals</b><small>Welcome new learners</small></span><strong>→</strong></button>
+        <button class="admin-quick-card" onclick="AMG.switchTab('ebooksTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="ebooksTab"]'))"><span class="admin-quick-icon quick-violet">▤</span><span><b>Digital library</b><small>Publish reading resources</small></span><strong>→</strong></button>
+        <button class="admin-quick-card" onclick="AMG.switchTab('statisticsTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="statisticsTab"]'))"><span class="admin-quick-icon quick-amber">⌁</span><span><b>Library insights</b><small>Explore usage and trends</small></span><strong>→</strong></button>
       </div>
       <div class="admin-overview-grid">
         <section class="admin-overview-panel">
@@ -169,7 +169,7 @@
           <div class="admin-panel-heading"><div><span class="admin-kicker">SPACE & SAFETY</span><h3>Library occupancy</h3></div><span class="admin-panel-mark">02</span></div>
           <div class="occupancy-number"><strong id="dashboardOccupancyCount">—</strong><span id="dashboardOccupancyCapacity">of — seats used</span></div>
           <div class="occupancy-track"><span id="dashboardOccupancyBar"></span></div>
-          <div class="occupancy-footer"><span><i class="occupancy-dot"></i> Currently in library</span><button onclick="AMG.switchTab('attendanceTab',this)">Manage attendance ↗</button></div>
+          <div class="occupancy-footer"><span><i class="occupancy-dot"></i> Currently in library</span><button onclick="AMG.switchTab('attendanceTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="attendanceTab"]'))">Manage attendance ↗</button></div>
         </section>
       </div>
       <div class="admin-command-hero">
@@ -190,14 +190,14 @@
       <div class="admin-stats-heading"><div><p class="eyebrow">LIVE OVERVIEW</p><h3>Library snapshot</h3></div><span>Figures update from available library records</span></div>
       <div class="stats-grid admin-stats-grid" id="adminStats"></div>
       <div class="tabs admin-tabs" role="tablist">
-        <button id="borrowRequestsTabButton" class="tab-btn active" onclick="AMG.switchTab('borrowRequestsTab',this)">Borrow requests</button>
-        <button class="tab-btn" onclick="AMG.switchTab('pendingLearnersTab',this)">Learner approvals</button>
+        <button id="borrowRequestsTabButton" class="tab-btn active" onclick="AMG.switchTab('borrowRequestsTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="borrowRequestsTab"]'))">Borrow requests</button>
+        <button class="tab-btn" onclick="AMG.switchTab('pendingLearnersTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="pendingLearnersTab"]'))">Learner approvals</button>
         <button class="tab-btn" onclick="AMG.switchTab('allLearnersTab',this)">Members & cards</button>
-        <button id="booksAdminTabButton" class="tab-btn" onclick="AMG.switchTab('booksAdminTab',this)">Book inventory</button>
-        <button id="attendanceTabButton" class="tab-btn" onclick="AMG.switchTab('attendanceTab',this)">Attendance</button>
-        <button class="tab-btn" onclick="AMG.switchTab('ebooksTab',this)">E-books</button>
+        <button id="booksAdminTabButton" class="tab-btn" onclick="AMG.switchTab('booksAdminTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="booksAdminTab"]'))">Book inventory</button>
+        <button id="attendanceTabButton" class="tab-btn" onclick="AMG.switchTab('attendanceTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="attendanceTab"]'))">Attendance</button>
+        <button class="tab-btn" onclick="AMG.switchTab('ebooksTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="ebooksTab"]'))">E-books</button>
         <button class="tab-btn" onclick="AMG.switchTab('newsAdminTab',this)">News & events</button>
-        <button id="statisticsTabButton" class="tab-btn" onclick="AMG.switchTab('statisticsTab',this)">Statistics</button>
+        <button id="statisticsTabButton" class="tab-btn" onclick="AMG.switchTab('statisticsTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="statisticsTab"]'))">Statistics</button>
       </div>
       <div id="borrowRequestsTab" class="tab-content active"><h3>Borrowing requests</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Learner</th><th>Book</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody id="borrowRequestsTable"></tbody></table></div></div>
       <div id="pendingLearnersTab" class="tab-content"><h3>Learners awaiting approval</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Name</th><th>School</th><th>Level</th><th>Guardian contact</th><th>Actions</th></tr></thead><tbody id="pendingLearnersTable"></tbody></table></div></div>
