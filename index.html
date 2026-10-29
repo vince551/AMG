@@ -23,7 +23,8 @@
 <body>
   <header class="navbar">
     <button class="nav-brand" onclick="AMG.showSection('heroSection')" aria-label="AMG Library home"><img src="AMG.images/logo.jpg" alt="" class="brand-mark"> <span>AMG <b>LIBRARY</b></span></button>
-    <nav class="nav-links" aria-label="Main navigation">
+    <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mainNavLinks" onclick="AMG.toggleMobileNav()">☰ <span>Menu</span></button>
+    <nav id="mainNavLinks" class="nav-links" aria-label="Main navigation">
       <button class="nav-btn" onclick="AMG.showSection('heroSection')">Home</button>
       <button class="nav-btn" onclick="AMG.showSection('libShelfSection')">Lib Shelf</button>
       <button class="nav-btn" onclick="AMG.showSection('newsSection')">News & Events</button>
@@ -217,6 +218,9 @@
         <button class="tab-btn" onclick="AMG.switchTab('newsAdminTab',this)">News & events</button>
         <button id="statisticsTabButton" class="tab-btn" onclick="AMG.switchTab('statisticsTab',document.querySelector('#librarianSection .admin-tabs .tab-btn[onclick*="statisticsTab"]'))">Statistics</button>
       </div>
+      <label class="admin-mobile-tab-picker" for="adminMobileTabSelect">Dashboard section<select id="adminMobileTabSelect" aria-label="Choose dashboard section" onchange="AMG.switchTab(this.value,null)">
+        <option value="borrowRequestsTab">Borrow requests</option><option value="pendingLearnersTab">Learner approvals</option><option value="allLearnersTab">Members &amp; cards</option><option value="booksAdminTab">Book inventory</option><option value="attendanceTab">Attendance</option><option value="ebooksTab">E-books</option><option value="newsAdminTab">News &amp; events</option><option value="statisticsTab">Statistics</option>
+      </select></label>
       <div id="borrowRequestsTab" class="tab-content active"><h3>Borrowing requests</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Learner</th><th>Book</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody id="borrowRequestsTable"></tbody></table></div></div>
       <div id="pendingLearnersTab" class="tab-content"><h3>Learners awaiting approval</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Name</th><th>School</th><th>Level</th><th>Guardian contact</th><th>Actions</th></tr></thead><tbody id="pendingLearnersTable"></tbody></table></div></div>
       <div id="allLearnersTab" class="tab-content"><h3>Registered members</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Library #</th><th>Name</th><th>School / Level</th><th>Status</th><th>Card</th></tr></thead><tbody id="allLearnersTable"></tbody></table></div></div>
