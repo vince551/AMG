@@ -5,7 +5,8 @@
   "version": "2.0.0",
   "description": "AMG Library web portal",
   "scripts": {
-    "test": "node --check app.js && node --check firebase-config.js && node --check scripts/set-librarian-claim.cjs",
+    "build": "node scripts/build-static.mjs",
+    "test": "node --check app.js && node --check firebase-config.js && node --check scripts/set-librarian-claim.cjs && node --check scripts/build-static.mjs && npm run build && test -f dist/index.html && test -f dist/app.js && test -f dist/firebase-config.js",
     "set-librarian": "node scripts/set-librarian-claim.cjs"
   },
   "devDependencies": {
