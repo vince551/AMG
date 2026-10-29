@@ -1,6 +1,6 @@
 // AMG Library Firebase client configuration.
 // These values are public client identifiers, NOT admin secrets.
-// Replace the placeholders with the config from Firebase Console > Project settings > Your apps.
+// Replace every placeholder with the config from Firebase Console > Project settings > Your apps.
 // Never place a service-account JSON, private key, or Admin SDK credential in this file.
 export const firebaseConfig = {
   apiKey: "REPLACE_WITH_FIREBASE_API_KEY",
@@ -12,9 +12,6 @@ export const firebaseConfig = {
 };
 
 export const isFirebaseConfigured = () =>
-  firebaseConfig.apiKey &&
-  !firebaseConfig.apiKey.startsWith("REPLACE_") &&
-  firebaseConfig.projectId &&
-  !firebaseConfig.projectId.startsWith("REPLACE_") &&
-  firebaseConfig.appId &&
-  !firebaseConfig.appId.startsWith("REPLACE_");
+  Object.values(firebaseConfig).every(
+    (value) => typeof value === "string" && value.length > 0 && !value.startsWith("REPLACE_")
+  );
