@@ -1872,3 +1872,187 @@ html.amg-compact-device .modal { align-items:flex-start; padding:.45rem; }
 html.amg-compact-device .modal-content { width:100%; max-width:100%; max-height:calc(100dvh - .9rem); }
 html.amg-compact-device .site-footer { padding:1rem .7rem; gap:.7rem; }
 @media (max-width:420px) { html.amg-compact-device #heroSection .featured-books-grid, html.amg-compact-device .book-grid, html.amg-compact-device #librarianSection .admin-quick-grid { grid-template-columns:minmax(0,1fr); } }
+
+
+/* Chrome "Desktop site" on a physically small touch screen:
+   keep the desktop viewport from activating half of the desktop composition.
+   These rules are gated by the html class set only in that browser mode. */
+html.amg-compact-device {
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
+html.amg-compact-device body,
+html.amg-compact-device main {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  margin-left:auto;
+  margin-right:auto;
+  overflow-x:hidden;
+}
+html.amg-compact-device .container,
+html.amg-compact-device .section,
+html.amg-compact-device .panel,
+html.amg-compact-device .toolbar,
+html.amg-compact-device .site-footer,
+html.amg-compact-device #heroSection,
+html.amg-compact-device #libShelfSection,
+html.amg-compact-device #profileSection,
+html.amg-compact-device #newsSection,
+html.amg-compact-device #librarianSection {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+html.amg-compact-device .container { box-sizing:border-box; }
+html.amg-compact-device .section *,
+html.amg-compact-device .panel *,
+html.amg-compact-device .toolbar *,
+html.amg-compact-device #librarianSection * {
+  min-width:0;
+}
+html.amg-compact-device #heroSection .hero-editorial,
+html.amg-compact-device #heroSection > .hero,
+html.amg-compact-device #heroSection .hero-copy,
+html.amg-compact-device #heroSection .hero-gallery,
+html.amg-compact-device #heroSection .home-purpose-grid,
+html.amg-compact-device #heroSection .home-feature-grid,
+html.amg-compact-device #heroSection .featured-books-grid,
+html.amg-compact-device #heroSection .journey-grid,
+html.amg-compact-device #heroSection .values-grid,
+html.amg-compact-device #heroSection .announcement-grid {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+html.amg-compact-device #heroSection .hero-editorial,
+html.amg-compact-device #heroSection > .hero {
+  grid-template-columns:minmax(0,1fr);
+}
+html.amg-compact-device #heroSection .home-purpose-grid,
+html.amg-compact-device #heroSection .journey-grid,
+html.amg-compact-device #heroSection .values-grid,
+html.amg-compact-device #heroSection .announcement-grid {
+  grid-template-columns:minmax(0,1fr);
+}
+html.amg-compact-device #heroSection .home-feature-grid,
+html.amg-compact-device #heroSection .featured-books-grid {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+html.amg-compact-device .info-grid,
+html.amg-compact-device .profile-layout,
+html.amg-compact-device .form-grid,
+html.amg-compact-device .inline-form,
+html.amg-compact-device .admin-overview-grid,
+html.amg-compact-device .admin-welcome,
+html.amg-compact-device .admin-command-hero {
+  grid-template-columns:minmax(0,1fr);
+}
+html.amg-compact-device .admin-quick-grid,
+html.amg-compact-device .admin-stats-grid,
+html.amg-compact-device .stats-grid,
+html.amg-compact-device .admin-command-actions {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+html.amg-compact-device .admin-priority-row {
+  grid-template-columns:30px minmax(0,1fr) auto;
+  gap:.45rem;
+}
+html.amg-compact-device .admin-priority-row > *,
+html.amg-compact-device .admin-welcome > *,
+html.amg-compact-device .admin-overview-grid > *,
+html.amg-compact-device .admin-command-hero > *,
+html.amg-compact-device .admin-command-actions > * {
+  min-width:0;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+html.amg-compact-device .toolbar {
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:.65rem;
+}
+html.amg-compact-device .toolbar input,
+html.amg-compact-device .toolbar select,
+html.amg-compact-device .toolbar button,
+html.amg-compact-device .form-grid input,
+html.amg-compact-device .form-grid select,
+html.amg-compact-device .form-grid textarea,
+html.amg-compact-device .inline-form input,
+html.amg-compact-device .inline-form select,
+html.amg-compact-device .inline-form textarea,
+html.amg-compact-device .form-stack input,
+html.amg-compact-device .form-stack select,
+html.amg-compact-device .form-stack button {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+html.amg-compact-device .table-responsive {
+  display:block;
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+}
+html.amg-compact-device .data-table,
+html.amg-compact-device #librarianSection table {
+  width:max-content;
+  min-width:100%;
+  max-width:none;
+  border-collapse:separate;
+}
+html.amg-compact-device .data-table th,
+html.amg-compact-device .data-table td,
+html.amg-compact-device #librarianSection table th,
+html.amg-compact-device #librarianSection table td {
+  white-space:nowrap;
+}
+html.amg-compact-device .bar-row {
+  grid-template-columns:minmax(64px,1fr) minmax(40px,2fr) 28px;
+  gap:.35rem;
+  overflow-wrap:anywhere;
+}
+html.amg-compact-device .modal {
+  align-items:flex-start;
+  justify-content:center;
+  padding:.45rem;
+}
+html.amg-compact-device .modal-content {
+  width:100%;
+  max-width:100%;
+  max-height:calc(100dvh - .9rem);
+  box-sizing:border-box;
+}
+html.amg-compact-device .modal-content.auth-modal {
+  grid-template-columns:minmax(0,1fr);
+  width:100%;
+  max-width:520px;
+  overflow:auto;
+}
+html.amg-compact-device .auth-art {
+  min-width:0;
+}
+html.amg-compact-device .auth-form-panel {
+  min-width:0;
+  padding:1rem;
+}
+html.amg-compact-device .site-footer {
+  box-sizing:border-box;
+  overflow-wrap:anywhere;
+}
+@media (max-width:420px) {
+  html.amg-compact-device #heroSection .home-feature-grid,
+  html.amg-compact-device #heroSection .featured-books-grid,
+  html.amg-compact-device .book-grid,
+  html.amg-compact-device .admin-quick-grid,
+  html.amg-compact-device .admin-stats-grid,
+  html.amg-compact-device .stats-grid,
+  html.amg-compact-device .admin-command-actions {
+    grid-template-columns:minmax(0,1fr);
+  }
+}
