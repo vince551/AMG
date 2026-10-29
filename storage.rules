@@ -1,0 +1,32 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function librarian() {
+      return signedIn() && request.auth.token.librarian == true;
+    }
+
+    match /member-photos/{uid}/{fileName} {
+      allow read: if signedIn() && (request.auth.uid == uid || librarian());
+      allow write: if signedIn() && request.auth.uid == uid
+        && (request.resource == null
+          || (request.resource.size < 5 * 1024 * 1024
+            && request.resource.contentType.matches('image/.*')));
+    }
+
+    match /ebooks/{fileName} {
+      allow read: if signedIn();
+      allow write: if librarian()
+        && (request.resource == null
+          || (request.resource.size < 30 * 1024 * 1024
+            && (request.resource.contentType == 'application/pdf'
+              || request.resource.contentType.matches('application/epub\\+zip'))));
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

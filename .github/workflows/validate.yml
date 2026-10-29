@@ -1,0 +1,41 @@
+name: Validate AMG Library
+on:
+  push:
+    branches:
+      - feature/firebase-library-upgrade
+      - main
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  syntax-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install tooling
+        run: npm install --ignore-scripts
+      - name: Check JavaScript syntax and static build
+        run: npm test
+  firebase-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Set up Java for Firebase emulators
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Compile Firestore and Storage rules with emulators
+        run: npx --yes firebase-tools@14.7.0 emulators:exec --only firestore,storage --project demo-amg-library "echo Firebase security rules compiled"

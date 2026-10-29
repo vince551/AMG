@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="AMG Library — learner membership, book discovery, borrowing, e-books and library services.">
+  <title>AMG Library | Learn. Discover. Grow.</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+</head>
+<body>
+  <header class="navbar">
+    <button class="nav-brand" onclick="AMG.showSection('heroSection')" aria-label="AMG Library home"><span>📚</span> AMG LIBRARY</button>
+    <nav class="nav-links" aria-label="Main navigation">
+      <button class="nav-btn" onclick="AMG.showSection('heroSection')">Home</button>
+      <button class="nav-btn" onclick="AMG.showSection('libShelfSection')">Lib Shelf</button>
+      <button class="nav-btn" onclick="AMG.showSection('newsSection')">News & Events</button>
+      <button class="nav-btn hidden" id="navProfileBtn" onclick="AMG.showSection('profileSection')">My Profile</button>
+      <button class="nav-btn hidden" id="navLibrarianBtn" onclick="AMG.showSection('librarianSection')">Librarian Desk</button>
+      <div id="memberDropdown" class="dropdown">
+        <button class="btn btn-primary" onclick="AMG.toggleDropdown()">Become a Member ▾</button>
+        <div id="dropdownMenu" class="dropdown-content">
+          <button onclick="AMG.openAuthModal('login')">Log In</button>
+          <button onclick="AMG.openAuthModal('register')">Register</button>
+        </div>
+      </div>
+      <div id="userBadge" class="user-badge hidden">
+        <span id="navUserName">Learner</span>
+        <button class="btn btn-sm btn-outline" onclick="AMG.logout()">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div id="setupNotice" class="notice notice-warning hidden" role="status">
+      <strong>Firebase setup required.</strong> The interface is ready, but this deployment is not connected to a Firebase project yet. Add your web app config to <code>firebase-config.js</code>, enable Email/Password Authentication, then deploy the included Firestore and Storage rules. See README.md.
+    </div>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <section id="heroSection" class="section active">
+      <div class="hero">
+        <p class="eyebrow">AMG LIBRARY · YOUR LEARNING PARTNER</p>
+        <h1>Learn. Discover. Grow.</h1>
+        <p>Discover books, access digital resources, track your library activity and grow your knowledge — from PP to university.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" onclick="AMG.showSection('libShelfSection')">Explore the Lib Shelf</button>
+          <button class="btn btn-secondary btn-lg" onclick="AMG.openAuthModal('register')">Become a Member</button>
+        </div>
+      </div>
+      <div class="info-grid">
+        <article class="info-card"><span class="icon">📖</span><h3>Discover books</h3><p>Search the library catalogue and browse by learning level or category.</p></article>
+        <article class="info-card"><span class="icon">🎫</span><h3>Digital membership card</h3><p>Get a membership card with a unique library number, barcode and QR code.</p></article>
+        <article class="info-card"><span class="icon">⚡</span><h3>Simple borrowing</h3><p>Request books online and track the status of each request and loan.</p></article>
+      </div>
+      <section class="panel" aria-labelledby="announcementsTitle">
+        <div class="section-header"><h2 id="announcementsTitle">Library announcements</h2><p>Latest news and notices from AMG Library.</p></div>
+        <div id="homeAnnouncements" class="announcement-grid"><p class="muted">Announcements will appear here when the library database is connected.</p></div>
+      </section>
+    </section>
+
+    <section id="libShelfSection" class="section">
+      <div class="section-header"><h2>Lib Shelf</h2><p>Search the catalogue, star favourites and request available books.</p></div>
+      <div class="toolbar">
+        <input id="searchInput" class="search-input" type="search" placeholder="Search by book title, author or category…" aria-label="Search books">
+        <select id="categoryFilter" aria-label="Filter by category">
+          <option value="All">All categories</option><option value="Starred">⭐ Starred</option><option>PP / Pre-Primary</option><option>Primary</option><option>Junior Secondary</option><option>Senior Secondary</option><option>High School</option><option>University</option><option>General / Fiction</option><option>Other</option>
+        </select>
+      </div>
+      <div id="bookGrid" class="book-grid"><div class="empty-state">Connect Firebase and register books to populate the Lib Shelf.</div></div><section class="panel"><div class="section-header"><h2>Digital library</h2><p>Download e-books shared by the librarian. Sign in to access files.</p></div><div id="publicEbooks" class="announcement-grid"><p class="muted">Sign in to view available e-books.</p></div></section>
+    </section>
+
+    <section id="profileSection" class="section">
+      <div class="section-header"><h2>My learner profile</h2><p>Your membership information, card, requests and loan history.</p></div>
+      <div id="pendingApprovalNotice" class="notice notice-warning hidden">Your registration is awaiting librarian approval. You can explore the catalogue while you wait.</div>
+      <div class="profile-layout">
+        <div class="card-preview-wrapper">
+          <div id="learnerProfileCard" class="library-card">
+            <div class="card-header"><div class="brand"><span class="brand-logo">📚</span><div><div class="brand-title">AMG LIBRARY</div><div class="brand-subtitle">Official Student Membership</div></div></div></div>
+            <div class="card-body"><img id="cardImage" class="card-photo" alt="Learner profile photo"><div class="card-info"><h3 id="cardFullName">Learner Name</h3><p><strong>School:</strong> <span id="cardSchool">—</span></p><p><strong>Study:</strong> <span id="cardStudyLevel">—</span></p><p><strong>Level:</strong> <span id="cardEduLevel" class="badge">—</span></p></div></div>
+            <div class="card-footer"><svg id="memberBarcode" aria-label="Membership barcode"></svg><div id="cardLibraryNum" class="library-number">AMG-000000</div><div id="memberQr" class="qr-holder"></div></div>
+          </div>
+          <div class="card-actions"><button class="btn btn-primary" onclick="AMG.downloadCard('learnerProfileCard')">Download membership card</button><label class="btn btn-outline upload-label">Update photo<input id="profilePhotoInput" type="file" accept="image/*" hidden></label></div>
+        </div>
+        <div class="panel"><h3>My requests and loans</h3><div id="myLoansList" class="stack-list"><p class="muted">Your requests will appear here after login.</p></div><div class="section-header top-gap"><h3>My library activity</h3></div><div id="learnerStats" class="stats-grid"></div></div>
+      </div>
+    </section>
+
+    <section id="newsSection" class="section">
+      <div class="section-header"><h2>News & Events</h2><p>Library notices, upcoming events and learning opportunities.</p></div>
+      <div id="announcementsList" class="announcement-grid"><p class="muted">News and events will appear here when the database is connected.</p></div>
+    </section>
+
+    <section id="librarianSection" class="section">
+      <div class="section-header"><p class="eyebrow">STAFF WORKSPACE</p><h2 id="librarianHeading">Librarian Desk</h2><p>Manage membership, catalogue, circulation, e-books, attendance and library statistics.</p></div>
+      <div class="notice notice-success">Librarian access is granted through Firebase custom claims. A visible button alone never grants administrative permissions.</div>
+      <div class="stats-grid" id="adminStats"></div>
+      <div class="tabs admin-tabs" role="tablist">
+        <button class="tab-btn active" onclick="AMG.switchTab('borrowRequestsTab',this)">Borrow requests</button>
+        <button class="tab-btn" onclick="AMG.switchTab('pendingLearnersTab',this)">Learner approvals</button>
+        <button class="tab-btn" onclick="AMG.switchTab('allLearnersTab',this)">Members & cards</button>
+        <button class="tab-btn" onclick="AMG.switchTab('booksAdminTab',this)">Book inventory</button>
+        <button class="tab-btn" onclick="AMG.switchTab('attendanceTab',this)">Attendance</button>
+        <button class="tab-btn" onclick="AMG.switchTab('ebooksTab',this)">E-books</button>
+        <button class="tab-btn" onclick="AMG.switchTab('newsAdminTab',this)">News & events</button>
+        <button class="tab-btn" onclick="AMG.switchTab('statisticsTab',this)">Statistics</button>
+      </div>
+      <div id="borrowRequestsTab" class="tab-content active"><h3>Borrowing requests</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Learner</th><th>Book</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody id="borrowRequestsTable"></tbody></table></div></div>
+      <div id="pendingLearnersTab" class="tab-content"><h3>Learners awaiting approval</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Name</th><th>School</th><th>Level</th><th>Guardian contact</th><th>Actions</th></tr></thead><tbody id="pendingLearnersTable"></tbody></table></div></div>
+      <div id="allLearnersTab" class="tab-content"><h3>Registered members</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Library #</th><th>Name</th><th>School / Level</th><th>Status</th><th>Card</th></tr></thead><tbody id="allLearnersTable"></tbody></table></div></div>
+      <div id="booksAdminTab" class="tab-content">
+        <h3>Register a book</h3><form id="bookForm" class="form-grid">
+          <label>Book title<input name="title" required maxlength="160"></label><label>Author<input name="author" required maxlength="120"></label>
+          <label>Category<select name="category" required><option>PP / Pre-Primary</option><option>Primary</option><option>Junior Secondary</option><option>Senior Secondary</option><option>High School</option><option>University</option><option>General / Fiction</option><option>Other</option></select></label>
+          <label>Total copies<input name="quantity" type="number" min="1" max="5000" value="1" required></label>
+          <label>Cover image URL (optional)<input name="coverUrl" type="url" placeholder="https://…"></label><label>Short description (optional)<input name="description" maxlength="500"></label>
+          <button class="btn btn-primary" type="submit">Register book & generate barcode</button>
+        </form>
+        <h3 class="top-gap">Current inventory</h3><div class="table-responsive"><table class="data-table"><thead><tr><th>Barcode / Library #</th><th>Book</th><th>Category</th><th>Available / Total</th><th>Actions</th></tr></thead><tbody id="inventoryTable"></tbody></table></div>
+      </div>
+      <div id="attendanceTab" class="tab-content"><h3>Member check-in / check-out</h3><p class="muted">Scan the membership barcode or enter the library number below. Camera scanning requires a supported browser and permission.</p><form id="attendanceForm" class="inline-form"><label>Library number or barcode<input name="libraryNumber" required placeholder="AMG-…"></label><label>Action<select name="action"><option value="check-in">Check in</option><option value="check-out">Check out</option></select></label><button class="btn btn-primary">Record attendance</button></form><button id="startScannerBtn" class="btn btn-outline top-gap">Start camera scanner</button><div id="scannerBox" class="scanner-box hidden"><video id="scannerVideo" playsinline></video><button id="stopScannerBtn" class="btn btn-secondary">Stop scanner</button></div><p id="currentCapacity" class="notice notice-info">Library capacity: loading…</p><form id="capacityForm" class="inline-form"><label>Maximum capacity<input name="capacity" type="number" min="1" max="10000" required></label><button class="btn btn-outline">Update capacity</button></form><div class="table-responsive"><table class="data-table"><thead><tr><th>Member</th><th>Library #</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead><tbody id="attendanceTable"></tbody></table></div></div>
+      <div id="ebooksTab" class="tab-content"><h3>Upload e-books</h3><form id="ebookForm" class="form-grid"><label>Title<input name="title" required maxlength="160"></label><label>Category<input name="category" required maxlength="80"></label><label>PDF or EPUB file<input name="file" type="file" accept=".pdf,.epub,application/pdf,application/epub+zip" required></label><button class="btn btn-primary">Upload e-book</button></form><div id="ebooksList" class="stack-list top-gap"></div></div>
+      <div id="newsAdminTab" class="tab-content"><h3>Publish news or an event</h3><form id="newsForm" class="form-grid"><label>Type<select name="type"><option value="announcement">News / Announcement</option><option value="event">Event</option></select></label><label>Title<input name="title" required maxlength="160"></label><label>Event date (optional)<input name="date" type="date"></label><label class="full-span">Message<textarea name="body" rows="4" required maxlength="3000"></textarea></label><button class="btn btn-primary">Publish update</button></form><div id="adminNewsList" class="stack-list top-gap"></div></div>
+      <div id="statisticsTab" class="tab-content"><h3>Library activity statistics</h3><p class="muted">Statistics are calculated from Firestore records. They update when the dashboard is refreshed.</p><div id="statisticsSummary" class="stats-grid"></div><div class="chart-panel"><h4>Borrow requests by status</h4><div id="borrowChart" class="bar-chart"></div></div><div class="chart-panel"><h4>Members by education level</h4><div id="educationChart" class="bar-chart"></div></div><div class="chart-panel"><h4>Attendance by day (latest records)</h4><div id="attendanceChart" class="bar-chart"></div></div><div class="chart-panel"><h4>Borrow requests by book category</h4><div id="categoryBorrowChart" class="bar-chart"></div></div><div class="chart-panel"><h4>Members by gender</h4><div id="genderChart" class="bar-chart"></div></div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><span>© <span id="year"></span> AMG Library</span><span>Learn. Discover. Grow.</span></footer>
+
+  <div id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-content auth-modal"><button class="close-btn" onclick="AMG.closeAuthModal()" aria-label="Close">×</button>
+      <div class="auth-tabs"><button id="loginModeBtn" class="pill active" onclick="AMG.setAuthMode('login')">Log In</button><button id="registerModeBtn" class="pill" onclick="AMG.setAuthMode('register')">Register</button></div>
+      <h2 id="authTitle">Member Log In</h2>
+      <p class="muted auth-help">Use your registered email and password. Your full name is shown on your member profile and card.</p>
+      <form id="loginForm" class="form-stack"><label>Email address<input name="email" type="email" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required minlength="8"></label><button class="btn btn-primary">Log In</button><button class="text-button" type="button" onclick="AMG.resetPassword()">Forgot password?</button></form>
+      <form id="registerForm" class="form-stack hidden">
+        <h3>Step 1 — Learner details</h3>
+        <label>Full name<input name="fullName" required minlength="2" maxlength="120" autocomplete="name"></label>
+        <label>Email address<input name="email" type="email" required autocomplete="email"></label>
+        <label>Gender<select name="gender"><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select></label>
+        <label>School<input name="school" required maxlength="160"></label>
+        <label>Level of study (e.g. Form 3, Grade 5, Year 1)<input name="studyLevel" required maxlength="80"></label>
+        <label>Education level<select name="eduLevel"><option>PP / Pre-Primary</option><option>Primary</option><option>Junior Secondary</option><option>Senior Secondary</option><option>High School</option><option>University</option></select></label>
+        <label>Password (at least 8 characters)<input name="password" type="password" minlength="8" required autocomplete="new-password"></label>
+        <h3>Step 2 — Parent or guardian</h3>
+        <label>Parent / guardian full name<input name="guardianName" required maxlength="120"></label>
+        <label>Relationship<select name="guardianRelation"><option>Mother</option><option>Father</option><option>Guardian</option></select></label>
+        <label>Parent / guardian phone number<input name="guardianPhone" type="tel" required maxlength="30" placeholder="+254 7XX XXX XXX"></label>
+        <label>Profile photo (optional)<input name="photo" type="file" accept="image/*"></label>
+        <button class="btn btn-primary">Submit registration for approval</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="cardModal" class="modal" role="dialog" aria-modal="true"><div class="modal-content card-modal-content"><button class="close-btn" onclick="AMG.closeCardModal()">×</button><div id="adminCardTarget" class="library-card"><div class="card-header"><div class="brand"><span class="brand-logo">📚</span><div><div class="brand-title">AMG LIBRARY</div><div class="brand-subtitle">Official Student Membership</div></div></div></div><div class="card-body"><img id="adminCardImage" class="card-photo" alt="Member photo"><div class="card-info"><h3 id="adminCardName"></h3><p><strong>School:</strong> <span id="adminCardSchool"></span></p><p><strong>Study:</strong> <span id="adminCardStudy"></span></p><p><strong>Level:</strong> <span id="adminCardLevel" class="badge"></span></p></div></div><div class="card-footer"><svg id="adminMemberBarcode"></svg><div id="adminCardNumber" class="library-number"></div><div id="adminMemberQr" class="qr-holder"></div></div></div><button class="btn btn-primary top-gap" onclick="AMG.downloadCard('adminCardTarget')">Download member card</button></div></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
