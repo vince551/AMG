@@ -425,7 +425,49 @@ function toggleStar(bookId) {
   localStorage.setItem("amg_starred_"+(state.user?.uid||"guest"),JSON.stringify(next));
   renderBooks();
 }
+function renderFeaturedBooks() {
+  const container = $("homeFeaturedBooks");
+  if (!container) return;
+  container.replaceChildren();
+  const books = state.books.slice(0, 4);
+  if (!books.length) {
+    const message = node("p", "The featured collection will appear here when books are available in the library catalogue.", "featured-empty");
+    const action = node("button", "Explore the Lib Shelf →", "btn btn-outline featured-empty-action");
+    action.type = "button";
+    action.addEventListener("click", () => showSection("libShelfSection"));
+    container.append(message, action);
+    return;
+  }
+  books.forEach(book => {
+    const card = node("article", null, "featured-book-card");
+    const cover = node("div", null, "featured-book-cover");
+    if (book.coverUrl) {
+      const image = node("img");
+      image.src = book.coverUrl;
+      image.alt = "Cover of " + (book.title || "book");
+      image.loading = "lazy";
+      cover.append(image);
+    } else {
+      cover.append(node("span", book.icon || "📚", "featured-cover-placeholder"));
+    }
+    const details = node("div", null, "featured-book-details");
+    details.append(
+      node("span", book.category || "Library collection", "featured-book-category"),
+      node("h3", book.title || "Untitled book"),
+      node("p", "by " + (book.author || "Unknown author"), "featured-book-author")
+    );
+    const available = Math.max(0, Number(book.available || 0));
+    details.append(node("span", available > 0 ? "Available to request" : "Currently unavailable", "featured-availability" + (available > 0 ? " is-available" : "")));
+    const action = node("button", "View in catalogue →", "featured-book-link");
+    action.type = "button";
+    action.addEventListener("click", () => showSection("libShelfSection"));
+    details.append(action);
+    card.append(cover, details);
+    container.append(card);
+  });
+}
 function renderBooks() {
+  renderFeaturedBooks();
   const grid = $("bookGrid");
   if (!grid) return;
   const search = ($("searchInput")?.value||"").trim().toLowerCase();
