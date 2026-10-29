@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "AMG Library",
+  "short_name": "AMG Library",
+  "description": "Discover books, access learning resources and manage your AMG Library membership.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f8fc",
+  "theme_color": "#087f5b",
+  "icons": [
+    {
+      "src": "AMG.images/logo.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
