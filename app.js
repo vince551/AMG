@@ -92,6 +92,7 @@ function init() {
   $("categoryFilter").addEventListener("change", renderBooks);
   $("loginForm").addEventListener("submit", login);
   $("registerForm").addEventListener("submit", register);
+  $("avatarChoice").addEventListener("change", updateAvatarPreview);
   $("bookForm").addEventListener("submit", registerBook);
   $("attendanceForm").addEventListener("submit", recordAttendance);
   $("capacityForm").addEventListener("submit", updateCapacity);
@@ -203,20 +204,75 @@ function setAuthMode(mode) {
   $("loginModeBtn").classList.toggle("active", !registerMode);
   $("registerModeBtn").classList.toggle("active", registerMode);
   setText("authTitle", registerMode ? "Register as an AMG Library Member" : "Member Log In");
+  if (registerMode) setRegistrationStep(1);
 }
 async function login(event) {
   event.preventDefault();
   if (!requireFirebase()) return;
   const form = new FormData(event.currentTarget);
+  const loginName = String(form.get("loginName") || "").trim();
+  const password = String(form.get("password") || "");
+  const email = loginName.toLowerCase() === "admin"
+    ? String(firebaseConfig.librarianEmail || "").trim()
+    : (loginName.includes("@") ? loginName : "");
+  if (!email || email.startsWith("REPLACE_")) {
+    showToast(loginName.toLowerCase() === "admin"
+      ? "Librarian username mapping is not configured. Set librarianEmail in firebase-config.js to the authorized Firebase account email."
+      : "Member full-name login needs a secure username mapping service. Use the account email until that service is configured.", "error");
+    return;
+  }
   try {
-    await signInWithEmailAndPassword(state.auth, String(form.get("email")).trim(), String(form.get("password")));
+    await signInWithEmailAndPassword(state.auth, email, password);
     closeAuthModal();
     showToast("Login successful.");
   } catch (error) { showToast(errorMessage(error), "error"); }
 }
+function setRegistrationStep(step) {
+  const current = step === 2 ? 2 : 1;
+  const first = $("registrationStepOne"), second = $("registrationStepTwo");
+  if (!first || !second) return;
+  first.classList.toggle("hidden", current !== 1);
+  second.classList.toggle("hidden", current !== 2);
+  first.setAttribute("aria-hidden", current === 1 ? "false" : "true");
+  second.setAttribute("aria-hidden", current === 2 ? "false" : "true");
+  first.querySelectorAll("input,select,textarea").forEach(el => {
+    if (!("stepRequired" in el.dataset)) el.dataset.stepRequired = el.required ? "true" : "false";
+    el.required = current === 1 && el.dataset.stepRequired === "true";
+    el.disabled = false;
+  });
+  second.querySelectorAll("input,select,textarea").forEach(el => {
+    if (!("stepRequired" in el.dataset)) el.dataset.stepRequired = el.required ? "true" : "false";
+    el.required = current === 2 && el.dataset.stepRequired === "true";
+    el.disabled = false;
+  });
+}
+function nextRegistrationStep() {
+  const first = $("registrationStepOne");
+  if (!first) return;
+  for (const field of first.querySelectorAll("input,select")) {
+    if (field.required && !field.checkValidity()) { field.reportValidity(); field.focus(); return; }
+  }
+  setRegistrationStep(2);
+  $("registrationStepTwo").querySelector("input,select")?.focus();
+}
+function previousRegistrationStep() { setRegistrationStep(1); }
+function updateAvatarPreview() {
+  const choice = $("avatarChoice")?.value || "scholar";
+  const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
+  const preview = $("avatarPreview");
+  if (preview) preview.src = "https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[choice] || seeds.scholar);
+}
+function validateRegistrationStepTwo() {
+  const second = $("registrationStepTwo");
+  if (!second) return true;
+  for (const field of second.querySelectorAll("input,select")) {
+    if (field.required && !field.disabled && !field.checkValidity()) { field.reportValidity(); field.focus(); return false; }
+  }
+  return true;
+}
 async function register(event) {
   event.preventDefault();
-  if (!requireFirebase()) return;
+  if (!requireFirebase() || !validateRegistrationStepTwo()) return;
   const form = new FormData(event.currentTarget);
   const fullName = String(form.get("fullName")).trim();
   const email = String(form.get("email")).trim().toLowerCase();
@@ -247,11 +303,19 @@ async function register(event) {
       const target = storageRef(state.storage, "member-photos/"+credential.user.uid+"/"+photo.name.replace(/[^a-zA-Z0-9._-]/g,"_"));
       await uploadBytes(target, photo, {contentType:photo.type});
       const photoURL = await getDownloadURL(target);
-      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
-      profile.photoURL = photoURL;
-      state.profile.photoURL = photoURL;
+      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,avatarChoice:null,updatedAt:serverTimestamp()});
+      profile.photoURL = photoURL; state.profile.photoURL = photoURL;
+    } else {
+      const choice = String(form.get("avatarChoice") || "scholar");
+      const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
+      const photoURL = "https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[choice] || seeds.scholar);
+      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,avatarChoice:choice,updatedAt:serverTimestamp()});
+      profile.photoURL = photoURL; profile.avatarChoice = choice;
+      state.profile.photoURL = photoURL; state.profile.avatarChoice = choice;
     }
     event.currentTarget.reset();
+    setRegistrationStep(1);
+    updateAvatarPreview();
     closeAuthModal();
     showToast("Registration submitted. Please wait for librarian approval.");
     await refreshMemberData();
@@ -267,8 +331,9 @@ function makeUniqueMemberNumber(uid) {
 }
 async function resetPassword() {
   if (!requireFirebase()) return;
-  const email = $("loginForm").elements.email.value.trim();
-  if (!email) { showToast("Enter your email address in the login form first.", "error"); return; }
+  const loginName = $("loginForm").elements.loginName.value.trim();
+  const email = loginName.toLowerCase() === "admin" ? String(firebaseConfig.librarianEmail || "").trim() : loginName;
+  if (!email || !email.includes("@") || email.startsWith("REPLACE_")) { showToast("Enter the account email address to reset the password.", "error"); return; }
   try { await sendPasswordResetEmail(state.auth,email); showToast("If an account exists for that email, a password reset email has been sent."); }
   catch (error) { showToast(errorMessage(error),"error"); }
 }
@@ -729,5 +794,5 @@ function renderStatistics() {
 }
 function renderInventoryPlaceholder() { /* Inventory is rendered with the admin data snapshot. */ }
 
-window.AMG = {showSection,toggleDropdown,openAuthModal,closeAuthModal,setAuthMode,logout,resetPassword,downloadCard,closeCardModal,switchTab,toggleTheme};
+window.AMG = {showSection,toggleDropdown,openAuthModal,closeAuthModal,setAuthMode,nextRegistrationStep,previousRegistrationStep,logout,resetPassword,downloadCard,closeCardModal,switchTab,toggleTheme};
 document.addEventListener("DOMContentLoaded",init);
