@@ -262,6 +262,9 @@ function updateAvatarPreview() {
   const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
   const preview = $("avatarPreview");
   if (preview) preview.src = "https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[choice] || seeds.scholar);
+  // Changing to an avatar explicitly replaces any camera photo selected earlier.
+  const cameraInput = $("registrationStepTwo")?.querySelector('input[name="photo"]');
+  if (cameraInput) cameraInput.value = "";
 }
 function validateRegistrationStepTwo() {
   const second = $("registrationStepTwo");
