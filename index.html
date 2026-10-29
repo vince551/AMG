@@ -3,7 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#087f5b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="icon" type="image/jpeg" href="AMG.images/logo.jpg">
+  <link rel="apple-touch-icon" href="AMG.images/logo.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
   <meta name="description" content="AMG Library — learner membership, book discovery, borrowing, e-books and library services.">
   <title>AMG Library | Learn. Discover. Grow.</title>
   <link rel="stylesheet" href="style.css">
@@ -14,7 +19,7 @@
 </head>
 <body>
   <header class="navbar">
-    <button class="nav-brand" onclick="AMG.showSection('heroSection')" aria-label="AMG Library home"><span>📚</span> AMG LIBRARY</button>
+    <button class="nav-brand" onclick="AMG.showSection('heroSection')" aria-label="AMG Library home"><img src="AMG.images/logo.jpg" alt="" class="brand-mark"> <span>AMG <b>LIBRARY</b></span></button>
     <nav class="nav-links" aria-label="Main navigation">
       <button class="nav-btn" onclick="AMG.showSection('heroSection')">Home</button>
       <button class="nav-btn" onclick="AMG.showSection('libShelfSection')">Lib Shelf</button>
@@ -49,6 +54,11 @@
         <div class="hero-actions">
           <button class="btn btn-primary btn-lg" onclick="AMG.showSection('libShelfSection')">Explore the Lib Shelf</button>
           <button class="btn btn-secondary btn-lg" onclick="AMG.openAuthModal('register')">Become a Member</button>
+        </div>
+        <div class="hero-gallery" aria-label="Learning at AMG Library">
+          <img src="AMG.images/learn.jpg" alt="Learners discovering new knowledge" fetchpriority="high">
+          <img src="AMG.images/soma.jpg" alt="Reading and study resources" loading="lazy">
+          <img src="AMG.images/toto.jpg" alt="Learning for young readers" loading="lazy">
         </div>
       </div>
       <div class="info-grid">
@@ -132,6 +142,15 @@
 
   <div id="authModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal-content auth-modal"><button class="close-btn" onclick="AMG.closeAuthModal()" aria-label="Close">×</button>
+      <aside class="auth-art">
+        <img class="auth-logo" src="AMG.images/logo.jpg" alt="AMG Library logo">
+        <p class="auth-kicker">YOUR LEARNING PARTNER</p>
+        <h2>Every page opens a new possibility.</h2>
+        <p>Discover books, grow your skills and keep your learning journey moving.</p>
+        <img class="auth-photo" src="AMG.images/learn.jpg" alt="Learners reading together" loading="lazy">
+        <div class="auth-art-footer"><span></span> Learn. Discover. Grow.</div>
+      </aside>
+      <div class="auth-form-panel">
       <div class="auth-tabs"><button id="loginModeBtn" class="pill active" onclick="AMG.setAuthMode('login')">Log In</button><button id="registerModeBtn" class="pill" onclick="AMG.setAuthMode('register')">Register</button></div>
       <h2 id="authTitle">Member Log In</h2>
       <p class="muted auth-help">Use your registered email and password. Your full name is shown on your member profile and card.</p>
@@ -152,11 +171,13 @@
         <label>Profile photo (optional)<input name="photo" type="file" accept="image/*"></label>
         <button class="btn btn-primary">Submit registration for approval</button>
       </form>
+      </div>
     </div>
   </div>
 
   <div id="cardModal" class="modal" role="dialog" aria-modal="true"><div class="modal-content card-modal-content"><button class="close-btn" onclick="AMG.closeCardModal()">×</button><div id="adminCardTarget" class="library-card"><div class="card-header"><div class="brand"><span class="brand-logo">📚</span><div><div class="brand-title">AMG LIBRARY</div><div class="brand-subtitle">Official Student Membership</div></div></div></div><div class="card-body"><img id="adminCardImage" class="card-photo" alt="Member photo"><div class="card-info"><h3 id="adminCardName"></h3><p><strong>School:</strong> <span id="adminCardSchool"></span></p><p><strong>Study:</strong> <span id="adminCardStudy"></span></p><p><strong>Level:</strong> <span id="adminCardLevel" class="badge"></span></p></div></div><div class="card-footer"><svg id="adminMemberBarcode"></svg><div id="adminCardNumber" class="library-number"></div><div id="adminMemberQr" class="qr-holder"></div></div></div><button class="btn btn-primary top-gap" onclick="AMG.downloadCard('adminCardTarget')">Download member card</button></div></div>
 
   <script type="module" src="app.js"></script>
+  <script>if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));</script>
 </body>
 </html>
