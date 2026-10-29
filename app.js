@@ -212,13 +212,14 @@ async function login(event) {
   const form = new FormData(event.currentTarget);
   const loginName = String(form.get("loginName") || "").trim();
   const password = String(form.get("password") || "");
-  const email = loginName.toLowerCase() === "admin"
+  const isLibrarianLogin = loginName.toLowerCase() === "librarian";
+  const email = isLibrarianLogin
     ? String(firebaseConfig.librarianEmail || "").trim()
     : (loginName.includes("@") ? loginName : "");
   if (!email || email.startsWith("REPLACE_")) {
-    showToast(loginName.toLowerCase() === "admin"
-      ? "Librarian username mapping is not configured. Set librarianEmail in firebase-config.js to the authorized Firebase account email."
-      : "Member full-name login needs a secure username mapping service. Use the account email until that service is configured.", "error");
+    showToast(isLibrarianLogin
+      ? "Librarian login is not configured yet. Set librarianEmail in firebase-config.js to the authorized Firebase account email."
+      : "Member full-name login needs a secure username mapping service. Until it is configured, enter the email address linked to your account.", "error");
     return;
   }
   try {
@@ -329,10 +330,10 @@ function makeUniqueMemberNumber(uid) {
   // the private member directory from the browser.
   return "AMG-" + new Date().getFullYear() + "-" + uid.toUpperCase();
 }
-async function resetPassword() {
+async async function resetPassword() {
   if (!requireFirebase()) return;
   const loginName = $("loginForm").elements.loginName.value.trim();
-  const email = loginName.toLowerCase() === "admin" ? String(firebaseConfig.librarianEmail || "").trim() : loginName;
+  const email = loginName.toLowerCase() === "librarian" ? String(firebaseConfig.librarianEmail || "").trim() : loginName;
   if (!email || !email.includes("@") || email.startsWith("REPLACE_")) { showToast("Enter the account email address to reset the password.", "error"); return; }
   try { await sendPasswordResetEmail(state.auth,email); showToast("If an account exists for that email, a password reset email has been sent."); }
   catch (error) { showToast(errorMessage(error),"error"); }
@@ -354,6 +355,35 @@ function makeQr(value, containerId) {
   if (!target) return;
   target.replaceChildren();
   if (window.QRCode) new window.QRCode(target,{text:value,width:68,height:68,colorDark:"#111827",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+}
+async function updatePhoto(event) {
+  const photo = event.currentTarget.files?.[0];
+  if (!photo) return;
+  if (!state.user || !state.profile || !state.storage || !state.db) {
+    showToast("Log in before updating your profile photo.", "error");
+    event.currentTarget.value = "";
+    return;
+  }
+  if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) {
+    showToast("Choose an image smaller than 5 MB.", "error");
+    event.currentTarget.value = "";
+    return;
+  }
+  try {
+    const safeName = photo.name.replace(/[^a-zA-Z0-9._-]/g, "_") || "profile-photo";
+    const target = storageRef(state.storage, "member-photos/" + state.user.uid + "/" + Date.now() + "-" + safeName);
+    await uploadBytes(target, photo, {contentType:photo.type});
+    const photoURL = await getDownloadURL(target);
+    await updateDoc(doc(state.db, "users", state.user.uid), {photoURL, updatedAt:serverTimestamp()});
+    state.profile.photoURL = photoURL;
+    renderProfileCard(state.profile);
+    updateAuthUI();
+    showToast("Profile photo updated.");
+  } catch (error) {
+    showToast("Photo could not be updated: " + errorMessage(error), "error");
+  } finally {
+    event.currentTarget.value = "";
+  }
 }
 function renderProfileCard(profile) {
   setText("cardFullName",profile.fullName);
