@@ -32,6 +32,9 @@ The Firebase client configuration is intentionally a placeholder. Do not use thi
 
 ## Features
 - Learner registration with school, level, gender and parent/guardian details.
+
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0759aec6-655f-410f-a7e3-717d4f1f91a0" />
+
 - Firebase Email/Password authentication and password reset.
 - Librarian approval before borrowing.
 - Searchable catalogue, category filter, starred books.
