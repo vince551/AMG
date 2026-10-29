@@ -122,7 +122,14 @@ async function refreshPublicData() {
     state.books = booksSnap.docs.map(d => ({id:d.id,...d.data()}));
     state.announcements = newsSnap.docs.map(d => ({id:d.id,...d.data()}));
     state.events = eventsSnap.docs.map(d => ({id:d.id,...d.data()}));
+    if (state.user) {
+      const ebookSnap = await getDocs(query(collection(state.db,"ebooks"), orderBy("createdAt","desc"), limit(100)));
+      state.ebooks = ebookSnap.docs.map(d => ({id:d.id,...d.data()}));
+    } else {
+      state.ebooks = [];
+    }
     renderBooks();
+    renderPublicEbooks();
     renderAnnouncements([...state.announcements, ...state.events].sort((a,b) => dateMillis(b.createdAt)-dateMillis(a.createdAt)));
   } catch (error) {
     // Empty collections may not have documents; permission errors are still surfaced.
@@ -636,6 +643,20 @@ function renderAnnouncements(items) {
     });
   });
 }
+function renderPublicEbooks() {
+  const container=$("publicEbooks");
+  if (!container) return;
+  container.replaceChildren();
+  if (!state.user) { container.append(node("p","Log in to view available e-books.","muted")); return; }
+  if (!state.ebooks.length) { container.append(node("p","No e-books have been uploaded yet.","muted")); return; }
+  state.ebooks.forEach(book => {
+    const card=node("article",null,"announcement-card");
+    card.append(node("h3",book.title),node("p",book.category||"Digital resource"));
+    const link=node("a","Open / download");
+    link.href=book.downloadUrl; link.target="_blank"; link.rel="noopener noreferrer";
+    card.append(link); container.append(card);
+  });
+}
 function renderAdminNews() {
   const container=$("adminNewsList"); container.replaceChildren();
   [...state.announcements.map(i=>({...i,_collection:"announcements"})),...state.events.map(i=>({...i,_collection:"events"}))].sort((a,b)=>dateMillis(b.createdAt)-dateMillis(a.createdAt)).forEach(item=>{
@@ -670,6 +691,10 @@ function renderStatistics() {
   renderBarChart("educationChart",Object.entries(levels).sort((a,b)=>b[1]-a[1]));
   const days={}; state.attendance.forEach(a=>{const d=formatDate(a.checkInAt); if(d!=="—") days[d]=(days[d]||0)+1;});
   renderBarChart("attendanceChart",Object.entries(days).sort((a,b)=>dateMillis(a[0])-dateMillis(b[0])).slice(-7));
+  const categoryCounts={}; state.requests.forEach(r=>{const key=r.bookCategory||"Other";categoryCounts[key]=(categoryCounts[key]||0)+1;});
+  renderBarChart("categoryBorrowChart",Object.entries(categoryCounts).sort((a,b)=>b[1]-a[1]));
+  const genderCounts={}; state.members.forEach(m=>{const key=m.gender||"Unspecified";genderCounts[key]=(genderCounts[key]||0)+1;});
+  renderBarChart("genderChart",Object.entries(genderCounts).sort((a,b)=>b[1]-a[1]));
 }
 function renderInventoryPlaceholder() { /* Inventory is rendered with the admin data snapshot. */ }
 
