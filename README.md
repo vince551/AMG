@@ -36,17 +36,19 @@ The Firebase client configuration is intentionally a placeholder. Do not use thi
 - Searchable catalogue, category filter, starred books.
 - Borrow request, approve/decline, issuing and returning with Firestore transactions.
 - Membership card with unique library number, CODE-128 barcode and QR code.
-- Optional profile photo upload.
+- Optional camera photo capture or a selected illustrated avatar.
 - Member directory and card downloads for librarians.
 - Check-in/check-out by library number and optional camera scanning.
 - Occupancy/remaining-capacity tracking.
 - PDF/EPUB e-book uploads through Firebase Storage.
 - News and events.
 - Statistics for members, stock, borrowing and attendance.
-- Responsive blue/white styling carried forward from the original site.
+- Responsive blue, green and white styling, with a home page featuring the library's mission, vision, services, values and membership journey.
 
 ## Authentication and data model
-Firebase Email/Password uses an email address as the authentication identifier. The learner's full name remains the profile/card name. This adds an email field to the handwritten login design because looking up accounts by full name from a public browser would expose a member directory or require a trusted backend endpoint.
+The login form accepts the librarian username `admin` and resolves it to the provisioned Firebase Auth account email in `firebase-config.js` (`librarianEmail`). Set this value to the actual librarian account email, and ensure that account has the `librarian: true` custom claim. Firebase Auth still verifies the password; the browser does not bypass authentication. The written default is `admin` / `admin`, but it must be provisioned in Firebase Auth intentionally and changed to a strong unique password before going live.
+
+Member accounts still authenticate using the email associated with their Firebase account. True learner full-name login requires a trusted username-to-account mapping service; the public browser must not search private member records or weaken Firestore rules to simulate name-based login.
 
 Librarian authorization uses a Firebase Authentication custom claim `librarian: true`. The UI checks this claim, but Firestore and Storage rules are the actual security boundary.
 
