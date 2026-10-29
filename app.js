@@ -410,11 +410,23 @@ async function downloadCard(elementId) {
   } catch (error) { showToast("Could not download the card. Check that the photo is accessible and try again.","error"); }
 }
 function closeCardModal() { $("cardModal").style.display = "none"; }
+function toggleMobileNav() {
+  const header = document.querySelector(".navbar");
+  const toggle = document.querySelector(".mobile-nav-toggle");
+  if (!header || !toggle) return;
+  const open = header.classList.toggle("mobile-nav-open");
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.innerHTML = open ? "✕ <span>Close</span>" : "☰ <span>Menu</span>";
+}
 function switchTab(tabId, button) {
   document.querySelectorAll("#librarianSection .tab-btn").forEach(el=>el.classList.remove("active"));
   document.querySelectorAll("#librarianSection .tab-content").forEach(el=>el.classList.remove("active"));
+  const matchingButton = [...document.querySelectorAll("#librarianSection .admin-tabs .tab-btn")].find(el => (el.getAttribute("onclick") || "").includes("'" + tabId + "'"));
   if (button) button.classList.add("active");
+  else if (matchingButton) matchingButton.classList.add("active");
   $(tabId)?.classList.add("active");
+  const mobilePicker = $("adminMobileTabSelect");
+  if (mobilePicker && mobilePicker.value !== tabId) mobilePicker.value = tabId;
 }
 function starredIds() {
   try { return JSON.parse(localStorage.getItem("amg_starred_"+(state.user?.uid||"guest"))||"[]"); } catch (_) { return []; }
@@ -909,5 +921,5 @@ function renderStatistics() {
 }
 function renderInventoryPlaceholder() { /* Inventory is rendered with the admin data snapshot. */ }
 
-window.AMG = {showSection,toggleDropdown,openAuthModal,closeAuthModal,setAuthMode,nextRegistrationStep,previousRegistrationStep,logout,resetPassword,downloadCard,closeCardModal,switchTab,toggleTheme};
+window.AMG = {showSection,toggleDropdown,toggleMobileNav,openAuthModal,closeAuthModal,setAuthMode,nextRegistrationStep,previousRegistrationStep,logout,resetPassword,downloadCard,closeCardModal,switchTab,toggleTheme};
 document.addEventListener("DOMContentLoaded",init);
