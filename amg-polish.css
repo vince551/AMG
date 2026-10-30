@@ -13,3 +13,25 @@
 :root[data-theme=dark] .hero,:root[data-theme=dark] .home-cta,:root[data-theme=dark] .admin-welcome{color:#e8f0f5;background:linear-gradient(130deg,#142e2a,#162633 55%,#1a2a3b)!important;border-color:#31534c}
 :root[data-theme=dark] .hero h1,:root[data-theme=dark] .section-header h2,:root[data-theme=dark] .panel h2,:root[data-theme=dark] .panel h3,:root[data-theme=dark] .purpose-card h2,:root[data-theme=dark] .home-feature h3,:root[data-theme=dark] .announcement-card h3,:root[data-theme=dark] .stack-item h4,:root[data-theme=dark] .featured-heading h2{color:#edf6fa}
 :root[data-theme=dark] p,:root[data-theme=dark] .muted,:root[data-theme=dark] .section-header p,:root[data-theme=dark] .panel p,:root[data-theme=dark] .stat-card span{color:#a9bbc8}
+:root[data-theme=dark] input:not([type=checkbox]):not([type=radio]),:root[data-theme=dark] textarea,:root[data-theme=dark] select,:root[data-theme=dark] .search-input{color:#edf5f8!important;background:#0e1b25!important;border-color:#38505e!important}
+:root[data-theme=dark] input::placeholder,:root[data-theme=dark] textarea::placeholder{color:#8ea3b2!important}
+:root[data-theme=dark] select option{color:#edf5f8;background:#14232e}:root[data-theme=dark] label{color:#d7e4eb}
+:root[data-theme=dark] .dropdown-content{background:rgba(20,35,46,.96)!important;border-color:#38505e!important}
+:root[data-theme=dark] .dropdown-content button,:root[data-theme=dark] .dropdown-content a{color:#e5eff5}
+:root[data-theme=dark] .book-card,:root[data-theme=dark] .book-details{color:#e8f0f5;background:#14232e;border-color:#2b414e}
+:root[data-theme=dark] .book-title,:root[data-theme=dark] .book-details h3{color:#edf6fa}
+:root[data-theme=dark] .site-footer{color:#a9bbc8;background:#101d27!important;border-color:#2b414e}
+:root[data-theme=dark] .data-table,:root[data-theme=dark] table{color:#e8f0f5;background:#14232e}
+:root[data-theme=dark] .data-table th,:root[data-theme=dark] table th{color:#e8f0f5;background:#1b303c;border-color:#304754}
+:root[data-theme=dark] .data-table td,:root[data-theme=dark] table td{color:#d6e3ea;border-color:#2b414e}
+:root[data-theme=dark] .bar-track{background:#293d49}
+:root[data-theme=dark] .modal-content,:root[data-theme=dark] .auth-form-panel{color:#e8f0f5;background:#14232e;border-color:#344b59}
+:root[data-theme=dark] .auth-form-panel #authTitle{color:#edf6fa}
+:root[data-theme=dark] .auth-modal .form-stack label{color:#d7e4eb}
+:root[data-theme=dark] .auth-modal .form-stack input,:root[data-theme=dark] .auth-modal .form-stack select{color:#edf5f8;background:#0e1b25;border-color:#38505e}
+:root[data-theme=dark] .auth-tabs{background:#0e1b25;border-color:#304754}
+:root[data-theme=dark] .auth-tabs .pill:not(.active){color:#a9bbc8}
+:root[data-theme=dark] .auth-tabs .pill.active{color:#5ee0b4;background:#1b3530}
+:root[data-theme=dark] .tab-btn{color:#a9bbc8}:root[data-theme=dark] .tab-btn.active{color:#5ee0b4}
+:root[data-theme=dark] .pill{color:#dce8ef;background:#1b303c;border-color:#38505e}
+:root[data-theme=dark] .library-card{color:#17354c}
