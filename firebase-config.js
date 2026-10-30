@@ -7,7 +7,7 @@ export const firebaseConfig = {
   authDomain: "amglibra-76222.firebaseapp.com",
   projectId: "amglibra-76222",
   storageBucket: "amglibra-76222.firebasestorage.app",
-  messagingSenderId: "REPLACE_WITH_MESSAGING_SENDER_ID",
+  messagingSenderId: "71849525439",
   appId: "REPLACE_WITH_FIREBASE_APP_ID",
   // Set to the email of the Firebase Auth librarian account.
   librarianEmail: "Edwinmuga99@gmail.com"
