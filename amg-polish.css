@@ -817,3 +817,30 @@ html.amg-compact-device #heroSection .hero-gallery{transform:translate3d(0,var(-
   #heroSection .values-grid>article,#heroSection > .home-cta,#heroSection > .panel[aria-labelledby="announcementsTitle"],
   #heroSection .featured-book-card,#heroSection .hero-gallery img,#heroSection .featured-book-cover img{opacity:1!important;visibility:visible!important}
 }
+
+/* Match the mobile motion system when Chrome requests Desktop site on a phone. */
+html.amg-compact-device .amg-counter-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin:.15rem 0 1.15rem;padding:.8rem .55rem;border:1px solid rgba(8,127,91,.12);border-radius:17px;background:linear-gradient(135deg,rgba(255,255,255,.97),rgba(239,248,244,.95));box-shadow:0 10px 28px rgba(17,54,62,.07)}
+html.amg-compact-device .amg-counter{display:flex;min-width:0;flex-direction:column;align-items:center;gap:.22rem;text-align:center}
+html.amg-compact-device .amg-counter+.amg-counter{border-left:1px solid rgba(8,127,91,.13)}
+html.amg-compact-device .amg-counter strong{color:#087f5b;font-size:1.65rem;font-weight:850;line-height:1.1;font-variant-numeric:tabular-nums}
+html.amg-compact-device .amg-counter span{color:#60736d;font-size:.68rem;font-weight:700;line-height:1.25}
+html.amg-compact-device .navbar{transition:background-color .22s ease,box-shadow .22s ease}
+html.amg-compact-device .navbar.amg-scrolled{background:rgba(248,252,251,.9)!important;box-shadow:0 10px 28px rgba(13,42,55,.16)!important}
+html.amg-compact-device #heroSection .hero-copy,html.amg-compact-device #heroSection .hero-gallery,
+html.amg-compact-device #heroSection > .home-featured-section,html.amg-compact-device #heroSection > .home-intro,
+html.amg-compact-device #heroSection .purpose-card,html.amg-compact-device #heroSection .home-feature,
+html.amg-compact-device #heroSection .journey-grid>article,html.amg-compact-device #heroSection .level-chips>*,
+html.amg-compact-device #heroSection .values-grid>article,html.amg-compact-device #heroSection > .home-cta,
+html.amg-compact-device #heroSection > .panel[aria-labelledby="announcementsTitle"],
+html.amg-compact-device #heroSection .featured-book-card{opacity:0;transform:translate3d(0,18px,0);transition:opacity .48s ease,transform .48s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--amg-stagger,0)*45ms)}
+html.amg-compact-device #heroSection .amg-revealed{opacity:1;transform:translate3d(0,0,0)}
+@media(prefers-reduced-motion:reduce){
+ html.amg-compact-device #heroSection *{transition:none!important;animation:none!important;transform:none!important;clip-path:none!important}
+ html.amg-compact-device #heroSection .hero-copy,html.amg-compact-device #heroSection .hero-gallery,
+ html.amg-compact-device #heroSection > .home-featured-section,html.amg-compact-device #heroSection > .home-intro,
+ html.amg-compact-device #heroSection .purpose-card,html.amg-compact-device #heroSection .home-feature,
+ html.amg-compact-device #heroSection .journey-grid>article,html.amg-compact-device #heroSection .level-chips>*,
+ html.amg-compact-device #heroSection .values-grid>article,html.amg-compact-device #heroSection > .home-cta,
+ html.amg-compact-device #heroSection > .panel[aria-labelledby="announcementsTitle"],
+ html.amg-compact-device #heroSection .featured-book-card{opacity:1!important;visibility:visible!important}
+}
