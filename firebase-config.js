@@ -3,7 +3,7 @@
 // Replace placeholders with Firebase Console > Project settings > Your apps.
 // Never put a service-account JSON, private key, or Admin SDK credential here.
 export const firebaseConfig = {
-  apiKey: "REPLACE_WITH_FIREBASE_API_KEY",
+  apiKey: "AIzaSyAMOQlVeZ8PDGGC4wUyMnFmxYUG2sgcgB4",
   authDomain: "REPLACE_WITH_PROJECT_ID.firebaseapp.com",
   projectId: "REPLACE_WITH_PROJECT_ID",
   storageBucket: "REPLACE_WITH_PROJECT_ID.firebasestorage.app",
