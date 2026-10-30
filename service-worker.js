@@ -1,10 +1,11 @@
-const CACHE_NAME = "amg-library-shell-v1";
+const CACHE_NAME = "amg-library-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./style.css",
   "./app.css",
   "./app.js",
+  "./mobile-effects.js",
   "./firebase-config.js",
   "./manifest.webmanifest",
   "./AMG.images/logo.jpg",
