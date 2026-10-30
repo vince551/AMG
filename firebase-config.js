@@ -4,7 +4,7 @@
 // Never put a service-account JSON, private key, or Admin SDK credential here.
 export const firebaseConfig = {
   apiKey: "AIzaSyAMOQlVeZ8PDGGC4wUyMnFmxYUG2sgcgB4",
-  authDomain: "REPLACE_WITH_PROJECT_ID.firebaseapp.com",
+  authDomain: "amglibra-76222.firebaseapp.com",
   projectId: "REPLACE_WITH_PROJECT_ID",
   storageBucket: "REPLACE_WITH_PROJECT_ID.firebasestorage.app",
   messagingSenderId: "REPLACE_WITH_MESSAGING_SENDER_ID",
