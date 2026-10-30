@@ -8,7 +8,7 @@ export const firebaseConfig = {
   projectId: "amglibra-76222",
   storageBucket: "amglibra-76222.firebasestorage.app",
   messagingSenderId: "71849525439",
-  appId: "REPLACE_WITH_FIREBASE_APP_ID",
+  appId: "1:71849525439:web:c3e70a8802c5c313c8460a",
   // Set to the email of the Firebase Auth librarian account.
   librarianEmail: "Edwinmuga99@gmail.com"
 };
