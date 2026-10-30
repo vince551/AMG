@@ -783,8 +783,10 @@ html.amg-compact-device #heroSection > .home-purpose-grid { background: #f2f7f5;
 
 
 /* Premium mobile scroll effects — transforms/opacity only; no heavy scroll handlers. */
-.amg-scroll-progress{position:fixed;inset:0 auto auto 0;z-index:2200;width:100%;height:3px;background:linear-gradient(90deg,#087f5b,#42c99a,#6da7ed);transform:scaleX(0);transform-origin:left center;pointer-events:none;will-change:transform}
+.amg-scroll-progress{display:none;position:fixed;inset:0 auto auto 0;z-index:2200;width:100%;height:3px;background:linear-gradient(90deg,#087f5b,#42c99a,#6da7ed);transform:scaleX(0);transform-origin:left center;pointer-events:none;will-change:transform}
 @media(max-width:680px){
+  .amg-scroll-progress{display:block}
+  .amg-counter-strip{display:grid}
   .navbar{transition:background-color .22s ease,box-shadow .22s ease,min-height .22s ease,backdrop-filter .22s ease}
   .navbar.amg-scrolled{background:rgba(248,252,251,.9)!important;box-shadow:0 10px 28px rgba(13,42,55,.16),inset 0 1px 0 rgba(255,255,255,.9)!important}
   .navbar.amg-scrolled .nav-brand .brand-mark{transform:scale(.92)}
@@ -844,3 +846,6 @@ html.amg-compact-device #heroSection .amg-revealed{opacity:1;transform:translate
  html.amg-compact-device #heroSection > .panel[aria-labelledby="announcementsTitle"],
  html.amg-compact-device #heroSection .featured-book-card{opacity:1!important;visibility:visible!important}
 }
+
+html.amg-compact-device .amg-scroll-progress{display:block}
+@media(min-width:681px){.amg-counter-strip{display:none}}
