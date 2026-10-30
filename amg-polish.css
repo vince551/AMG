@@ -563,3 +563,220 @@ html { scroll-padding-top: 100px; }
 @media (prefers-reduced-motion: reduce) {
   .navbar, .navbar .nav-links .nav-btn { transition: none !important; }
 }
+
+
+/* Mobile homepage refresh: make the landing page feel like a modern web experience. */
+@media (max-width: 680px) {
+  #heroSection { overflow: clip; }
+  #heroSection > .hero {
+    min-height: 0;
+    margin: 0 0 1.35rem;
+    padding: 1.45rem 1.05rem 1.2rem;
+    border-radius: 22px;
+    background:
+      radial-gradient(circle at 92% 8%, rgba(31,190,139,.2), transparent 34%),
+      linear-gradient(145deg, #0b342f 0%, #123f55 58%, #174b68 100%);
+    box-shadow: 0 18px 42px rgba(13,55,66,.16);
+  }
+  #heroSection .hero h1 { max-width: 12ch; font-size: clamp(2rem, 9vw, 2.65rem); line-height: 1.02; letter-spacing: -.055em; }
+  #heroSection .hero-description { max-width: 34rem; line-height: 1.65; }
+  #heroSection .hero-proof { display: flex; flex-wrap: nowrap; gap: .55rem; overflow-x: auto; padding: .3rem 0 .55rem; scrollbar-width: none; }
+  #heroSection .hero-proof::-webkit-scrollbar { display: none; }
+  #heroSection .hero-proof span { flex: 0 0 auto; padding: .45rem .65rem; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.09); font-size: .72rem; }
+  #heroSection .hero-gallery { margin-top: 1.1rem; }
+  #heroSection .hero-gallery img, #heroSection .hero-gallery img:first-child { height: clamp(82px, 24vw, 112px); border-radius: 13px; }
+  #heroSection .hero-image-note { border-radius: 13px; }
+  #heroSection .hero-bottom-line { display: none; }
+
+  #heroSection > .home-featured-section,
+  #heroSection > .home-intro,
+  #heroSection > .home-purpose-grid,
+  #heroSection > .home-services,
+  #heroSection > .home-journey,
+  #heroSection > .home-levels,
+  #heroSection > .home-values,
+  #heroSection > .home-cta,
+  #heroSection > .panel[aria-labelledby="announcementsTitle"] {
+    margin: 1.35rem -0.55rem;
+    padding: 1.35rem 1rem;
+    border-radius: 0;
+  }
+  #heroSection > .home-featured-section { margin-top: 1.1rem; padding-top: 1.25rem; padding-bottom: 1.5rem; background: #f1f7f4; }
+  .featured-heading { display: flex; flex-direction: column; align-items: flex-start; gap: .65rem; margin-bottom: 1rem; }
+  .featured-heading .eyebrow { color: #087f5b; letter-spacing: .13em; font-size: .68rem; font-weight: 850; }
+  .featured-heading h2 { max-width: 19ch; font-size: 1.55rem; line-height: 1.12; letter-spacing: -.04em; }
+  .featured-heading p:not(.eyebrow) { font-size: .84rem; }
+  .featured-heading .text-link-button { align-self: flex-start; }
+  .featured-books-grid {
+    display: grid !important;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 76%);
+    grid-template-columns: none !important;
+    gap: .8rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
+    padding: .15rem .05rem .8rem;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .featured-books-grid > * { min-width: 0; scroll-snap-align: start; }
+  .featured-books-grid .book-card { display: grid; grid-template-columns: 104px minmax(0,1fr); min-height: 150px; overflow: hidden; border: 1px solid #dce9e3; border-radius: 17px; background: #fff; box-shadow: 0 10px 25px rgba(16,55,65,.08); }
+  .featured-books-grid .book-cover { height: 100%; min-height: 150px; border-radius: 0; }
+  .featured-books-grid .book-details { align-content: center; padding: .8rem; }
+  .featured-books-grid .book-actions { display: flex; flex-wrap: wrap; }
+  .featured-books-grid .book-actions .btn { width: auto; }
+  .featured-empty { grid-column: 1 / -1; padding: 1.1rem; border: 1px dashed #b8d3c6; border-radius: 15px; background: rgba(255,255,255,.75); }
+
+  #heroSection > .home-intro {
+    margin-top: 1.4rem;
+    padding: 1.35rem 1.05rem;
+    border: 0;
+    border-left: 4px solid #0b946b;
+    border-radius: 0 16px 16px 0;
+    background: linear-gradient(110deg, #edf8f2, #f5f8ff);
+    box-shadow: none;
+  }
+  .home-intro h2 { max-width: 19ch; font-size: 1.55rem; line-height: 1.12; }
+  .home-intro > p:last-child { font-size: .9rem; line-height: 1.7; }
+
+  #heroSection > .home-purpose-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 82%);
+    grid-template-columns: none;
+    gap: .75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 1.1rem 1rem 1.35rem;
+    background: #f6f8fb;
+    scrollbar-width: none;
+  }
+  .home-purpose-grid::-webkit-scrollbar { display: none; }
+  .purpose-card { scroll-snap-align: start; min-height: 205px; padding: 1.1rem; border-radius: 17px; box-shadow: 0 10px 26px rgba(20,52,70,.07); }
+  .purpose-card h2 { font-size: 1.22rem; }
+  .purpose-card > p:last-child { font-size: .86rem; line-height: 1.65; }
+
+  #heroSection > .home-services { background: #fff; border: 0; box-shadow: none; }
+  .home-services .section-header, .home-journey .section-header, .home-levels .section-header, .home-values .section-header { margin-bottom: 1rem; }
+  .home-services .section-header h2, .home-journey .section-header h2, .home-levels .section-header h2, .home-values .section-header h2 { font-size: 1.55rem; line-height: 1.12; }
+  .home-feature-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 78%);
+    grid-template-columns: none;
+    gap: .75rem;
+    overflow-x: auto;
+    padding: .1rem .05rem .75rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .home-feature { min-height: 150px; padding: 1rem; border-radius: 16px; scroll-snap-align: start; background: #f5faf7; }
+  .home-feature h3 { font-size: 1rem; }
+  .home-feature p { font-size: .85rem; line-height: 1.6; }
+
+  #heroSection > .home-journey { background: #f1f7fb; border: 0; box-shadow: none; }
+  .journey-grid { display: grid; grid-template-columns: repeat(3, minmax(190px, 1fr)); gap: .7rem; overflow-x: auto; padding: .1rem .05rem .75rem; scroll-snap-type: x mandatory; }
+  .journey-grid article { min-height: 145px; padding: .9rem; border: 1px solid #dce9e3; border-left: 3px solid var(--amg-green); border-radius: 13px; scroll-snap-align: start; }
+  .journey-grid p { font-size: .82rem; }
+
+  #heroSection > .home-levels { background: #fff; border: 0; box-shadow: none; }
+  .level-chips { flex-wrap: nowrap; overflow-x: auto; padding: .15rem .05rem .65rem; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .level-chips::-webkit-scrollbar { display: none; }
+  .level-chips span { flex: 0 0 auto; scroll-snap-align: start; }
+
+  #heroSection > .home-values { background: #f2f7f5; border: 0; box-shadow: none; }
+  .values-grid { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 82%); grid-template-columns: none; gap: .75rem; overflow-x: auto; padding: .1rem .05rem .75rem; scroll-snap-type: x mandatory; }
+  .values-grid article { min-height: 135px; padding: 1rem; border-radius: 15px; background: #fff; scroll-snap-align: start; }
+  .values-grid p { font-size: .84rem; }
+
+  #heroSection > .home-cta {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.4rem;
+    padding: 1.45rem 1.05rem;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #087f5b, #1557b0);
+  }
+  .home-cta h2 { font-size: 1.7rem; }
+  .home-cta .hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; }
+  .home-cta .hero-actions .btn { width: 100%; min-width: 0; padding: .7rem .55rem; font-size: .78rem; }
+  #heroSection > .panel[aria-labelledby="announcementsTitle"] { background: #f7f9fc; border: 0; box-shadow: none; }
+  #heroSection #homeAnnouncements { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 82%); grid-template-columns: none; gap: .75rem; overflow-x: auto; scroll-snap-type: x mandatory; }
+  #heroSection #homeAnnouncements > * { scroll-snap-align: start; }
+}
+
+/* Chrome desktop-site mode on a phone gets the same landing-page treatment. */
+html.amg-compact-device #heroSection { overflow: visible; }
+html.amg-compact-device #heroSection > .hero { min-height: 0; margin-bottom: 1.2rem; padding: 1.4rem 1rem; border-radius: 20px; }
+html.amg-compact-device #heroSection .hero h1 { font-size: 2.15rem; line-height: 1.04; }
+html.amg-compact-device #heroSection .hero-proof { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+html.amg-compact-device #heroSection .hero-proof span { flex: 0 0 auto; }
+html.amg-compact-device #heroSection .hero-bottom-line { display: none; }
+html.amg-compact-device #heroSection > .home-featured-section,
+html.amg-compact-device #heroSection > .home-intro,
+html.amg-compact-device #heroSection > .home-purpose-grid,
+html.amg-compact-device #heroSection > .home-services,
+html.amg-compact-device #heroSection > .home-journey,
+html.amg-compact-device #heroSection > .home-levels,
+html.amg-compact-device #heroSection > .home-values,
+html.amg-compact-device #heroSection > .home-cta,
+html.amg-compact-device #heroSection > .panel[aria-labelledby="announcementsTitle"] { margin: 1.25rem -0.5rem; padding: 1.25rem 1rem; border-radius: 0; }
+html.amg-compact-device .featured-books-grid,
+html.amg-compact-device .home-purpose-grid,
+html.amg-compact-device .home-feature-grid,
+html.amg-compact-device .values-grid,
+html.amg-compact-device #heroSection #homeAnnouncements { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: .7rem; }
+html.amg-compact-device .featured-books-grid > *,
+html.amg-compact-device .home-purpose-grid > *,
+html.amg-compact-device .home-feature-grid > *,
+html.amg-compact-device .values-grid > * { scroll-snap-align: start; }
+html.amg-compact-device .featured-books-grid .book-card { display: grid; grid-template-columns: 104px minmax(0,1fr); }
+html.amg-compact-device .featured-books-grid .book-cover { height: 100%; min-height: 150px; }
+html.amg-compact-device .home-journey .journey-grid { display: grid; grid-template-columns: repeat(3, minmax(190px,1fr)); overflow-x: auto; }
+html.amg-compact-device .home-levels .level-chips { flex-wrap: nowrap; overflow-x: auto; }
+html.amg-compact-device #heroSection > .home-cta { display: grid; gap: 1rem; border-radius: 18px; }
+html.amg-compact-device .home-cta .hero-actions { display: grid; grid-template-columns: 1fr 1fr; }
+html.amg-compact-device #heroSection > .home-intro { border-left: 4px solid #0b946b; background: linear-gradient(110deg,#edf8f2,#f5f8ff); box-shadow: none; }
+html.amg-compact-device #heroSection > .home-services,
+html.amg-compact-device #heroSection > .home-levels { background: #fff; box-shadow: none; }
+html.amg-compact-device #heroSection > .home-journey { background: #f1f7fb; box-shadow: none; }
+html.amg-compact-device #heroSection > .home-values,
+html.amg-compact-device #heroSection > .home-purpose-grid { background: #f2f7f5; box-shadow: none; }
+
+/* Native scroll-linked reveal where supported; content remains visible without it. */
+@supports (animation-timeline: view()) {
+  @media (max-width: 680px) {
+    #heroSection > .home-featured-section,
+    #heroSection > .home-intro,
+    #heroSection > .home-purpose-grid,
+    #heroSection > .home-services,
+    #heroSection > .home-journey,
+    #heroSection > .home-levels,
+    #heroSection > .home-values,
+    #heroSection > .home-cta,
+    #heroSection > .panel[aria-labelledby="announcementsTitle"] {
+      animation: amg-home-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 24%;
+    }
+  }
+  html.amg-compact-device #heroSection > .home-featured-section,
+  html.amg-compact-device #heroSection > .home-intro,
+  html.amg-compact-device #heroSection > .home-purpose-grid,
+  html.amg-compact-device #heroSection > .home-services,
+  html.amg-compact-device #heroSection > .home-journey,
+  html.amg-compact-device #heroSection > .home-levels,
+  html.amg-compact-device #heroSection > .home-values,
+  html.amg-compact-device #heroSection > .home-cta { animation: amg-home-reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 24%; }
+}
+@keyframes amg-home-reveal {
+  from { opacity: .35; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #heroSection > * { animation: none !important; scroll-behavior: auto !important; }
+  .featured-books-grid, .home-purpose-grid, .home-feature-grid, .journey-grid, .values-grid, .level-chips { scroll-behavior: auto !important; }
+}
