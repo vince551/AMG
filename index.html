@@ -87,6 +87,11 @@
         </div>
         <div class="hero-bottom-line"><span>KNOWLEDGE FOR EVERY LEARNER</span><span>AMG LIBRARY <b>✳</b> LEARN. DISCOVER. GROW.</span></div>
       </div>
+      <div class="amg-counter-strip" aria-label="AMG Library at a glance">
+        <div class="amg-counter"><strong data-amg-count="books" data-count-target="0">0</strong><span>Books in catalogue</span></div>
+        <div class="amg-counter"><strong data-amg-count="levels" data-count-target="0">0</strong><span>Learning stages</span></div>
+        <div class="amg-counter"><strong data-amg-count="steps" data-count-target="0">0</strong><span>Steps to get started</span></div>
+      </div>
       <section class="home-featured-section" aria-labelledby="featuredBooksTitle">
         <div class="featured-heading">
           <div><p class="eyebrow">FIND YOUR NEXT READ</p><h2 id="featuredBooksTitle">Stories, ideas and knowledge await.</h2><p>Explore books from the AMG Library catalogue.</p></div>
@@ -303,6 +308,7 @@
 
   <div id="cardModal" class="modal" role="dialog" aria-modal="true"><div class="modal-content card-modal-content"><button class="close-btn" onclick="AMG.closeCardModal()">×</button><div id="adminCardTarget" class="library-card"><div class="card-header"><div class="brand"><img class="brand-logo" src="AMG.images/logo.jpg" alt="AMG Library logo"><div><div class="brand-title">AMG LIBRARY</div><div class="brand-subtitle">Official Student Membership</div></div></div></div><div class="card-body"><img id="adminCardImage" class="card-photo" alt="Member photo"><div class="card-info"><h3 id="adminCardName"></h3><p><strong>School:</strong> <span id="adminCardSchool"></span></p><p><strong>Study:</strong> <span id="adminCardStudy"></span></p><p><strong>Level:</strong> <span id="adminCardLevel" class="badge"></span></p></div></div><div class="card-footer"><svg id="adminMemberBarcode"></svg><div id="adminCardNumber" class="library-number"></div><div id="adminMemberQr" class="qr-holder"></div></div></div><button class="btn btn-primary top-gap" onclick="AMG.downloadCard('adminCardTarget')">Download member card</button></div></div>
 
+  <script src="mobile-effects.js" defer></script>
   <script type="module" src="app.js"></script>
   <script>if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));</script>
 </body>
