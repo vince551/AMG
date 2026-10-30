@@ -1,7 +1,4 @@
 /* AMG visual polish */
-.password-field{position:relative}
-/* Eye icon inside the password field */
-.password-field{position:relative;display:block;width:100%}.password-field input{width:100%;min-width:0;padding-right:3.2rem!important}.password-toggle{position:absolute;right:.55rem;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:36px;height:36px;min-height:36px;padding:0;border:0;border-radius:9px;background:transparent;color:#718596;font-size:0;box-shadow:none}.password-toggle svg{display:none}.password-toggle:before{content:"";width:20px;height:20px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8'%3E%3Cpath d='M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center/contain no-repeat}.password-toggle[aria-pressed=true]:before{mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='m3 3 18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7s-1 2-3 4M6 6C3 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8M10 10a3 3 0 0 0 4 4'/%3E%3C/svg%3E")}.password-toggle:hover{color:var(--primary);background:rgba(8,127,91,.08)}
 /* Glassmorphism header */
 .navbar{position:sticky;top:0;z-index:1100;background:rgba(248,252,251,.72)!important;border:1px solid rgba(255,255,255,.72)!important;border-top:0!important;box-shadow:0 12px 34px rgba(13,42,55,.1),inset 0 1px 0 rgba(255,255,255,.82)!important;backdrop-filter:blur(22px) saturate(165%);-webkit-backdrop-filter:blur(22px) saturate(165%)}.navbar .nav-links{gap:.35rem}.navbar .nav-btn{border-radius:10px}
 :root[data-theme=dark]{color-scheme:dark;--bg-color:#0b141c;--surface-color:#14212b;--text-main:#e8f0f5;--text-muted:#a8bac7;--border-color:#2b414e;--primary:#35c99a;--primary-dark:#22a97e;--secondary:#80b7ff;--amg-green:#48d3a5;--amg-blue:#8dbbff;--field-bg:#101d27;--amg-menu-bg:#172631;--amg-menu-border:#38505e;--amg-menu-text:#e8f0f5}
@@ -67,73 +64,6 @@ body { padding-top: var(--amg-fixed-nav-space); }
   border-color: rgba(177, 213, 207, .16) !important;
   box-shadow: 0 12px 38px rgba(0,0,0,.34) !important;
 }
-
-/* Instagram-inspired password control: full-width field, eye pinned to the far right. */
-.password-field {
-  position: relative !important;
-  display: block !important;
-  width: 100% !important;
-  min-width: 0;
-}
-.password-field input,
-.auth-modal .password-field input,
-.form-stack .password-field input {
-  display: block;
-  width: 100% !important;
-  min-width: 0;
-  min-height: 48px;
-  padding: 0 3.25rem 0 14px !important;
-  border: 1px solid #d5dce3;
-  border-radius: 12px;
-  background: #f7f8fa;
-  color: #172b3a;
-  box-shadow: none;
-  outline: none;
-}
-.password-field input:focus {
-  border-color: #7d9fbd;
-  box-shadow: 0 0 0 3px rgba(68,126,174,.12);
-}
-.password-toggle,
-.form-stack .password-field .password-toggle,
-.auth-modal .password-field .password-toggle {
-  position: absolute !important;
-  top: 50% !important;
-  right: 8px !important;
-  left: auto !important;
-  transform: translateY(-50%) !important;
-  display: grid !important;
-  place-items: center;
-  width: 36px !important;
-  min-width: 36px !important;
-  max-width: 36px !important;
-  height: 36px !important;
-  min-height: 36px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 8px !important;
-  background: transparent !important;
-  color: #687989 !important;
-  box-shadow: none !important;
-  font-size: 0 !important;
-  line-height: 0 !important;
-}
-.password-toggle svg { display: none !important; }
-.password-toggle::before {
-  content: "";
-  display: block;
-  width: 20px;
-  height: 20px;
-  background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8'%3E%3Cpath d='M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center/contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8'%3E%3Cpath d='M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center/contain no-repeat;
-}
-.password-toggle[aria-pressed="true"]::before {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='m3 3 18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7s-1 2-3 4M6 6C3 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8M10 10a3 3 0 0 0 4 4'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='m3 3 18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7s-1 2-3 4M6 6C3 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8M10 10a3 3 0 0 0 4 4'/%3E%3C/svg%3E");
-}
-.password-toggle:hover { color: #315f80 !important; }
 
 /* Small, floating theme switch with a clean line icon (no emoji or text label). */
 .theme-toggle.theme-toggle-float {
