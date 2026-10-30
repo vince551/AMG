@@ -78,18 +78,20 @@
     window.requestAnimationFrame(frame);
   };
 
-  if (reducedMotion || !("IntersectionObserver" in window)) {
-    countElements.forEach(animateCount);
-    return;
-  }
-
-  const revealTargets = document.querySelectorAll(
+  const revealSelector =
     "#heroSection .hero-copy, #heroSection .hero-gallery, #heroSection > .home-featured-section, " +
     "#heroSection > .home-intro, #heroSection .purpose-card, #heroSection .home-feature, " +
     "#heroSection .journey-grid > article, #heroSection .level-chips > *, #heroSection .values-grid > article, " +
     "#heroSection > .home-cta, #heroSection > .panel[aria-labelledby='announcementsTitle'], " +
-    "#heroSection .featured-book-card, #heroSection .hero-gallery img, #heroSection .featured-book-cover img"
-  );
+    "#heroSection .featured-book-card, #heroSection .hero-gallery img, #heroSection .featured-book-cover img";
+
+  if (reducedMotion || !("IntersectionObserver" in window)) {
+    document.querySelectorAll(revealSelector).forEach(element => element.classList.add("amg-revealed"));
+    countElements.forEach(animateCount);
+    return;
+  }
+
+  const revealTargets = document.querySelectorAll(revealSelector);
   const revealObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
@@ -113,7 +115,13 @@
   if (featured && "MutationObserver" in window) {
     const dataObserver = new MutationObserver(() => {
       const counter = document.querySelector('[data-amg-count="books"]');
-      if (counter && counterObserver) counterObserver.observe(counter);
+      if (counter) counterObserver.observe(counter);
+      featured.querySelectorAll(".featured-book-card, .featured-book-cover img").forEach((element, index) => {
+        if (element.classList.contains("amg-observed")) return;
+        element.classList.add("amg-observed");
+        element.style.setProperty("--amg-stagger", String(Math.min(index, 6)));
+        revealObserver.observe(element);
+      });
     });
     dataObserver.observe(featured, { childList: true });
   }
