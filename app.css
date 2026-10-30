@@ -2103,3 +2103,11 @@ html.amg-compact-device .navbar .nav-links .dropdown-content {
   .dropdown-content { background: rgba(245,251,248,.97); }
   :root[data-theme="dark"] .dropdown-content { background: rgba(24,35,45,.97); }
 }
+
+
+/* Individual physical-copy barcode and QR label sheets */
+.copy-labels-panel{margin:1.25rem 0;padding:1rem;border:1px solid var(--border-color,#dbe4e8);border-radius:16px;background:var(--surface,#fff)}
+.copy-label-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:1rem}
+.copy-label{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px;border:1px dashed #94a3b8;border-radius:10px;background:#fff;color:#111827;break-inside:avoid}
+.copy-label svg{max-width:100%;height:46px}.copy-label small{font-size:10px;overflow-wrap:anywhere;text-align:center}.copy-label-qr{min-height:88px}
+@media print{body *{visibility:hidden!important}#copyLabelsPanel,#copyLabelsPanel *{visibility:visible!important}#copyLabelsPanel{display:block!important;position:absolute;inset:0;width:100%;margin:0;padding:12px;border:0}.copy-label-grid{grid-template-columns:repeat(3,1fr)}.copy-label{break-inside:avoid}}

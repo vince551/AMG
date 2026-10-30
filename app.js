@@ -721,9 +721,35 @@ async function registerBook(event) {
   try {
     const createBook = httpsCallable(state.functions,"registerBookCopies");
     const result = await createBook({title,author:String(form.get("author")).trim(),category,quantity,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim()});
-    event.currentTarget.reset(); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
+    event.currentTarget.reset(); renderCopyLabels(title, result.data.copies || []); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
     await refreshPublicData(); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
+}
+function renderCopyLabels(title, copies) {
+  const panel = $("copyLabelsPanel");
+  if (!panel) return;
+  panel.replaceChildren();
+  if (!copies.length) return;
+  const heading = node("h4", "Copy labels — " + title);
+  const note = node("p", "Each label identifies one physical copy. Print and attach one label to each copy.", "muted");
+  const printButton = node("button", "Print copy labels", "btn btn-outline top-gap");
+  printButton.type = "button";
+  printButton.addEventListener("click", () => window.print());
+  const grid = node("div", null, "copy-label-grid");
+  copies.forEach(copy => {
+    const card = node("article", null, "copy-label");
+    card.append(node("strong", "Copy " + copy.copyNumber));
+    const barcode = node("svg");
+    card.append(barcode);
+    try { if (window.JsBarcode) window.JsBarcode(barcode, copy.barcode, {format:"CODE128",displayValue:false,margin:2,height:42,width:1.4}); } catch (_) {}
+    card.append(node("small", copy.barcode));
+    const qr = node("div", null, "copy-label-qr");
+    if (window.QRCode) new window.QRCode(qr, {text:copy.barcode,width:88,height:88,colorDark:"#111827",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
+    card.append(qr);
+    grid.append(card);
+  });
+  panel.append(heading, note, printButton, grid);
+  panel.classList.remove("hidden");
 }
 function renderInventory() {
   const table=$("inventoryTable"); table.replaceChildren();
