@@ -5,7 +5,7 @@
 export const firebaseConfig = {
   apiKey: "AIzaSyAMOQlVeZ8PDGGC4wUyMnFmxYUG2sgcgB4",
   authDomain: "amglibra-76222.firebaseapp.com",
-  projectId: "REPLACE_WITH_PROJECT_ID",
+  projectId: "amglibra-76222",
   storageBucket: "REPLACE_WITH_PROJECT_ID.firebasestorage.app",
   messagingSenderId: "REPLACE_WITH_MESSAGING_SENDER_ID",
   appId: "REPLACE_WITH_FIREBASE_APP_ID",
