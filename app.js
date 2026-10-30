@@ -437,6 +437,8 @@ function renderFeaturedBooks() {
   if (!container) return;
   container.replaceChildren();
   const books = state.books.slice(0, 4);
+  const catalogueCounter = document.querySelector('[data-amg-count="books"]');
+  if (catalogueCounter) catalogueCounter.dataset.countTarget = String(state.books.length);
   if (!books.length) {
     const message = node("p", "The featured collection will appear here when books are available in the library catalogue.", "featured-empty");
     const action = node("button", "Explore the Lib Shelf →", "btn btn-outline featured-empty-action");
