@@ -93,6 +93,17 @@ function init() {
   $("categoryFilter").addEventListener("change", renderBooks);
   $("loginForm").addEventListener("submit", login);
   $("registerForm").addEventListener("submit", register);
+  document.querySelectorAll("[data-password-toggle]").forEach(button => {
+    button.addEventListener("click", () => {
+      const input = $(button.dataset.passwordToggle);
+      if (!input) return;
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      button.textContent = show ? "Hide" : "Show";
+      button.setAttribute("aria-label", show ? "Hide password" : "Show password");
+      button.setAttribute("aria-pressed", String(show));
+    });
+  });
   $("avatarChoice").addEventListener("change", updateAvatarPreview);
   $("bookForm").addEventListener("submit", registerBook);
   $("attendanceForm").addEventListener("submit", recordAttendance);
@@ -131,8 +142,17 @@ function init() {
       }
       updateAuthUI();
       await refreshPublicData();
-      if (user && state.profile) await refreshMemberData();
-      if (state.librarian) await refreshAdminData();
+
+      // Route authenticated users to the workspace their verified account can access.
+      // The librarian desk remains protected by the server-issued custom claim.
+      if (user && state.librarian) {
+        showSection("librarianSection");
+      } else if (user && state.profile) {
+        showSection("profileSection");
+      } else if (user && user.email &&
+        user.email.toLowerCase() === String(firebaseConfig.librarianEmail || "").trim().toLowerCase()) {
+        showToast("You are signed in, but librarian permissions have not been assigned yet. The librarian account needs the secure librarian claim before the desk can open.", "error");
+      }
     });
   } catch (error) {
     $("setupNotice").classList.remove("hidden");
