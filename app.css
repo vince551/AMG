@@ -2111,3 +2111,38 @@ html.amg-compact-device .navbar .nav-links .dropdown-content {
 .copy-label{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px;border:1px dashed #94a3b8;border-radius:10px;background:#fff;color:#111827;break-inside:avoid}
 .copy-label svg{max-width:100%;height:46px}.copy-label small{font-size:10px;overflow-wrap:anywhere;text-align:center}.copy-label-qr{min-height:88px}
 @media print{body *{visibility:hidden!important}#copyLabelsPanel,#copyLabelsPanel *{visibility:visible!important}#copyLabelsPanel{display:block!important;position:absolute;inset:0;width:100%;margin:0;padding:12px;border:0}.copy-label-grid{grid-template-columns:repeat(3,1fr)}.copy-label{break-inside:avoid}}
+
+
+/* Accessible show/hide controls for account password fields. */
+.password-field {
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  width:100%;
+}
+.password-field input {
+  flex:1 1 auto;
+  width:100%;
+  min-width:0;
+}
+.password-toggle {
+  flex:0 0 auto;
+  min-height:42px;
+  padding:.55rem .85rem;
+  border:1px solid var(--border-color,#cbd5e1);
+  border-radius:10px;
+  background:var(--surface,#fff);
+  color:var(--text-color,#173b30);
+  font:inherit;
+  font-size:.88rem;
+  font-weight:750;
+  cursor:pointer;
+}
+.password-toggle:focus-visible {
+  outline:3px solid rgba(8,127,91,.28);
+  outline-offset:2px;
+}
+html.amg-compact-device .password-toggle {
+  width:auto;
+  max-width:5rem;
+}
