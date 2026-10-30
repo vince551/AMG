@@ -101,18 +101,18 @@
         <p>AMG Library connects learners with books, digital learning resources and a supportive reading community. From early learning to university, we help every member discover knowledge, build confidence and develop lifelong learning habits.</p>
       </section>
       <div class="home-purpose-grid">
-        <article class="purpose-card mission-card"><span class="purpose-icon">🎯</span><p class="eyebrow">OUR MISSION</p><h2>Make knowledge accessible</h2><p>To provide an inclusive, learner-centred library where people of every learning level can access useful books, reliable resources and opportunities to grow through reading.</p></article>
-        <article class="purpose-card vision-card"><span class="purpose-icon">🌍</span><p class="eyebrow">OUR VISION</p><h2>A community of confident readers</h2><p>To nurture curious, informed and empowered learners who use knowledge, creativity and lifelong reading to build brighter futures for themselves and their communities.</p></article>
+        <article class="purpose-card mission-card"><p class="eyebrow">OUR MISSION</p><h2>Make knowledge accessible</h2><p>To provide an inclusive, learner-centred library where people of every learning level can access useful books, reliable resources and opportunities to grow through reading.</p></article>
+        <article class="purpose-card vision-card"><p class="eyebrow">OUR VISION</p><h2>A community of confident readers</h2><p>To nurture curious, informed and empowered learners who use knowledge, creativity and lifelong reading to build brighter futures for themselves and their communities.</p></article>
       </div>
       <section class="home-services panel" aria-labelledby="servicesTitle">
         <div class="section-header"><p class="eyebrow">WHAT YOU CAN DO HERE</p><h2 id="servicesTitle">More than a bookshelf</h2><p>Practical library services designed around the learner.</p></div>
         <div class="home-feature-grid">
-          <article class="home-feature"><span>📚</span><h3>Explore the Lib Shelf</h3><p>Search books by title, author or category and discover your next read.</p></article>
-          <article class="home-feature"><span>🎫</span><h3>Digital membership</h3><p>Receive a member card with a unique library number, barcode and QR code.</p></article>
-          <article class="home-feature"><span>🔄</span><h3>Book borrowing</h3><p>Request available books and follow the status of requests and loans.</p></article>
-          <article class="home-feature"><span>💻</span><h3>Digital resources</h3><p>Access e-books and learning materials shared by the library.</p></article>
-          <article class="home-feature"><span>📈</span><h3>Learning activity</h3><p>Keep track of your library activity and build consistent reading habits.</p></article>
-          <article class="home-feature"><span>🤝</span><h3>Community updates</h3><p>Stay informed about announcements, reading activities and library events.</p></article>
+          <article class="home-feature"><h3>Explore the Lib Shelf</h3><p>Search books by title, author or category and discover your next read.</p></article>
+          <article class="home-feature"><h3>Digital membership</h3><p>Receive a member card with a unique library number, barcode and QR code.</p></article>
+          <article class="home-feature"><h3>Book borrowing</h3><p>Request available books and follow the status of requests and loans.</p></article>
+          <article class="home-feature"><h3>Digital resources</h3><p>Access e-books and learning materials shared by the library.</p></article>
+          <article class="home-feature"><h3>Learning activity</h3><p>Keep track of your library activity and build consistent reading habits.</p></article>
+          <article class="home-feature"><h3>Community updates</h3><p>Stay informed about announcements, reading activities and library events.</p></article>
         </div>
       </section>
       <section class="home-journey panel" aria-labelledby="journeyTitle">
@@ -139,7 +139,7 @@
       <div class="toolbar">
         <input id="searchInput" class="search-input" type="search" placeholder="Search by book title, author or category…" aria-label="Search books">
         <select id="categoryFilter" aria-label="Filter by category">
-          <option value="All">All categories</option><option value="Starred">⭐ Starred</option><option>PP / Pre-Primary</option><option>Primary</option><option>Junior Secondary</option><option>Senior Secondary</option><option>High School</option><option>University</option><option>General / Fiction</option><option>Other</option>
+          <option value="All">All categories</option><option value="Starred">Starred</option><option>PP / Pre-Primary</option><option>Primary</option><option>Junior Secondary</option><option>Senior Secondary</option><option>High School</option><option>University</option><option>General / Fiction</option><option>Other</option>
         </select>
       </div>
       <div id="bookGrid" class="book-grid"><div class="empty-state">Connect Firebase and register books to populate the Lib Shelf.</div></div><section class="panel"><div class="section-header"><h2>Digital library</h2><p>Download e-books shared by the librarian. Sign in to access files.</p></div><div id="publicEbooks" class="announcement-grid"><p class="muted">Sign in to view available e-books.</p></div></section>
@@ -290,7 +290,7 @@
         <label>Relationship<select name="guardianRelation"><option>Mother</option><option>Father</option><option>Guardian</option></select></label>
         <label>Parent / guardian phone number<input name="guardianPhone" type="tel" required maxlength="30" placeholder="+254 7XX XXX XXX"></label>
         <fieldset class="avatar-fieldset"><legend>Choose a profile picture (optional)</legend><p class="muted">Take a photo with your camera, or choose an avatar instead.</p>
-          <label class="camera-picker">📷 Take a photo<input name="photo" type="file" accept="image/*" capture="user"></label>
+          <label class="camera-picker">Take a photo<input name="photo" type="file" accept="image/*" capture="user"></label>
           <label>Or choose an avatar<select name="avatarChoice" id="avatarChoice"><option value="scholar">Scholar</option><option value="reader">Book lover</option><option value="explorer">Explorer</option><option value="creative">Creative learner</option><option value="classic">Classic portrait</option></select></label>
           <div class="avatar-preview-row"><img id="avatarPreview" src="https://api.dicebear.com/9.x/avataaars/svg?seed=AMG-Scholar" alt="Selected avatar preview"><span class="muted">You can use this avatar without uploading a photo.</span></div>
         </fieldset>
