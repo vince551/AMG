@@ -115,7 +115,7 @@
   if (featured && "MutationObserver" in window) {
     const dataObserver = new MutationObserver(() => {
       const counter = document.querySelector('[data-amg-count="books"]');
-      if (counter) counterObserver.observe(counter);
+      if (counter) { counterObserver.unobserve(counter); counterObserver.observe(counter); }
       featured.querySelectorAll(".featured-book-card, .featured-book-cover img").forEach((element, index) => {
         if (element.classList.contains("amg-observed")) return;
         element.classList.add("amg-observed");
