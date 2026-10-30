@@ -61,33 +61,7 @@ function requireFirebase() {
 }
 function isReady() { return Boolean(state.auth && state.db && state.storage); }
 
-function applyTheme(theme) {
-  const selected = theme === "dark" ? "dark" : "light";
-  document.documentElement.setAttribute("data-theme", selected);
-  const button = $("themeToggle");
-  const icon = $("themeIcon");
-  const label = $("themeLabel");
-  if (button) {
-    button.setAttribute("aria-label", selected === "dark" ? "Switch to light theme" : "Switch to dark theme");
-    button.setAttribute("aria-pressed", selected === "dark" ? "true" : "false");
-    button.title = selected === "dark" ? "Switch to light theme" : "Switch to dark theme";
-  }
-  if (icon) icon.textContent = selected === "dark" ? "☀" : "☾";
-  if (label) label.textContent = selected === "dark" ? "Light mode" : "Dark mode";
-  const themeColor = document.querySelector('meta[name="theme-color"]');
-  if (themeColor) themeColor.setAttribute("content", selected === "dark" ? "#101820" : "#087f5b");
-}
-
-function toggleTheme() {
-  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  applyTheme(next);
-  try { localStorage.setItem("amg-library-theme", next); } catch (_) {}
-}
-
 function init() {
-  let savedTheme = "light";
-  try { savedTheme = localStorage.getItem("amg-library-theme") || "light"; } catch (_) {}
-  applyTheme(savedTheme);
   $("year").textContent = new Date().getFullYear();
   $("searchInput").addEventListener("input", renderBooks);
   $("categoryFilter").addEventListener("change", renderBooks);
@@ -1002,5 +976,5 @@ function renderStatistics() {
 }
 function renderInventoryPlaceholder() { /* Inventory is rendered with the admin data snapshot. */ }
 
-window.AMG = {showSection,toggleDropdown,toggleMobileNav,openAuthModal,closeAuthModal,setAuthMode,nextRegistrationStep,previousRegistrationStep,logout,resetPassword,downloadCard,closeCardModal,switchTab,toggleTheme};
+window.AMG = {showSection,toggleDropdown,toggleMobileNav,openAuthModal,closeAuthModal,setAuthMode,nextRegistrationStep,previousRegistrationStep,logout,resetPassword,downloadCard,closeCardModal,switchTab};
 document.addEventListener("DOMContentLoaded",init);
