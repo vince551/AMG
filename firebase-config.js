@@ -10,7 +10,7 @@ export const firebaseConfig = {
   messagingSenderId: "REPLACE_WITH_MESSAGING_SENDER_ID",
   appId: "REPLACE_WITH_FIREBASE_APP_ID",
   // Set to the email of the Firebase Auth librarian account.
-  librarianEmail: "REPLACE_WITH_LIBRARIAN_ACCOUNT_EMAIL"
+  librarianEmail: "Edwinmuga99@gmail.com"
 };
 
 export const isFirebaseConfigured = () =>
