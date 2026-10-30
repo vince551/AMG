@@ -462,7 +462,7 @@ function renderFeaturedBooks() {
       image.loading = "lazy";
       cover.append(image);
     } else {
-      cover.append(node("span", book.icon || "📚", "featured-cover-placeholder"));
+      cover.append(node("span", book.icon || "BOOK", "featured-cover-placeholder"));
     }
     const details = node("div", null, "featured-book-details");
     details.append(
@@ -497,7 +497,7 @@ function renderBooks() {
     const card = node("article",null,"book-card");
     const cover = node("div",null,"book-cover");
     if (book.coverUrl) { const image=node("img"); image.src=book.coverUrl; image.alt="Cover of "+book.title; image.loading="lazy"; cover.append(image); }
-    else cover.append(node("span",book.icon||"📚"));
+    else cover.append(node("span",book.icon||"BOOK"));
     const star=node("button",stars.includes(book.id)?"★":"☆","star-btn");
     star.type="button"; star.setAttribute("aria-label",stars.includes(book.id)?"Remove from starred books":"Star book");
     star.addEventListener("click",()=>toggleStar(book.id)); cover.append(star);
