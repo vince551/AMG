@@ -78,3 +78,21 @@ This checks JavaScript syntax only. Against your configured Firebase project, te
 - Rules deny admin writes unless the authenticated account has the librarian custom claim.
 - Guardian contact information is readable only by the member and librarian.
 - Camera scanning requires HTTPS and browser permission; manual library-number entry remains available.
+
+
+## Smart barcode and QR circulation
+
+The Librarian Desk has one scanner workflow for member check-in/check-out, book issue and book return. Membership cards retain their current member barcode and QR code. Each physical copy gets a unique CODE-128 barcode identifier.
+
+- **Phone camera:** use Start camera scanner on the Attendance tab. Requires HTTPS, camera permission and browser Barcode Detection API support.
+- **USB/Bluetooth scanner:** connect or pair it; most scanners type the decoded code into the focused input like a keyboard. Select the mode and submit.
+- **Issue:** choose Issue book, scan the member card first, then scan the physical copy barcode.
+- **Return:** choose Return book and scan the physical copy barcode.
+
+### Secure Firebase operations
+Cloud Functions validate the Firebase Auth `librarian: true` custom claim for every operation. Attendance, book-copy issue and return updates use Firestore transactions. Browser clients cannot directly write attendance history, member presence or physical-copy records. Deploy with `firebase deploy --only functions,firestore:rules`. Cloud Functions require the Firebase Blaze plan; configure billing alerts first. Replace the placeholder web-app configuration in `firebase-config.js` using Firebase Console; never commit service-account credentials.
+
+### Data model
+`bookCopies/{copyId}` stores `bookId`, `barcode`, `copyNumber` and `status`. `loans` stores `bookCopyId` and `copyBarcode`. `memberPresence/{uid}` is the current-presence pointer; `attendance` remains the history. Registering is limited to 400 copies per operation to stay within Firestore batch write limits.
+
+Before production use, deploy to a staging Firebase project and test callable operations with a librarian test account and sample member/copies.

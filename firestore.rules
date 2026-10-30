@@ -55,7 +55,18 @@ service cloud.firestore {
     }
 
     match /attendance/{attendanceId} {
-      allow read, create, update, delete: if librarian();
+      allow read: if librarian();
+      allow create, update, delete: if false;
+    }
+
+    match /bookCopies/{copyId} {
+      allow read: if librarian();
+      allow create, update, delete: if false;
+    }
+
+    match /memberPresence/{uid} {
+      allow read: if librarian() || own(uid);
+      allow write: if false;
     }
 
     match /announcements/{announcementId} {

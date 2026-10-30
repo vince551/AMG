@@ -10,10 +10,11 @@ import {
 import {
   getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
 import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
 
 const $ = (id) => document.getElementById(id);
-const state = { app:null, auth:null, db:null, storage:null, user:null, profile:null, librarian:false,
+const state = { app:null, auth:null, db:null, storage:null, functions:null, user:null, profile:null, librarian:false, scanMemberCode:"",
   books:[], requests:[], members:[], loans:[], attendance:[], ebooks:[], announcements:[], events:[],
   capacity:100, scanner:null, scanStream:null, toastTimer:null };
 const categories = {
@@ -115,6 +116,7 @@ function init() {
     state.auth = getAuth(state.app);
     state.db = getFirestore(state.app);
     state.storage = getStorage(state.app);
+    state.functions = getFunctions(state.app);
     onAuthStateChanged(state.auth, async (user) => {
       state.user = user;
       state.profile = null;
@@ -715,12 +717,11 @@ async function registerBook(event) {
   const form=new FormData(event.currentTarget);
   const title=String(form.get("title")).trim(), category=String(form.get("category"));
   const quantity=Number(form.get("quantity"));
-  if(!title||!Number.isInteger(quantity)||quantity<1||quantity>5000) { showToast("Enter a title and a valid number of copies.","error"); return; }
+  if(!title||!Number.isInteger(quantity)||quantity<1||quantity>400) { showToast("Enter a title and between 1 and 400 physical copies.","error"); return; }
   try {
-    const prefix=initialsCategory(category);
-    const barcode=prefix+"-"+new Date().getFullYear()+"-"+Math.random().toString(36).slice(2,8).toUpperCase();
-    await addDoc(collection(state.db,"books"),{title,author:String(form.get("author")).trim(),category,quantity,available:quantity,barcode,libraryNumber:barcode,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim(),createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:state.user.uid});
-    event.currentTarget.reset(); showToast("Book registered. Unique CODE-128 barcode: "+barcode);
+    const createBook = httpsCallable(state.functions,"registerBookCopies");
+    const result = await createBook({title,author:String(form.get("author")).trim(),category,quantity,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim()});
+    event.currentTarget.reset(); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
     await refreshPublicData(); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
@@ -741,26 +742,48 @@ async function deleteBook(book) {
     await deleteDoc(doc(state.db,"books",book.id)); showToast("Book removed from catalogue."); await refreshPublicData(); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
-async function recordAttendance(event) {
-  event.preventDefault(); if(!state.librarian) return;
-  const form=new FormData(event.currentTarget), libraryNumber=String(form.get("libraryNumber")).trim(), action=String(form.get("action"));
+async function processUnifiedCode(rawCode, mode) {
+  if (!state.librarian || !rawCode) return;
+  const code = String(rawCode).trim();
+  if (!code) return;
   try {
-    const found=await getDocs(query(collection(state.db,"users"),where("libraryNumber","==",libraryNumber),limit(1)));
-    if(found.empty) throw new Error("No registered member matches that library number.");
-    const member={id:found.docs[0].id,...found.docs[0].data()};
-    if(!member.isApproved) throw new Error("This member has not been approved.");
-    const open=state.attendance.find(a=>a.uid===member.uid&&a.status==="In library");
-    if(action==="check-in") {
-      if(open) throw new Error("This member is already checked in.");
-      await addDoc(collection(state.db,"attendance"),{uid:member.uid,memberName:member.fullName,libraryNumber:member.libraryNumber,checkInAt:serverTimestamp(),checkOutAt:null,status:"In library",recordedBy:state.user.uid});
-      showToast(member.fullName+" checked in.");
-    } else {
-      if(!open) throw new Error("No open check-in was found for this member.");
-      await updateDoc(doc(state.db,"attendance",open.id),{checkOutAt:serverTimestamp(),status:"Checked out",checkedOutBy:state.user.uid});
-      showToast(member.fullName+" checked out.");
+    if (mode === "check-in" || mode === "check-out") {
+      const call = httpsCallable(state.functions, "recordMemberAttendance");
+      const result = await call({libraryNumber:code, action:mode});
+      showToast(result.data.message || "Attendance recorded.");
+    } else if (mode === "issue-book") {
+      if (!state.scanMemberCode) {
+        state.scanMemberCode = code;
+        setText("scannerInstruction", "Member scanned. Now scan the individual book-copy barcode.");
+        showToast("Member scanned. Scan the book copy.");
+        return;
+      }
+      const call = httpsCallable(state.functions, "issueBookCopy");
+      const result = await call({libraryNumber:state.scanMemberCode, copyBarcode:code});
+      state.scanMemberCode = "";
+      setText("scannerInstruction", "Scan a member and then a book copy.");
+      showToast(result.data.message || "Book issued.");
+    } else if (mode === "return-book") {
+      const call = httpsCallable(state.functions, "returnBookCopy");
+      const result = await call({copyBarcode:code});
+      showToast(result.data.message || "Book returned.");
     }
-    event.currentTarget.reset(); await refreshAdminData();
-  } catch(error) { showToast(errorMessage(error),"error"); }
+    await refreshPublicData();
+    await refreshAdminData();
+  } catch(error) {
+    state.scanMemberCode = "";
+    setText("scannerInstruction", "Select an action, then scan the relevant membership card or book-copy label.");
+    showToast(errorMessage(error), "error");
+  }
+}
+async function recordAttendance(event) {
+  event.preventDefault();
+  if (!state.librarian) return;
+  const form = new FormData(event.currentTarget);
+  const code = String(form.get("libraryNumber") || "").trim();
+  const mode = String(form.get("action") || "check-in");
+  await processUnifiedCode(code, mode);
+  event.currentTarget.reset();
 }
 async function updateCapacity(event) {
   event.preventDefault(); if(!state.librarian) return;
@@ -779,31 +802,44 @@ function renderAttendance() {
   $("capacityForm").elements.capacity.value=state.capacity;
 }
 async function startScanner() {
-  if(!state.librarian) return;
-  if(!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia) { showToast("Camera barcode scanning is not supported in this browser. Enter the library number manually.","error"); return; }
+  if (!state.librarian) return;
+  if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia) {
+    showToast("Camera scanning is unavailable in this browser. Use a USB/Bluetooth scanner or enter the code manually.", "error");
+    return;
+  }
   try {
-    const detector=new BarcodeDetector({formats:["code_128","qr_code","ean_13"]});
-    state.scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
-    const video=$("scannerVideo"); video.srcObject=state.scanStream; await video.play(); $("scannerBox").classList.remove("hidden");
-    const scan=async()=>{
-      if(!state.scanStream) return;
+    const detector = new BarcodeDetector({formats:["code_128","qr_code","ean_13","ean_8","upc_a","upc_e"]});
+    state.scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}});
+    const video = $("scannerVideo");
+    video.srcObject = state.scanStream;
+    await video.play();
+    $("scannerBox").classList.remove("hidden");
+    const scan = async () => {
+      if (!state.scanStream) return;
       try {
-        const codes=await detector.detect(video);
-        if(codes.length&&codes[0].rawValue) {
-          $("attendanceForm").elements.libraryNumber.value=codes[0].rawValue;
-          showToast("Barcode scanned. Choose check-in/check-out and submit.");
-          await stopScanner(); return;
+        const codes = await detector.detect(video);
+        if (codes.length && codes[0].rawValue) {
+          const mode = $("attendanceForm").elements.action.value;
+          await processUnifiedCode(codes[0].rawValue, mode);
+          if (mode !== "issue-book" || !state.scanMemberCode) {
+            await stopScanner();
+            return;
+          }
         }
-      } catch(_){}
-      state.scanner=requestAnimationFrame(scan);
+      } catch(_) {}
+      state.scanner = requestAnimationFrame(scan);
     };
     scan();
-  } catch(error) { await stopScanner(); showToast("Could not open camera: "+errorMessage(error),"error"); }
+  } catch(error) {
+    await stopScanner();
+    showToast("Could not open camera: " + errorMessage(error), "error");
+  }
 }
 async function stopScanner() {
   if(state.scanner) cancelAnimationFrame(state.scanner);
   state.scanner=null;
   if(state.scanStream) state.scanStream.getTracks().forEach(track=>track.stop());
+  state.scanMemberCode = "";
   state.scanStream=null;
   if($("scannerVideo")) $("scannerVideo").srcObject=null;
   $("scannerBox")?.classList.add("hidden");
