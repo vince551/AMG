@@ -1,7 +1,7 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {initializeApp} = require("firebase-admin/app");
 const {getFirestore, FieldValue} = require("firebase-admin/firestore");
-const {randomBytes} = require("node:crypto");
+const {randomBytes, randomInt} = require("node:crypto");
 initializeApp();
 const db=getFirestore();
 function requireLibrarian(request){if(!request.auth||request.auth.token.librarian!==true)throw new HttpsError("permission-denied","Authorized librarian access is required.");}
@@ -18,6 +18,61 @@ async function findCopy(code){
  if(snap.empty)throw new HttpsError("not-found","No physical book copy matches that barcode.");
  return snap.docs[0];
 }
+exports.createLearnerProfile=onCall(async request=>{
+ if(!request.auth)throw new HttpsError("unauthenticated","Sign in before submitting a membership application.");
+ const uid=request.auth.uid,email=clean(request.auth.token.email,254).toLowerCase();
+ if(!email)throw new HttpsError("failed-precondition","The signed-in account must have an email address.");
+ const input=request.data||{};
+ const fullName=clean(input.fullName,120),school=clean(input.school,160),studyLevel=clean(input.studyLevel,80),guardianName=clean(input.guardianName,120),guardianPhone=clean(input.guardianPhone,30);
+ if(fullName.length<2||!school||!studyLevel||!guardianName||!guardianPhone)throw new HttpsError("invalid-argument","Complete all required learner and guardian details.");
+ const allowedGender=["Male","Female","Other","Prefer not to say"],allowedRelation=["Mother","Father","Guardian"],allowedLevel=["PP / Pre-Primary","Primary","Junior Secondary","Senior Secondary","High School","University"];
+ const gender=clean(input.gender,30),guardianRelation=clean(input.guardianRelation,30),eduLevel=clean(input.eduLevel,50);
+ if(!allowedGender.includes(gender)||!allowedRelation.includes(guardianRelation)||!allowedLevel.includes(eduLevel))throw new HttpsError("invalid-argument","Choose valid learner and guardian options.");
+ const userRef=db.collection("users").doc(uid);
+ for(let attempt=0;attempt<30;attempt++){
+  const suffix=String(randomInt(100000,1000000));
+  const libraryNumber="AMG-"+suffix,numberRef=db.collection("memberNumbers").doc(libraryNumber);
+  try{
+   const result=await db.runTransaction(async tx=>{
+    const existing=await tx.get(userRef);
+    if(existing.exists){
+     const current=existing.data();
+     if(current.role!=="learner"||current.email!==email)throw new HttpsError("already-exists","A membership profile already exists for this account.");
+     return {libraryNumber:current.libraryNumber,alreadyExists:true};
+    }
+    const [reserved,existingNumber]=await Promise.all([
+     tx.get(numberRef),
+     tx.get(db.collection("users").where("libraryNumber","==",libraryNumber).limit(1))
+    ]);
+    if(reserved.exists||!existingNumber.empty)return null;
+    const profile={uid,fullName,email,gender,school,studyLevel,eduLevel,guardianName,guardianRelation,guardianPhone,libraryNumber,role:"learner",isApproved:false,membershipStatus:"Pending",photoURL:"",starredBookIds:[],createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()};
+    tx.create(numberRef,{uid,createdAt:FieldValue.serverTimestamp()});
+    tx.create(userRef,profile);
+    return {libraryNumber,alreadyExists:false};
+   });
+   if(result)return result;
+  }catch(error){
+   if(error instanceof HttpsError)throw error;
+   throw error;
+  }
+ }
+ throw new HttpsError("resource-exhausted","A unique membership number could not be allocated. Please try again.");
+});
+exports.reviewLearnerMembership=onCall(async request=>{
+ requireLibrarian(request);
+ const uid=clean(request.data?.uid,128),decision=clean(request.data?.decision,20);
+ if(!uid||!["Approved","Denied"].includes(decision))throw new HttpsError("invalid-argument","Choose a learner and approve or deny the application.");
+ const userRef=db.collection("users").doc(uid);
+ await db.runTransaction(async tx=>{
+  const snap=await tx.get(userRef);
+  if(!snap.exists)throw new HttpsError("not-found","The learner profile no longer exists.");
+  const member=snap.data();
+  if(member.role!=="learner")throw new HttpsError("failed-precondition","Only learner membership applications can be reviewed.");
+  if(member.isApproved===true||member.membershipStatus==="Denied")throw new HttpsError("failed-precondition","This membership application has already been decided.");
+  tx.update(userRef,{isApproved:decision==="Approved",membershipStatus:decision,decisionAt:FieldValue.serverTimestamp(),decisionBy:request.auth.uid,updatedAt:FieldValue.serverTimestamp(),...(decision==="Approved"?{approvedAt:FieldValue.serverTimestamp()}:{deniedAt:FieldValue.serverTimestamp()})});
+ });
+ return {decision,message:"Membership "+decision.toLowerCase()+" successfully."};
+});
 exports.registerBookCopies=onCall(async request=>{
  requireLibrarian(request);
  const title=clean(request.data?.title),author=clean(request.data?.author,120),category=clean(request.data?.category,80),quantity=Number(request.data?.quantity);
