@@ -40,8 +40,11 @@ exports.createLearnerProfile=onCall(async request=>{
      if(current.role!=="learner"||current.email!==email)throw new HttpsError("already-exists","A membership profile already exists for this account.");
      return {libraryNumber:current.libraryNumber,alreadyExists:true};
     }
-    const reserved=await tx.get(numberRef);
-    if(reserved.exists)return null;
+    const [reserved,existingNumber]=await Promise.all([
+     tx.get(numberRef),
+     tx.get(db.collection("users").where("libraryNumber","==",libraryNumber).limit(1))
+    ]);
+    if(reserved.exists||!existingNumber.empty)return null;
     const profile={uid,fullName,email,gender,school,studyLevel,eduLevel,guardianName,guardianRelation,guardianPhone,libraryNumber,role:"learner",isApproved:false,membershipStatus:"Pending",photoURL:"",starredBookIds:[],createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp()};
     tx.create(numberRef,{uid,createdAt:FieldValue.serverTimestamp()});
     tx.create(userRef,profile);
