@@ -849,3 +849,70 @@ html.amg-compact-device #heroSection .amg-revealed{opacity:1;transform:translate
 
 html.amg-compact-device .amg-scroll-progress{display:block}
 @media(min-width:681px){.amg-counter-strip{display:none}}
+
+
+/* Password controls: keep the existing field styling and place the eye inside it. */
+.auth-modal .password-field {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.auth-modal .password-field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding-right: 3.2rem !important;
+}
+.auth-modal .password-toggle {
+  position: absolute;
+  top: 50%;
+  right: .45rem;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #557064;
+  font-size: 0;
+  line-height: 1;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color .18s ease, color .18s ease;
+}
+.auth-modal .password-toggle:hover {
+  background: rgba(8, 127, 91, .09);
+  color: #087f5b;
+}
+.auth-modal .password-toggle svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+}
+.auth-modal .password-toggle:focus-visible {
+  outline: 2px solid rgba(8, 127, 91, .5);
+  outline-offset: 1px;
+}
+:root[data-theme="dark"] .auth-modal .password-toggle {
+  color: #b8d9cc;
+}
+:root[data-theme="dark"] .auth-modal .password-toggle:hover {
+  color: #72e0b8;
+  background: rgba(72, 211, 165, .12);
+}
+html.amg-compact-device .auth-modal .password-toggle {
+  right: .45rem;
+  width: 36px;
+  max-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-modal .password-toggle { transition: none; }
+}
