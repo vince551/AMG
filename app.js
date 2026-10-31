@@ -4,7 +4,7 @@ import {
   signOut, onAuthStateChanged, sendPasswordResetEmail, updateProfile
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {
-  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc,
+  getFirestore, collection, doc, getDoc, getDocs, getCountFromServer, addDoc, setDoc, updateDoc,
   deleteDoc, query, where, orderBy, limit, serverTimestamp, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {
@@ -16,7 +16,7 @@ const $ = (id) => document.getElementById(id);
 const state = { app:null, auth:null, db:null, storage:null, user:null, profile:null, librarian:false, scanMemberCode:"",
   books:[], requests:[], members:[], loans:[], attendance:[], ebooks:[], announcements:[], events:[],
   capacity:100, scanner:null, scanStream:null, toastTimer:null,
-  adminLoadedAt:{}, adminLoads:{} };
+  adminLoadedAt:{}, adminLoads:{}, adminCounts:{} };
 const categories = {
   "PP / Pre-Primary":"PP", "Primary":"PRI", "Junior Secondary":"JSS",
   "Senior Secondary":"SSS", "High School":"HS", "University":"UNI",
@@ -663,6 +663,28 @@ async function refreshAdminData(force = false) {
   return loadAdminTab(activeTab, force);
 }
 
+async function loadAdminOverview() {
+  if (!state.librarian || !state.db || state.adminCounts.loaded) return;
+  try {
+    const [members, approved, pendingMembers, pendingRequests, activeLoans, inside] = await Promise.all([
+      getCountFromServer(collection(state.db,"users")),
+      getCountFromServer(query(collection(state.db,"users"),where("isApproved","==",true))),
+      getCountFromServer(query(collection(state.db,"users"),where("membershipStatus","==","Pending"))),
+      getCountFromServer(query(collection(state.db,"borrowRequests"),where("status","==","Pending"))),
+      getCountFromServer(query(collection(state.db,"loans"),where("status","==","Borrowed"))),
+      getCountFromServer(query(collection(state.db,"attendance"),where("status","==","In library")))
+    ]);
+    state.adminCounts = {
+      loaded:true, members:members.data().count, approved:approved.data().count,
+      pendingMembers:pendingMembers.data().count, pendingRequests:pendingRequests.data().count,
+      activeLoans:activeLoans.data().count, inside:inside.data().count
+    };
+    renderAdminSummary();
+  } catch (error) {
+    // Keep the dashboard usable with the locally loaded records if count aggregation is unavailable.
+  }
+}
+
 async function loadAdminTab(tabId, force = false) {
   if (!state.librarian || !state.db) return;
   const supportedTabs = new Set([
@@ -684,6 +706,7 @@ async function loadAdminTab(tabId, force = false) {
         state.requests = requests.docs.map(d=>({id:d.id,...d.data()}));
         state.loans = loans.docs.map(d=>({id:d.id,...d.data()}));
         renderAdminTables();
+        loadAdminOverview();
       } else if (tabId === "pendingLearnersTab" || tabId === "allLearnersTab") {
         const users = await getDocs(query(collection(state.db,"users"),orderBy("createdAt","desc"),limit(1000)));
         state.members = users.docs.map(d=>({id:d.id,...d.data()}));
@@ -740,7 +763,7 @@ function addAction(row,label,handler,className="btn btn-sm btn-outline") {
 function renderDashboardOverview() {
   const date = $("adminWelcomeDate");
   if (date) date.textContent = new Intl.DateTimeFormat("en-KE", {weekday:"long", day:"numeric", month:"long", year:"numeric"}).format(new Date());
-  const inside = state.attendance.filter(item => item.status === "In library").length;
+  const inside = state.adminCounts.inside ?? state.attendance.filter(item => item.status === "In library").length;
   const capacity = Math.max(1, Number(state.capacity) || 100);
   setText("dashboardOccupancyCount", inside);
   setText("dashboardOccupancyCapacity", "of " + capacity + " places used");
@@ -752,8 +775,8 @@ function renderDashboardOverview() {
   const list = $("adminPriorityList");
   if (!list) return;
   list.replaceChildren();
-  const pendingRequests = state.requests.filter(item => item.status === "Pending").length;
-  const pendingMembers = state.members.filter(item => !item.isApproved && item.membershipStatus !== "Denied").length;
+  const pendingRequests = state.adminCounts.pendingRequests ?? state.requests.filter(item => item.status === "Pending").length;
+  const pendingMembers = state.adminCounts.pendingMembers ?? state.members.filter(item => !item.isApproved && item.membershipStatus !== "Denied").length;
   const lowStock = state.books.filter(book => Number(book.available || 0) <= 1).length;
   const priorities = [
     {icon:"↗", title:"Borrow requests", detail:"Requests waiting for a decision", count:pendingRequests, tab:"borrowRequestsTab", tone:"blue"},
@@ -804,7 +827,18 @@ function renderAdminTables() {
     const row=node("tr"); addCell(row,member.libraryNumber); addCell(row,member.fullName); addCell(row,(member.school||"")+" / "+(member.eduLevel||"")); addCell(row,member.isApproved?"Approved":member.membershipStatus==="Denied"?"Denied":"Pending");
     addAction(row,"View / download card",()=>viewMemberCard(member)); all.append(row);
   });
-  setStats("adminStats",[["Members",state.members.length],["Awaiting approval",state.members.filter(m=>!m.isApproved && m.membershipStatus!=="Denied").length],["Book titles",state.books.length],["Pending requests",state.requests.filter(r=>r.status==="Pending").length],["Currently in library",state.attendance.filter(a=>a.status==="In library").length],["Available copies",state.books.reduce((n,b)=>n+Number(b.available||0),0)]]);
+  renderAdminSummary();
+}
+function renderAdminSummary() {
+  const counts = state.adminCounts || {};
+  setStats("adminStats",[
+    ["Members",counts.members ?? state.members.length],
+    ["Awaiting approval",counts.pendingMembers ?? state.members.filter(m=>!m.isApproved && m.membershipStatus!=="Denied").length],
+    ["Book titles",state.books.length],
+    ["Pending requests",counts.pendingRequests ?? state.requests.filter(r=>r.status==="Pending").length],
+    ["Currently in library",counts.inside ?? state.attendance.filter(a=>a.status==="In library").length],
+    ["Available copies",state.books.reduce((n,b)=>n+Number(b.available||0),0)]
+  ]);
   renderDashboardOverview();
 }
 async function reviewLearner(uid,decision) {
