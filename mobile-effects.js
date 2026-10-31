@@ -91,6 +91,7 @@
     return;
   }
 
+  root.classList.add("amg-scroll-effects-ready");
   const revealTargets = document.querySelectorAll(revealSelector);
   const revealObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
