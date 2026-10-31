@@ -1,0 +1,197 @@
+/* AMG mobile responsiveness pass — isolated from desktop styling. */
+@media (max-width: 760px) {
+  :root { --amg-mobile-gutter: 14px; }
+  html, body { width: 100%; max-width: 100%; overflow-x: clip; }
+  body { -webkit-text-size-adjust: 100%; }
+  main.container, .container {
+    width: calc(100% - (var(--amg-mobile-gutter) * 2)) !important;
+    max-width: 100%;
+    min-width: 0;
+    margin-inline: auto;
+  }
+  main, section, article, .panel, .tab-content, .card-preview-wrapper,
+  .profile-layout, .admin-overview-grid, .admin-welcome { min-width: 0; }
+  img, video, canvas, svg { max-width: 100%; }
+  h1, h2, h3, h4, p, small, label, strong, span, a {
+    overflow-wrap: anywhere;
+  }
+
+  /* Keep the floating header compact and the logo unobstructed. */
+  .navbar {
+    width: calc(100% - 16px) !important;
+    max-width: 100%;
+    min-width: 0;
+    gap: 7px !important;
+    padding: 7px 9px !important;
+  }
+  .navbar .nav-brand { min-width: 0; max-width: calc(100% - 92px); }
+  .navbar .nav-brand span { min-width: 0; font-size: clamp(.78rem, 3.5vw, .96rem); }
+  .navbar .brand-mark { flex: 0 0 32px; width: 32px; height: 32px; }
+  .navbar .mobile-nav-toggle { flex: 0 0 auto; min-height: 42px; }
+  .navbar .nav-links {
+    box-sizing: border-box;
+    width: 100% !important;
+    max-width: 100%;
+    max-height: min(70dvh, 560px);
+    padding: 9px !important;
+    gap: 6px !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .navbar .nav-links .nav-btn,
+  .navbar .nav-links .dropdown > .btn,
+  .navbar .nav-links .user-badge { min-width: 0; }
+  .navbar .nav-links .nav-btn { min-height: 44px; }
+  .navbar .nav-links .dropdown-content {
+    max-width: calc(100vw - 38px);
+    overflow: hidden;
+  }
+  .navbar .liquid-nav-indicator { max-width: 100%; pointer-events: none; }
+
+  /* Content rhythm and readable section headings. */
+  .section-header { align-items: flex-start; gap: 6px; }
+  .section-header h2, .panel h2 { line-height: 1.2; }
+  .panel, .chart-panel, .admin-overview-panel, .announcement-card {
+    min-width: 0;
+    padding: clamp(12px, 3.5vw, 16px);
+  }
+  .section, .tab-content.active { min-width: 0; }
+  .hero, .home-cta, .admin-welcome { min-width: 0; }
+  .hero-actions { width: 100%; }
+  .hero-actions > *, .home-cta .hero-actions > * { min-width: 0; }
+  .home-cta .hero-actions { grid-template-columns: minmax(0, 1fr); }
+
+  /* Forms: prevent narrow columns and keep controls easy to tap. */
+  .form-grid, .inline-form, .form-stack, .registration-grid,
+  .auth-modal .form-grid, .auth-modal .form-stack {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100%;
+    min-width: 0;
+  }
+  .form-grid > *, .inline-form > *, .form-stack > *,
+  .form-grid label, .inline-form label, .form-stack label { min-width: 0; width: 100%; }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  select, textarea, .search-input, #categoryFilter {
+    min-width: 0;
+    max-width: 100%;
+    font-size: 16px;
+  }
+  .form-grid input, .form-grid select, .form-grid textarea,
+  .form-stack input, .form-stack select, .inline-form input,
+  .inline-form select, .inline-form textarea { min-height: 46px; }
+  textarea { resize: vertical; }
+  .form-grid button, .inline-form button, .form-stack button,
+  .registration-actions .btn { min-height: 44px; }
+  .btn, button { max-width: 100%; }
+  .btn-group, .registration-actions { gap: 8px; flex-wrap: wrap; }
+  .password-field { width: 100%; min-width: 0; }
+
+  /* Cards and dashboards use stable, non-overflowing grid tracks. */
+  .book-grid, .featured-books-grid, .info-grid, .announcement-grid,
+  .home-purpose-grid, .journey-grid, .values-grid, .home-feature-grid,
+  .admin-quick-grid, .admin-stats-grid, .stats-grid, .admin-overview-grid,
+  .profile-layout, .admin-command-actions, .home-feature-grid {
+    min-width: 0;
+  }
+  .book-card, .book-details, .stack-item, .stat-card,
+  .admin-quick-card, .admin-command-hero, .admin-command-actions > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .book-actions { min-width: 0; }
+  .book-actions .btn { min-width: 0; white-space: normal; }
+  .card-preview-wrapper { width: 100%; }
+  .library-card { width: 100%; max-width: 350px; }
+  .card-body { min-width: 0; }
+  .card-info { flex: 1 1 auto; min-width: 0; }
+  .card-footer svg { display: block; width: 100%; height: auto; }
+  .card-actions { width: 100%; }
+  .card-actions > * { flex: 1 1 145px; min-width: 0; }
+  .qr-holder { min-width: 0; }
+  .admin-welcome { grid-template-columns: minmax(0, 1fr); }
+  .admin-welcome-art { display: none; }
+  .admin-welcome-copy, .admin-date-strip { min-width: 0; }
+  .admin-quick-card { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .admin-quick-card small { overflow-wrap: anywhere; }
+
+  /* Mobile tab picker and horizontally scrollable data tables. */
+  #librarianSection .admin-tabs { display: none !important; }
+  #librarianSection .admin-mobile-tab-picker {
+    display: flex !important;
+    width: 100%;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+    margin: 10px 0;
+  }
+  #librarianSection .admin-mobile-tab-picker select { width: 100%; min-height: 46px; }
+  .table-responsive {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    border-radius: 12px;
+  }
+  .table-responsive table { width: max-content; min-width: 620px; max-width: none; }
+  .table-responsive th, .table-responsive td { white-space: normal; }
+  .table-responsive td button { min-height: 36px; }
+  .tabs:not(.admin-tabs) { max-width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+  .tabs:not(.admin-tabs) > * { flex: 0 0 auto; white-space: nowrap; }
+
+  /* Scanner, media, dialogs and footer. */
+  .scanner-box, .scanner-box video { width: 100%; max-width: 100%; }
+  .scanner-box video { max-height: 52dvh; object-fit: contain; }
+  .modal { align-items: flex-start; padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+  .modal-content, .modal-content.auth-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .site-footer { min-width: 0; overflow-wrap: anywhere; }
+  .toast { max-width: 100%; overflow-wrap: anywhere; }
+}
+
+/* Extra-small phones: use a single column instead of squeezing cards. */
+@media (max-width: 390px) {
+  :root { --amg-mobile-gutter: 10px; }
+  .navbar { width: calc(100% - 12px) !important; }
+  .navbar .nav-brand { max-width: calc(100% - 82px); }
+  .navbar .nav-brand span { font-size: .78rem; }
+  .navbar .brand-mark { flex-basis: 29px; width: 29px; height: 29px; }
+  .navbar .mobile-nav-toggle { padding-inline: 9px; }
+  .book-grid, .featured-books-grid, .admin-quick-grid,
+  .admin-stats-grid, .stats-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .book-card { display: grid; grid-template-columns: 92px minmax(0, 1fr); }
+  .book-cover { height: 100%; min-height: 132px; }
+  .card-actions { flex-direction: column; }
+  .card-actions > * { width: 100%; }
+  .amg-counter-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Chrome's Desktop-site mode on a phone: apply the same compact geometry. */
+html.amg-compact-device body { overflow-x: clip; }
+html.amg-compact-device .container,
+html.amg-compact-device main.container { width: calc(100% - 20px) !important; min-width: 0; }
+html.amg-compact-device .navbar { width: calc(100% - 12px) !important; }
+html.amg-compact-device .navbar .nav-brand { max-width: calc(100% - 88px); min-width: 0; }
+html.amg-compact-device .navbar .nav-links { max-height: min(70dvh, 560px); overflow-y: auto; }
+html.amg-compact-device .form-grid,
+html.amg-compact-device .inline-form,
+html.amg-compact-device .profile-layout,
+html.amg-compact-device .admin-overview-grid,
+html.amg-compact-device .admin-welcome { grid-template-columns: minmax(0, 1fr) !important; }
+html.amg-compact-device .table-responsive { width: 100%; overflow-x: auto !important; }
+html.amg-compact-device .table-responsive table { width: max-content; min-width: 620px; max-width: none; }
+html.amg-compact-device .admin-welcome-art { display: none; }
+html.amg-compact-device .admin-tabs { display: none !important; }
+html.amg-compact-device .admin-mobile-tab-picker { display: flex !important; }
+@media (prefers-reduced-motion: reduce) {
+  .navbar, .navbar *, .book-card, .admin-quick-card { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
