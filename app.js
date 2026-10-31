@@ -88,6 +88,25 @@ function init() {
   $("stopScannerBtn").addEventListener("click", stopScanner);
   $("authModal").addEventListener("click", (event) => { if (event.target === $("authModal")) closeAuthModal(); });
   $("cardModal").addEventListener("click", (event) => { if (event.target === $("cardModal")) closeCardModal(); });
+  document.addEventListener("click", (event) => {
+    const header = document.querySelector(".navbar");
+    if (!header) return;
+    if (!event.target.closest("#memberDropdown")) closeMemberDropdown();
+    if (event.target.closest("#userBadge button")) closeMobileNav();
+    if (!header.contains(event.target)) {
+      closeMobileNav();
+      closeMemberDropdown();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const mobileWasOpen = document.querySelector(".navbar")?.classList.contains("mobile-nav-open");
+    const dropdownWasOpen = $("dropdownMenu")?.classList.contains("show");
+    closeMobileNav();
+    closeMemberDropdown();
+    if (mobileWasOpen) document.querySelector(".mobile-nav-toggle")?.focus();
+    else if (dropdownWasOpen) document.querySelector("#memberDropdown > button")?.focus();
+  });
   renderBooks();
   renderAnnouncements([]);
   updateLiquidNav("heroSection");
@@ -179,17 +198,33 @@ function updateAuthUI() {
 function showSection(sectionId) {
   const section = $(sectionId);
   if (!section) return;
-  if (sectionId === "profileSection" && !state.user) { openAuthModal("login"); showToast("Log in to view your profile.", "error"); return; }
-  if (sectionId === "librarianSection" && !state.librarian) { showToast("Librarian access requires an authorized Firebase account.", "error"); openAuthModal("login"); return; }
+  if (sectionId === "profileSection" && !state.user) { closeMobileNav(); closeMemberDropdown(); openAuthModal("login"); showToast("Log in to view your profile.", "error"); return; }
+  if (sectionId === "librarianSection" && !state.librarian) { closeMobileNav(); closeMemberDropdown(); showToast("Librarian access requires an authorized Firebase account.", "error"); openAuthModal("login"); return; }
   document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
   section.classList.add("active");
   if (sectionId === "profileSection") refreshMemberData();
   if (sectionId === "librarianSection") refreshAdminData();
   updateLiquidNav(sectionId);
+  closeMobileNav();
+  closeMemberDropdown();
   window.scrollTo({top:0,behavior:"smooth"});
 }
-function toggleDropdown() { $("dropdownMenu").classList.toggle("show"); }
+function closeMemberDropdown() {
+  const menu = $("dropdownMenu");
+  const trigger = document.querySelector("#memberDropdown > button");
+  menu?.classList.remove("show");
+  trigger?.setAttribute("aria-expanded", "false");
+}
+function toggleDropdown() {
+  const menu = $("dropdownMenu");
+  const trigger = document.querySelector("#memberDropdown > button");
+  if (!menu) return;
+  const open = menu.classList.toggle("show");
+  trigger?.setAttribute("aria-expanded", String(open));
+}
 function openAuthModal(mode="login") {
+  closeMobileNav();
+  closeMemberDropdown();
   $("authModal").style.display = "flex";
   setAuthMode(mode);
   $("dropdownMenu").classList.remove("show");
@@ -408,14 +443,27 @@ async function downloadCard(elementId) {
   } catch (error) { showToast("Could not download the card. Check that the photo is accessible and try again.","error"); }
 }
 function closeCardModal() { $("cardModal").style.display = "none"; }
+function closeMobileNav() {
+  const header = document.querySelector(".navbar");
+  const toggle = document.querySelector(".mobile-nav-toggle");
+  if (!header || !toggle) return;
+  header.classList.remove("mobile-nav-open");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = "☰ <span>Menu</span>";
+}
 function toggleMobileNav() {
   const header = document.querySelector(".navbar");
   const toggle = document.querySelector(".mobile-nav-toggle");
   if (!header || !toggle) return;
-  const open = header.classList.toggle("mobile-nav-open");
-  toggle.setAttribute("aria-expanded", String(open));
-  toggle.innerHTML = open ? "✕ <span>Close</span>" : "☰ <span>Menu</span>";
-  if (open) requestAnimationFrame(() => updateLiquidNav());
+  const open = !header.classList.contains("mobile-nav-open");
+  if (open) {
+    header.classList.add("mobile-nav-open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.innerHTML = "✕ <span>Close</span>";
+    requestAnimationFrame(() => updateLiquidNav());
+  } else {
+    closeMobileNav();
+  }
 }
 function updateLiquidNav(sectionId) {
   const nav = $("mainNavLinks");
