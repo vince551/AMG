@@ -6,11 +6,13 @@
   "description": "AMG Library web portal",
   "scripts": {
     "build": "node scripts/build-static.mjs",
-    "test": "node --check app.js && node --check mobile-effects.js && node --check firebase-config.js && node --check scripts/set-librarian-claim.cjs && node --check scripts/build-static.mjs && npm run build && test -f dist/index.html && test -f dist/app.js && test -f dist/mobile-effects.js && test -f dist/firebase-config.js && test -f dist/manifest.webmanifest && test -f dist/service-worker.js && test -f dist/AMG.images/logo.jpg && test -f dist/AMG.images/learn.jpg && node --check functions/index.js",
+    "test": "node --check app.js && node --check api/library.js && node --check mobile-effects.js && node --check firebase-config.js && node --check scripts/set-librarian-claim.cjs && node --check scripts/build-static.mjs && npm run build && test -f dist/index.html && test -f dist/app.js && test -f dist/mobile-effects.js && test -f dist/firebase-config.js && test -f dist/manifest.webmanifest && test -f dist/service-worker.js && test -f dist/AMG.images/logo.jpg && test -f dist/AMG.images/learn.jpg && node --check functions/index.js",
     "set-librarian": "node scripts/set-librarian-claim.cjs"
   },
   "devDependencies": {
-    "firebase-admin": "^13.0.0",
     "firebase-functions": "^6.3.2"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
   }
 }
