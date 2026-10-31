@@ -196,7 +196,7 @@ function updateAuthUI() {
   $("navLibrarianBtn").classList.toggle("hidden", !state.librarian);
   setText("navUserName", state.profile?.fullName || state.user?.email || "Member");
   $("pendingApprovalNotice").classList.toggle("hidden", !signedIn || !state.profile || state.profile.isApproved || state.profile.membershipStatus === "Denied");
-  if (state.profile?.membershipStatus === "Denied") setText("membershipDecisionNotice", "Your membership application was denied. Please contact the librarian for assistance.");
+  $("membershipDecisionNotice")?.classList.toggle("hidden", !signedIn || state.profile?.membershipStatus !== "Denied");
   if (state.profile) renderProfileCard(state.profile);
   if (state.librarian) setText("librarianHeading", "Librarian Desk — " + (state.profile?.fullName || state.user.email));
 }
