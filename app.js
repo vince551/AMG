@@ -10,11 +10,10 @@ import {
 import {
   getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
 import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
 
 const $ = (id) => document.getElementById(id);
-const state = { app:null, auth:null, db:null, storage:null, functions:null, user:null, profile:null, librarian:false, scanMemberCode:"",
+const state = { app:null, auth:null, db:null, storage:null, user:null, profile:null, librarian:false, scanMemberCode:"",
   books:[], requests:[], members:[], loans:[], attendance:[], ebooks:[], announcements:[], events:[],
   capacity:100, scanner:null, scanStream:null, toastTimer:null };
 const categories = {
@@ -60,6 +59,24 @@ function requireFirebase() {
   return true;
 }
 function isReady() { return Boolean(state.auth && state.db && state.storage); }
+
+async function callLibraryApi(action, payload = {}) {
+  if (!state.user) throw new Error("Please sign in before performing this action.");
+  const token = await state.user.getIdToken();
+  const response = await fetch("/api/library", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+    cache: "no-store",
+    body: JSON.stringify({ ...payload, action })
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(result.error || "The library service could not complete this action.");
+    error.code = result.code || "api/error";
+    throw error;
+  }
+  return result;
+}
 
 function init() {
   $("year").textContent = new Date().getFullYear();
@@ -125,7 +142,6 @@ function init() {
     state.auth = getAuth(state.app);
     state.db = getFirestore(state.app);
     state.storage = getStorage(state.app);
-    state.functions = getFunctions(state.app);
     onAuthStateChanged(state.auth, async (user) => {
       state.user = user;
       state.profile = null;
@@ -333,9 +349,8 @@ async function register(event) {
       guardianName:String(form.get("guardianName")).trim(), guardianRelation:String(form.get("guardianRelation")),
       guardianPhone
     };
-    const createProfile = httpsCallable(state.functions,"createLearnerProfile");
-    const created = await createProfile(profileInput);
-    const libraryNumber = created.data.libraryNumber;
+    const created = await callLibraryApi("createLearnerProfile", profileInput);
+    const libraryNumber = created.libraryNumber;
     const profile = {
       uid:credential.user.uid, ...profileInput, email, libraryNumber,
       role:"learner", isApproved:false, membershipStatus:"Pending", photoURL:"",
@@ -745,9 +760,8 @@ async function reviewLearner(uid,decision) {
   const action=decision==="Approved"?"approve":"deny";
   if(!member || !confirm("Are you sure you want to "+action+" "+member.fullName+"'s membership?")) return;
   try {
-    const review=httpsCallable(state.functions,"reviewLearnerMembership");
-    const result=await review({uid,decision});
-    showToast(result.data.message || "Membership decision saved.");
+    const result=await callLibraryApi("reviewLearnerMembership",{uid,decision});
+    showToast(result.message || "Membership decision saved.");
     await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
@@ -807,9 +821,8 @@ async function registerBook(event) {
   const quantity=Number(form.get("quantity"));
   if(!title||!Number.isInteger(quantity)||quantity<1||quantity>400) { showToast("Enter a title and between 1 and 400 physical copies.","error"); return; }
   try {
-    const createBook = httpsCallable(state.functions,"registerBookCopies");
-    const result = await createBook({title,author:String(form.get("author")).trim(),category,quantity,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim()});
-    event.currentTarget.reset(); renderCopyLabels(title, result.data.copies || []); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
+    const result = await callLibraryApi("registerBookCopies",{title,author:String(form.get("author")).trim(),category,quantity,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim()});
+    event.currentTarget.reset(); renderCopyLabels(title, result.copies || []); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
     await refreshPublicData(); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
@@ -862,9 +875,8 @@ async function processUnifiedCode(rawCode, mode) {
   if (!code) return;
   try {
     if (mode === "check-in" || mode === "check-out") {
-      const call = httpsCallable(state.functions, "recordMemberAttendance");
-      const result = await call({libraryNumber:code, action:mode});
-      showToast(result.data.message || "Attendance recorded.");
+      const result = await callLibraryApi("recordMemberAttendance",{libraryNumber:code, action:mode});
+      showToast(result.message || "Attendance recorded.");
     } else if (mode === "issue-book") {
       if (!state.scanMemberCode) {
         state.scanMemberCode = code;
@@ -872,15 +884,13 @@ async function processUnifiedCode(rawCode, mode) {
         showToast("Member scanned. Scan the book copy.");
         return;
       }
-      const call = httpsCallable(state.functions, "issueBookCopy");
-      const result = await call({libraryNumber:state.scanMemberCode, copyBarcode:code});
+      const result = await callLibraryApi("issueBookCopy",{libraryNumber:state.scanMemberCode, copyBarcode:code});
       state.scanMemberCode = "";
       setText("scannerInstruction", "Scan a member and then a book copy.");
-      showToast(result.data.message || "Book issued.");
+      showToast(result.message || "Book issued.");
     } else if (mode === "return-book") {
-      const call = httpsCallable(state.functions, "returnBookCopy");
-      const result = await call({copyBarcode:code});
-      showToast(result.data.message || "Book returned.");
+      const result = await callLibraryApi("returnBookCopy",{copyBarcode:code});
+      showToast(result.message || "Book returned.");
     }
     await refreshPublicData();
     await refreshAdminData();
