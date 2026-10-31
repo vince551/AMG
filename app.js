@@ -100,11 +100,12 @@ function init() {
   });
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    const wasOpen = document.querySelector(".navbar")?.classList.contains("mobile-nav-open")
-      || $("dropdownMenu")?.classList.contains("show");
+    const mobileWasOpen = document.querySelector(".navbar")?.classList.contains("mobile-nav-open");
+    const dropdownWasOpen = $("dropdownMenu")?.classList.contains("show");
     closeMobileNav();
     closeMemberDropdown();
-    if (wasOpen) document.querySelector(".mobile-nav-toggle")?.focus();
+    if (mobileWasOpen) document.querySelector(".mobile-nav-toggle")?.focus();
+    else if (dropdownWasOpen) document.querySelector("#memberDropdown > button")?.focus();
   });
   renderBooks();
   renderAnnouncements([]);
