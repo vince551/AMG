@@ -1,7 +1,7 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {initializeApp} = require("firebase-admin/app");
 const {getFirestore, FieldValue} = require("firebase-admin/firestore");
-const {randomBytes} = require("node:crypto");
+const {randomBytes, randomInt} = require("node:crypto");
 initializeApp();
 const db=getFirestore();
 function requireLibrarian(request){if(!request.auth||request.auth.token.librarian!==true)throw new HttpsError("permission-denied","Authorized librarian access is required.");}
@@ -21,7 +21,7 @@ async function findCopy(code){
 exports.createLearnerProfile=onCall(async request=>{
  if(!request.auth)throw new HttpsError("unauthenticated","Sign in before submitting a membership application.");
  const uid=request.auth.uid,email=clean(request.auth.token.email,254).toLowerCase();
- if(!email||request.auth.token.email_verified===false)throw new HttpsError("failed-precondition","A verified account email is required to create a membership profile.");
+ if(!email)throw new HttpsError("failed-precondition","The signed-in account must have an email address.");
  const input=request.data||{};
  const fullName=clean(input.fullName,120),school=clean(input.school,160),studyLevel=clean(input.studyLevel,80),guardianName=clean(input.guardianName,120),guardianPhone=clean(input.guardianPhone,30);
  if(fullName.length<2||!school||!studyLevel||!guardianName||!guardianPhone)throw new HttpsError("invalid-argument","Complete all required learner and guardian details.");
@@ -30,7 +30,7 @@ exports.createLearnerProfile=onCall(async request=>{
  if(!allowedGender.includes(gender)||!allowedRelation.includes(guardianRelation)||!allowedLevel.includes(eduLevel))throw new HttpsError("invalid-argument","Choose valid learner and guardian options.");
  const userRef=db.collection("users").doc(uid);
  for(let attempt=0;attempt<30;attempt++){
-  const suffix=String(require("node:crypto").randomInt(100000,1000000));
+  const suffix=String(randomInt(100000,1000000));
   const libraryNumber="AMG-"+suffix,numberRef=db.collection("memberNumbers").doc(libraryNumber);
   try{
    const result=await db.runTransaction(async tx=>{
