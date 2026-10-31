@@ -10,6 +10,7 @@ export const firebaseConfig = {
   messagingSenderId: "71849525439",
   appId: "1:71849525439:web:c3e70a8802c5c313c8460a",
   // Set to the email of the Firebase Auth librarian account.
+  // Muga's Email: AMG librarian
   librarianEmail: "Edwinmuga99@gmail.com"
 };
 
