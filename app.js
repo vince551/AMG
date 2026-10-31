@@ -449,7 +449,7 @@ function closeMobileNav() {
   if (!header || !toggle) return;
   header.classList.remove("mobile-nav-open");
   toggle.setAttribute("aria-expanded", "false");
-  toggle.innerHTML = "☰ <span>Menu</span>";
+  toggle.innerHTML = '<svg class="nav-icon nav-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span>';
 }
 function toggleMobileNav() {
   const header = document.querySelector(".navbar");
@@ -459,7 +459,7 @@ function toggleMobileNav() {
   if (open) {
     header.classList.add("mobile-nav-open");
     toggle.setAttribute("aria-expanded", "true");
-    toggle.innerHTML = "✕ <span>Close</span>";
+    toggle.innerHTML = '<svg class="nav-icon nav-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span>Close</span>';
     requestAnimationFrame(() => updateLiquidNav());
   } else {
     closeMobileNav();
