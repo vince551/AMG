@@ -15,7 +15,8 @@ import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
 const $ = (id) => document.getElementById(id);
 const state = { app:null, auth:null, db:null, storage:null, user:null, profile:null, librarian:false, scanMemberCode:"",
   books:[], requests:[], members:[], loans:[], attendance:[], ebooks:[], announcements:[], events:[],
-  capacity:100, scanner:null, scanStream:null, toastTimer:null };
+  capacity:100, scanner:null, scanStream:null, toastTimer:null,
+  adminLoadedAt:{}, adminLoads:{} };
 const categories = {
   "PP / Pre-Primary":"PP", "Primary":"PRI", "Junior Secondary":"JSS",
   "Senior Secondary":"SSS", "High School":"HS", "University":"UNI",
@@ -520,6 +521,7 @@ function switchTab(tabId, button) {
   $(tabId)?.classList.add("active");
   const mobilePicker = $("adminMobileTabSelect");
   if (mobilePicker && mobilePicker.value !== tabId) mobilePicker.value = tabId;
+  if (state.librarian) loadAdminTab(tabId);
 }
 function starredIds() {
   try { return JSON.parse(localStorage.getItem("amg_starred_"+(state.user?.uid||"guest"))||"[]"); } catch (_) { return []; }
@@ -656,29 +658,80 @@ function formatDate(value) {
   const millis=dateMillis(value);
   return millis ? new Date(millis).toLocaleDateString() : "—";
 }
-async function refreshAdminData() {
+async function refreshAdminData(force = false) {
+  const activeTab = document.querySelector("#librarianSection .tab-content.active")?.id || "borrowRequestsTab";
+  return loadAdminTab(activeTab, force);
+}
+
+async function loadAdminTab(tabId, force = false) {
   if (!state.librarian || !state.db) return;
-  try {
-    const [users,requests,loans,attendance,ebooks,news,events,settings] = await Promise.all([
-      getDocs(query(collection(state.db,"users"),orderBy("createdAt","desc"),limit(1000))),
-      getDocs(query(collection(state.db,"borrowRequests"),orderBy("createdAt","desc"),limit(1000))),
-      getDocs(query(collection(state.db,"loans"),orderBy("createdAt","desc"),limit(1000))),
-      getDocs(query(collection(state.db,"attendance"),orderBy("checkInAt","desc"),limit(500))),
-      getDocs(query(collection(state.db,"ebooks"),orderBy("createdAt","desc"),limit(200))),
-      getDocs(query(collection(state.db,"announcements"),orderBy("createdAt","desc"),limit(100))),
-      getDocs(query(collection(state.db,"events"),orderBy("createdAt","desc"),limit(100))),
-      getDoc(doc(state.db,"settings","library"))
-    ]);
-    state.members=users.docs.map(d=>({id:d.id,...d.data()}));
-    state.requests=requests.docs.map(d=>({id:d.id,...d.data()}));
-    state.loans=loans.docs.map(d=>({id:d.id,...d.data()}));
-    state.attendance=attendance.docs.map(d=>({id:d.id,...d.data()}));
-    state.ebooks=ebooks.docs.map(d=>({id:d.id,...d.data()}));
-    state.announcements=news.docs.map(d=>({id:d.id,...d.data()}));
-    state.events=events.docs.map(d=>({id:d.id,...d.data()}));
-    state.capacity=settings.exists()?Number(settings.data().capacity||100):100;
-    renderAdminTables(); renderInventory(); renderAttendance(); renderEbooks(); renderAdminNews(); renderStatistics();
-  } catch(error) { showToast(errorMessage(error),"error"); }
+  const supportedTabs = new Set([
+    "borrowRequestsTab","pendingLearnersTab","allLearnersTab","booksAdminTab",
+    "attendanceTab","ebooksTab","newsAdminTab","statisticsTab"
+  ]);
+  if (!supportedTabs.has(tabId)) return;
+  const now = Date.now();
+  if (!force && state.adminLoadedAt[tabId] && now - state.adminLoadedAt[tabId] < 30000) return;
+  if (state.adminLoads[tabId]) return state.adminLoads[tabId];
+
+  const load = (async () => {
+    try {
+      if (tabId === "borrowRequestsTab") {
+        const [requests, loans] = await Promise.all([
+          getDocs(query(collection(state.db,"borrowRequests"),orderBy("createdAt","desc"),limit(1000))),
+          getDocs(query(collection(state.db,"loans"),orderBy("createdAt","desc"),limit(1000)))
+        ]);
+        state.requests = requests.docs.map(d=>({id:d.id,...d.data()}));
+        state.loans = loans.docs.map(d=>({id:d.id,...d.data()}));
+        renderAdminTables();
+      } else if (tabId === "pendingLearnersTab" || tabId === "allLearnersTab") {
+        const users = await getDocs(query(collection(state.db,"users"),orderBy("createdAt","desc"),limit(1000)));
+        state.members = users.docs.map(d=>({id:d.id,...d.data()}));
+        renderAdminTables();
+      } else if (tabId === "booksAdminTab") {
+        renderInventory();
+      } else if (tabId === "attendanceTab") {
+        const [attendance, settings] = await Promise.all([
+          getDocs(query(collection(state.db,"attendance"),orderBy("checkInAt","desc"),limit(500))),
+          getDoc(doc(state.db,"settings","library"))
+        ]);
+        state.attendance = attendance.docs.map(d=>({id:d.id,...d.data()}));
+        state.capacity = settings.exists() ? Number(settings.data().capacity || 100) : 100;
+        renderAttendance();
+      } else if (tabId === "ebooksTab") {
+        const ebooks = await getDocs(query(collection(state.db,"ebooks"),orderBy("createdAt","desc"),limit(200)));
+        state.ebooks = ebooks.docs.map(d=>({id:d.id,...d.data()}));
+        renderEbooks();
+      } else if (tabId === "newsAdminTab") {
+        const [news, events] = await Promise.all([
+          getDocs(query(collection(state.db,"announcements"),orderBy("createdAt","desc"),limit(100))),
+          getDocs(query(collection(state.db,"events"),orderBy("createdAt","desc"),limit(100)))
+        ]);
+        state.announcements = news.docs.map(d=>({id:d.id,...d.data()}));
+        state.events = events.docs.map(d=>({id:d.id,...d.data()}));
+        renderAdminNews();
+      } else if (tabId === "statisticsTab") {
+        const [users, requests, loans, attendance] = await Promise.all([
+          getDocs(query(collection(state.db,"users"),orderBy("createdAt","desc"),limit(1000))),
+          getDocs(query(collection(state.db,"borrowRequests"),orderBy("createdAt","desc"),limit(1000))),
+          getDocs(query(collection(state.db,"loans"),orderBy("createdAt","desc"),limit(1000))),
+          getDocs(query(collection(state.db,"attendance"),orderBy("checkInAt","desc"),limit(500)))
+        ]);
+        state.members = users.docs.map(d=>({id:d.id,...d.data()}));
+        state.requests = requests.docs.map(d=>({id:d.id,...d.data()}));
+        state.loans = loans.docs.map(d=>({id:d.id,...d.data()}));
+        state.attendance = attendance.docs.map(d=>({id:d.id,...d.data()}));
+        renderStatistics();
+      }
+      state.adminLoadedAt[tabId] = Date.now();
+    } catch(error) {
+      showToast(errorMessage(error),"error");
+    } finally {
+      delete state.adminLoads[tabId];
+    }
+  })();
+  state.adminLoads[tabId] = load;
+  return load;
 }
 function addCell(row,text) { row.append(node("td",text)); }
 function addAction(row,label,handler,className="btn btn-sm btn-outline") {
@@ -762,7 +815,7 @@ async function reviewLearner(uid,decision) {
   try {
     const result=await callLibraryApi("reviewLearnerMembership",{uid,decision});
     showToast(result.message || "Membership decision saved.");
-    await refreshAdminData();
+    await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 async function processRequest(requestId,status) {
@@ -788,7 +841,7 @@ async function processRequest(requestId,status) {
       });
     }
     showToast(status==="Approved"?"Request approved and book issued.":"Request declined.");
-    await refreshPublicData(); await refreshAdminData();
+    await refreshPublicData(); await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 async function returnLoan(requestId,loanId) {
@@ -805,7 +858,7 @@ async function returnLoan(requestId,loanId) {
       transaction.update(loanRef,{status:"Returned",returnedAt:serverTimestamp(),returnedBy:state.user.uid});
       transaction.update(doc(state.db,"borrowRequests",requestId),{status:"Returned",returnedAt:serverTimestamp()});
     });
-    showToast("Book return recorded."); await refreshPublicData(); await refreshAdminData();
+    showToast("Book return recorded."); await refreshPublicData(); await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 function viewMemberCard(member) {
@@ -823,7 +876,7 @@ async function registerBook(event) {
   try {
     const result = await callLibraryApi("registerBookCopies",{title,author:String(form.get("author")).trim(),category,quantity,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim()});
     event.currentTarget.reset(); renderCopyLabels(title, result.copies || []); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
-    await refreshPublicData(); await refreshAdminData();
+    await refreshPublicData(); await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 function renderCopyLabels(title, copies) {
@@ -866,7 +919,7 @@ async function deleteBook(book) {
   if(!state.librarian || !confirm("Delete “"+book.title+"” from the catalogue? This is only allowed if the book has no active loans.")) return;
   try {
     if(Number(book.available||0)!==Number(book.quantity||0)) throw new Error("This book has active loans. Return all copies before deleting it.");
-    await deleteDoc(doc(state.db,"books",book.id)); showToast("Book removed from catalogue."); await refreshPublicData(); await refreshAdminData();
+    await deleteDoc(doc(state.db,"books",book.id)); showToast("Book removed from catalogue."); await refreshPublicData(); await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 async function processUnifiedCode(rawCode, mode) {
@@ -893,7 +946,7 @@ async function processUnifiedCode(rawCode, mode) {
       showToast(result.message || "Book returned.");
     }
     await refreshPublicData();
-    await refreshAdminData();
+    await refreshAdminData(true);
   } catch(error) {
     state.scanMemberCode = "";
     setText("scannerInstruction", "Select an action, then scan the relevant membership card or book-copy label.");
@@ -913,7 +966,7 @@ async function updateCapacity(event) {
   event.preventDefault(); if(!state.librarian) return;
   const capacity=Number(new FormData(event.currentTarget).get("capacity"));
   if(!Number.isInteger(capacity)||capacity<1||capacity>10000) { showToast("Capacity must be between 1 and 10,000.","error"); return; }
-  try { await setDoc(doc(state.db,"settings","library"),{capacity,updatedAt:serverTimestamp(),updatedBy:state.user.uid},{merge:true}); state.capacity=capacity; showToast("Library capacity updated."); await refreshAdminData(); }
+  try { await setDoc(doc(state.db,"settings","library"),{capacity,updatedAt:serverTimestamp(),updatedBy:state.user.uid},{merge:true}); state.capacity=capacity; showToast("Library capacity updated."); await refreshAdminData(true); }
   catch(error) { showToast(errorMessage(error),"error"); }
 }
 function renderAttendance() {
@@ -983,7 +1036,7 @@ async function uploadEbook(event) {
     await uploadBytes(target,file,{contentType:isPdf?"application/pdf":"application/epub+zip"});
     const url=await getDownloadURL(target);
     await setDoc(record,{title,category,fileName:file.name,storagePath:target.fullPath,downloadUrl:url,size:file.size,uploadedBy:state.user.uid,createdAt:serverTimestamp()});
-    event.currentTarget.reset(); showToast("E-book uploaded."); await refreshAdminData();
+    event.currentTarget.reset(); showToast("E-book uploaded."); await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 function renderEbooks() {
@@ -1000,7 +1053,7 @@ async function removeEbook(book) {
   try {
     await deleteDoc(doc(state.db,"ebooks",book.id));
     if(book.storagePath) { try { await deleteObject(storageRef(state.storage,book.storagePath)); } catch(_){} }
-    showToast("E-book removed."); await refreshAdminData();
+    showToast("E-book removed."); await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 async function publishNews(event) {
@@ -1009,7 +1062,7 @@ async function publishNews(event) {
   try {
     const target=type==="event"?"events":"announcements";
     await addDoc(collection(state.db,target),{title,body,date:date||null,type,createdAt:serverTimestamp(),createdBy:state.user.uid});
-    event.currentTarget.reset(); showToast("Published successfully."); await refreshPublicData(); await refreshAdminData();
+    event.currentTarget.reset(); showToast("Published successfully."); await refreshPublicData(); await refreshAdminData(true);
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 function renderAnnouncements(items) {
@@ -1046,7 +1099,7 @@ function renderAdminNews() {
     const remove=node("button","Delete","btn btn-sm btn-danger top-gap");
     remove.addEventListener("click",async()=>{
       if(!confirm("Delete this post?")) return;
-      try { await deleteDoc(doc(state.db,item._collection,item.id)); showToast("Post deleted."); await refreshPublicData(); await refreshAdminData(); }
+      try { await deleteDoc(doc(state.db,item._collection,item.id)); showToast("Post deleted."); await refreshPublicData(); await refreshAdminData(true); }
       catch(error) { showToast(errorMessage(error),"error"); }
     });
     row.append(remove); container.append(row);
