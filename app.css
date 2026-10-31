@@ -2146,3 +2146,95 @@ html.amg-compact-device .password-toggle {
   width:auto;
   max-width:5rem;
 }
+
+/* Final visual consistency pass — presentation only. */
+:root {
+  --amg-focus-ring: 0 0 0 3px rgba(8,127,91,.18);
+  --amg-card-shadow: 0 12px 30px rgba(16,48,72,.055);
+  --amg-card-shadow-hover: 0 18px 38px rgba(16,48,72,.095);
+}
+button, input, select, textarea { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid rgba(8,127,91,.42);
+  outline-offset: 3px;
+}
+:where(.btn, button.nav-btn, .tab-btn, .admin-quick-card) {
+  transition: color .18s ease, background-color .18s ease, border-color .18s ease,
+    box-shadow .18s ease, transform .18s ease;
+}
+.btn { min-height: 42px; }
+.btn-primary { box-shadow: 0 7px 17px rgba(8,127,91,.14); }
+.btn-primary:hover { box-shadow: 0 10px 22px rgba(8,127,91,.2); }
+.section-header { gap: .45rem; }
+.section-header h2 { letter-spacing: -.045em; }
+.panel, .info-card, .stat-card, .announcement-card, .stack-item,
+.chart-panel, .empty-state, .book-card {
+  border-radius: 16px;
+}
+.panel, .info-card, .chart-panel { box-shadow: var(--amg-card-shadow); }
+.book-card {
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--amg-card-shadow);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.book-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--amg-green) 34%, var(--border-color));
+  box-shadow: var(--amg-card-shadow-hover);
+}
+.toolbar input, .toolbar select,
+.form-grid input, .form-grid select, .form-grid textarea,
+.inline-form input, .inline-form select,
+.form-stack input, .form-stack select, .form-stack textarea {
+  min-height: 44px;
+  border-radius: 10px;
+}
+.form-grid textarea, .form-stack textarea { min-height: 110px; }
+.data-table { border-collapse: separate; border-spacing: 0; overflow: hidden; }
+.data-table th { font-size: .75rem; font-weight: 800; letter-spacing: .035em; }
+.data-table td { vertical-align: middle; }
+.data-table tbody tr { transition: background-color .16s ease; }
+.data-table tbody tr:hover { background: rgba(8,127,91,.045); }
+#librarianSection .admin-command-hero {
+  border-radius: 22px;
+  box-shadow: 0 22px 48px rgba(16,49,67,.14);
+}
+#librarianSection .admin-command-actions button {
+  min-height: 54px;
+  border-radius: 13px;
+}
+#librarianSection .admin-stats-grid .stat-card,
+#librarianSection .tab-content,
+#librarianSection .admin-tabs {
+  border-radius: 15px;
+}
+#librarianSection .admin-tabs .tab-btn {
+  min-height: 42px;
+}
+#librarianSection .tab-content { box-shadow: 0 12px 30px rgba(16,48,72,.045); }
+#librarianSection .table-responsive { border-radius: 12px; }
+:root[data-theme="dark"] .book-card,
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .info-card,
+:root[data-theme="dark"] .chart-panel,
+:root[data-theme="dark"] #librarianSection .tab-content {
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+}
+:root[data-theme="dark"] .data-table tbody tr:hover {
+  background: rgba(72,211,165,.08);
+}
+@media (max-width: 680px) {
+  .btn { min-height: 44px; }
+  .panel { padding: 1rem; }
+  #librarianSection .admin-command-hero { border-radius: 17px; }
+  #librarianSection .tab-content { padding: .9rem; }
+  .data-table th, .data-table td { padding: .7rem .65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(button, a, input, select, textarea, .book-card, .data-table tbody tr) {
+    transition: none !important;
+  }
+  .book-card:hover { transform: none; }
+}
