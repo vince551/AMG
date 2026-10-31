@@ -88,6 +88,22 @@ function init() {
   $("stopScannerBtn").addEventListener("click", stopScanner);
   $("authModal").addEventListener("click", (event) => { if (event.target === $("authModal")) closeAuthModal(); });
   $("cardModal").addEventListener("click", (event) => { if (event.target === $("cardModal")) closeCardModal(); });
+  document.addEventListener("click", (event) => {
+    const header = document.querySelector(".navbar");
+    if (!header) return;
+    if (!header.contains(event.target)) {
+      closeMobileNav();
+      closeMemberDropdown();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const wasOpen = document.querySelector(".navbar")?.classList.contains("mobile-nav-open")
+      || $("dropdownMenu")?.classList.contains("show");
+    closeMobileNav();
+    closeMemberDropdown();
+    if (wasOpen) document.querySelector(".mobile-nav-toggle")?.focus();
+  });
   renderBooks();
   renderAnnouncements([]);
   updateLiquidNav("heroSection");
@@ -186,10 +202,26 @@ function showSection(sectionId) {
   if (sectionId === "profileSection") refreshMemberData();
   if (sectionId === "librarianSection") refreshAdminData();
   updateLiquidNav(sectionId);
+  closeMobileNav();
+  closeMemberDropdown();
   window.scrollTo({top:0,behavior:"smooth"});
 }
-function toggleDropdown() { $("dropdownMenu").classList.toggle("show"); }
+function closeMemberDropdown() {
+  const menu = $("dropdownMenu");
+  const trigger = document.querySelector("#memberDropdown > button");
+  menu?.classList.remove("show");
+  trigger?.setAttribute("aria-expanded", "false");
+}
+function toggleDropdown() {
+  const menu = $("dropdownMenu");
+  const trigger = document.querySelector("#memberDropdown > button");
+  if (!menu) return;
+  const open = menu.classList.toggle("show");
+  trigger?.setAttribute("aria-expanded", String(open));
+}
 function openAuthModal(mode="login") {
+  closeMobileNav();
+  closeMemberDropdown();
   $("authModal").style.display = "flex";
   setAuthMode(mode);
   $("dropdownMenu").classList.remove("show");
@@ -408,14 +440,27 @@ async function downloadCard(elementId) {
   } catch (error) { showToast("Could not download the card. Check that the photo is accessible and try again.","error"); }
 }
 function closeCardModal() { $("cardModal").style.display = "none"; }
+function closeMobileNav() {
+  const header = document.querySelector(".navbar");
+  const toggle = document.querySelector(".mobile-nav-toggle");
+  if (!header || !toggle) return;
+  header.classList.remove("mobile-nav-open");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = "☰ <span>Menu</span>";
+}
 function toggleMobileNav() {
   const header = document.querySelector(".navbar");
   const toggle = document.querySelector(".mobile-nav-toggle");
   if (!header || !toggle) return;
-  const open = header.classList.toggle("mobile-nav-open");
-  toggle.setAttribute("aria-expanded", String(open));
-  toggle.innerHTML = open ? "✕ <span>Close</span>" : "☰ <span>Menu</span>";
-  if (open) requestAnimationFrame(() => updateLiquidNav());
+  const open = !header.classList.contains("mobile-nav-open");
+  if (open) {
+    header.classList.add("mobile-nav-open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.innerHTML = "✕ <span>Close</span>";
+    requestAnimationFrame(() => updateLiquidNav());
+  } else {
+    closeMobileNav();
+  }
 }
 function updateLiquidNav(sectionId) {
   const nav = $("mainNavLinks");
