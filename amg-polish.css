@@ -957,3 +957,17 @@ body:has(#librarianSection.active) #userBadge > button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .navbar .dropdown-content button { transition: none !important; }
 }
+
+
+/* SVG navigation symbols are mobile-only; keep the desktop navigation text-only. */
+@media (min-width: 901px) {
+  html:not(.amg-compact-device) .navbar .nav-links .nav-btn,
+  html:not(.amg-compact-device) .navbar .nav-links #memberDropdown > button {
+    display: revert;
+    gap: 0;
+  }
+  html:not(.amg-compact-device) .navbar .nav-links .nav-icon,
+  html:not(.amg-compact-device) .navbar .nav-links .nav-chevron {
+    display: none;
+  }
+}
