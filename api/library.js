@@ -42,7 +42,7 @@ function requireValue(condition, message) {
 }
 function bearerToken(req) {
   const value = req.headers.authorization || req.headers.Authorization || "";
-  const match = String(value).match(/^Bearer\\s+(.+)$/i);
+  const match = String(value).match(/^Bearer\s+(.+)$/i);
   if (!match) throw new ApiError(401, "unauthenticated", "Sign in to continue.");
   return match[1];
 }
