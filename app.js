@@ -91,6 +91,10 @@ function init() {
   document.addEventListener("click", (event) => {
     const header = document.querySelector(".navbar");
     if (!header) return;
+    // Preserve the original click path: toggleMobileNav updates the button label,
+    // so event.target may be detached before this document listener runs.
+    const mobileToggle = header.querySelector(".mobile-nav-toggle");
+    if (mobileToggle && event.composedPath().includes(mobileToggle)) return;
     if (!event.target.closest("#memberDropdown")) closeMemberDropdown();
     if (event.target.closest("#userBadge button")) closeMobileNav();
     if (!header.contains(event.target)) {
@@ -449,7 +453,7 @@ function closeMobileNav() {
   if (!header || !toggle) return;
   header.classList.remove("mobile-nav-open");
   toggle.setAttribute("aria-expanded", "false");
-  toggle.innerHTML = '<svg class="nav-icon nav-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span>';
+  toggle.textContent = "Menu";
 }
 function toggleMobileNav() {
   const header = document.querySelector(".navbar");
@@ -459,7 +463,7 @@ function toggleMobileNav() {
   if (open) {
     header.classList.add("mobile-nav-open");
     toggle.setAttribute("aria-expanded", "true");
-    toggle.innerHTML = '<svg class="nav-icon nav-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg><span>Close</span>';
+    toggle.textContent = "Close";
     requestAnimationFrame(() => updateLiquidNav());
   } else {
     closeMobileNav();
