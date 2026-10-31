@@ -11,14 +11,13 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
+    match /memberNumbers/{libraryNumber} {
+      allow read, write: if false;
+    }
+
     match /users/{uid} {
-      allow create: if own(uid)
-        && request.resource.data.uid == uid
-        && request.resource.data.role == 'learner'
-        && request.resource.data.isApproved == false
-        && request.resource.data.fullName is string
-        && request.resource.data.fullName.size() >= 2
-        && request.resource.data.libraryNumber is string;
+      // Membership profiles and short member-number reservations are created only by the trusted callable backend.
+      allow create: if false;
       allow read: if own(uid) || librarian();
       // Learners can only update their own safe profile fields, never role,
       // approval status, library number, guardian data or account identity.
