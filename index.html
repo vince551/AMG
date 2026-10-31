@@ -46,7 +46,7 @@
       <button class="nav-btn hidden" data-section="profileSection" id="navProfileBtn" onclick="AMG.showSection('profileSection')">My Profile</button>
       <button class="nav-btn hidden" data-section="librarianSection" id="navLibrarianBtn" onclick="AMG.showSection('librarianSection')">Librarian Desk</button>
       <div id="memberDropdown" class="dropdown">
-        <button class="btn btn-primary" onclick="AMG.toggleDropdown()">Become a Member ▾</button>
+        <button class="btn btn-primary" type="button" aria-expanded="false" aria-controls="dropdownMenu" onclick="AMG.toggleDropdown()">Become a Member ▾</button>
         <div id="dropdownMenu" class="dropdown-content">
           <button onclick="AMG.openAuthModal('login')">Log In</button>
           <button onclick="AMG.openAuthModal('register')">Register</button>
