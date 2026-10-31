@@ -849,3 +849,50 @@ html.amg-compact-device #heroSection .amg-revealed{opacity:1;transform:translate
 
 html.amg-compact-device .amg-scroll-progress{display:block}
 @media(min-width:681px){.amg-counter-strip{display:none}}
+
+
+/* Librarian Desk: focused logout control styling only. */
+body:has(#librarianSection.active) #userBadge > button {
+  min-height: 38px;
+  padding: .55rem .95rem;
+  border: 1px solid rgba(190, 54, 54, .2) !important;
+  border-radius: 999px;
+  color: #a62b35 !important;
+  background: linear-gradient(135deg, #fff7f7, #ffeded) !important;
+  box-shadow: 0 3px 10px rgba(150, 35, 45, .07);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .01em;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+body:has(#librarianSection.active) #userBadge > button:hover {
+  color: #fff !important;
+  border-color: #b8323e !important;
+  background: linear-gradient(135deg, #c9434d, #a92332) !important;
+  box-shadow: 0 7px 16px rgba(169, 35, 50, .2);
+  transform: translateY(-1px);
+}
+body:has(#librarianSection.active) #userBadge > button:focus-visible {
+  outline: 3px solid rgba(190, 54, 54, .24);
+  outline-offset: 3px;
+}
+:root[data-theme="dark"] body:has(#librarianSection.active) #userBadge > button {
+  color: #ffb5b9 !important;
+  border-color: rgba(255, 130, 139, .25) !important;
+  background: linear-gradient(135deg, #382329, #30202a) !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .16);
+}
+:root[data-theme="dark"] body:has(#librarianSection.active) #userBadge > button:hover {
+  color: #fff !important;
+  border-color: #c94b58 !important;
+  background: linear-gradient(135deg, #b83c49, #8f2635) !important;
+}
+@media (max-width: 680px) {
+  body:has(#librarianSection.active) #userBadge > button {
+    min-height: 40px;
+    padding: .55rem 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body:has(#librarianSection.active) #userBadge > button { transition: none; }
+}
