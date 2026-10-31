@@ -10,7 +10,9 @@
     "set-librarian": "node scripts/set-librarian-claim.cjs"
   },
   "devDependencies": {
-    "firebase-admin": "^13.0.0",
     "firebase-functions": "^6.3.2"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
   }
 }
