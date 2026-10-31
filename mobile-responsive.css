@@ -209,3 +209,22 @@ html.amg-compact-device .admin-mobile-tab-picker { display: flex !important; }
 @media (prefers-reduced-motion: reduce) {
   .navbar .nav-links, .navbar .nav-links *, .mobile-nav-toggle { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+
+/* Compact floating navigation card: keep the menu proportional on small screens. */
+@media (max-width: 760px) {
+  .navbar .nav-links {
+    width: min(250px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+    min-width: 0 !important;
+    right: 6px;
+    left: auto;
+  }
+}
+html.amg-compact-device .navbar .nav-links {
+  width: min(250px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+  min-width: 0 !important;
+  right: 6px;
+  left: auto;
+}
