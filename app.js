@@ -195,7 +195,8 @@ function updateAuthUI() {
   $("navProfileBtn").classList.toggle("hidden", !signedIn || !state.profile);
   $("navLibrarianBtn").classList.toggle("hidden", !state.librarian);
   setText("navUserName", state.profile?.fullName || state.user?.email || "Member");
-  $("pendingApprovalNotice").classList.toggle("hidden", !signedIn || !state.profile || state.profile.isApproved);
+  $("pendingApprovalNotice").classList.toggle("hidden", !signedIn || !state.profile || state.profile.isApproved || state.profile.membershipStatus === "Denied");
+  if (state.profile?.membershipStatus === "Denied") setText("membershipDecisionNotice", "Your membership application was denied. Please contact the librarian for assistance.");
   if (state.profile) renderProfileCard(state.profile);
   if (state.librarian) setText("librarianHeading", "Librarian Desk — " + (state.profile?.fullName || state.user.email));
 }
@@ -326,16 +327,20 @@ async function register(event) {
   try {
     credential = await createUserWithEmailAndPassword(state.auth, email, password);
     await updateProfile(credential.user, {displayName:fullName});
-    const libraryNumber = makeUniqueMemberNumber(credential.user.uid);
-    const profile = {
-      uid:credential.user.uid, fullName, email,
-      gender:String(form.get("gender")), school:String(form.get("school")).trim(),
+    const profileInput = {
+      fullName, gender:String(form.get("gender")), school:String(form.get("school")).trim(),
       studyLevel:String(form.get("studyLevel")).trim(), eduLevel:String(form.get("eduLevel")),
       guardianName:String(form.get("guardianName")).trim(), guardianRelation:String(form.get("guardianRelation")),
-      guardianPhone, libraryNumber, role:"learner", isApproved:false, photoURL:"",
-      starredBookIds:[], createdAt:serverTimestamp(), updatedAt:serverTimestamp()
+      guardianPhone
     };
-    await setDoc(doc(state.db,"users",credential.user.uid), profile);
+    const createProfile = httpsCallable(state.functions,"createLearnerProfile");
+    const created = await createProfile(profileInput);
+    const libraryNumber = created.data.libraryNumber;
+    const profile = {
+      uid:credential.user.uid, ...profileInput, email, libraryNumber,
+      role:"learner", isApproved:false, membershipStatus:"Pending", photoURL:"",
+      starredBookIds:[], createdAt:new Date(), updatedAt:new Date()
+    };
     state.profile = { ...profile, createdAt:new Date(), updatedAt:new Date() };
     updateAuthUI();
     const photo = form.get("photo");
@@ -364,11 +369,6 @@ async function register(event) {
     // Auth account may exist if a later Firestore/photo step failed; never log credentials.
     showToast("Registration could not be completed: "+errorMessage(error), "error");
   }
-}
-function makeUniqueMemberNumber(uid) {
-  // The full Firebase Auth UID makes the member number unique without querying
-  // the private member directory from the browser.
-  return "AMG-" + new Date().getFullYear() + "-" + uid.toUpperCase();
 }
 async function resetPassword() {
   if (!requireFirebase()) return;
@@ -685,7 +685,7 @@ function renderDashboardOverview() {
   if (!list) return;
   list.replaceChildren();
   const pendingRequests = state.requests.filter(item => item.status === "Pending").length;
-  const pendingMembers = state.members.filter(item => !item.isApproved).length;
+  const pendingMembers = state.members.filter(item => !item.isApproved && item.membershipStatus !== "Denied").length;
   const lowStock = state.books.filter(book => Number(book.available || 0) <= 1).length;
   const priorities = [
     {icon:"↗", title:"Borrow requests", detail:"Requests waiting for a decision", count:pendingRequests, tab:"borrowRequestsTab", tone:"blue"},
@@ -724,22 +724,32 @@ function renderAdminTables() {
     row.append(td); reqTable.append(row);
   });
   const pending=$("pendingLearnersTable"); pending.replaceChildren();
-  state.members.filter(m=>!m.isApproved).forEach(member=>{
+  state.members.filter(m=>!m.isApproved && m.membershipStatus!=="Denied").forEach(member=>{
     const row=node("tr"); addCell(row,member.fullName); addCell(row,member.school); addCell(row,member.eduLevel); addCell(row,(member.guardianName||"")+" · "+(member.guardianPhone||""));
-    addAction(row,"Approve",()=>approveLearner(member.uid),"btn btn-sm btn-success"); pending.append(row);
+    const actions=node("td");
+    const approve=node("button","Approve","btn btn-sm btn-success"); approve.type="button"; approve.addEventListener("click",()=>reviewLearner(member.uid,"Approved"));
+    const deny=node("button","Deny","btn btn-sm btn-danger"); deny.type="button"; deny.addEventListener("click",()=>reviewLearner(member.uid,"Denied"));
+    actions.append(approve,deny); row.append(actions); pending.append(row);
   });
   const all=$("allLearnersTable"); all.replaceChildren();
   state.members.forEach(member=>{
-    const row=node("tr"); addCell(row,member.libraryNumber); addCell(row,member.fullName); addCell(row,(member.school||"")+" / "+(member.eduLevel||"")); addCell(row,member.isApproved?"Approved":"Pending");
+    const row=node("tr"); addCell(row,member.libraryNumber); addCell(row,member.fullName); addCell(row,(member.school||"")+" / "+(member.eduLevel||"")); addCell(row,member.isApproved?"Approved":member.membershipStatus==="Denied"?"Denied":"Pending");
     addAction(row,"View / download card",()=>viewMemberCard(member)); all.append(row);
   });
-  setStats("adminStats",[["Members",state.members.length],["Awaiting approval",state.members.filter(m=>!m.isApproved).length],["Book titles",state.books.length],["Pending requests",state.requests.filter(r=>r.status==="Pending").length],["Currently in library",state.attendance.filter(a=>a.status==="In library").length],["Available copies",state.books.reduce((n,b)=>n+Number(b.available||0),0)]]);
+  setStats("adminStats",[["Members",state.members.length],["Awaiting approval",state.members.filter(m=>!m.isApproved && m.membershipStatus!=="Denied").length],["Book titles",state.books.length],["Pending requests",state.requests.filter(r=>r.status==="Pending").length],["Currently in library",state.attendance.filter(a=>a.status==="In library").length],["Available copies",state.books.reduce((n,b)=>n+Number(b.available||0),0)]]);
   renderDashboardOverview();
 }
-async function approveLearner(uid) {
-  if(!state.librarian) return;
-  try { await updateDoc(doc(state.db,"users",uid),{isApproved:true,approvedAt:serverTimestamp(),approvedBy:state.user.uid,updatedAt:serverTimestamp()}); showToast("Learner approved."); await refreshAdminData(); }
-  catch(error) { showToast(errorMessage(error),"error"); }
+async function reviewLearner(uid,decision) {
+  if(!state.librarian || !["Approved","Denied"].includes(decision)) return;
+  const member=state.members.find(item=>item.uid===uid);
+  const action=decision==="Approved"?"approve":"deny";
+  if(!member || !confirm("Are you sure you want to "+action+" "+member.fullName+"'s membership?")) return;
+  try {
+    const review=httpsCallable(state.functions,"reviewLearnerMembership");
+    const result=await review({uid,decision});
+    showToast(result.data.message || "Membership decision saved.");
+    await refreshAdminData();
+  } catch(error) { showToast(errorMessage(error),"error"); }
 }
 async function processRequest(requestId,status) {
   if(!state.librarian) return;
