@@ -37,12 +37,13 @@
   <header class="navbar">
     <button class="nav-brand" onclick="AMG.showSection('heroSection')" aria-label="AMG Library home"><img src="AMG.images/logo.jpg" alt="" class="brand-mark"> <span>AMG <b>LIBRARY</b></span></button>
     <button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mainNavLinks" onclick="AMG.toggleMobileNav()">☰ <span>Menu</span></button>
-    <nav id="mainNavLinks" class="nav-links" aria-label="Main navigation">
-      <button class="nav-btn" onclick="AMG.showSection('heroSection')">Home</button>
-      <button class="nav-btn" onclick="AMG.showSection('libShelfSection')">Lib Shelf</button>
-      <button class="nav-btn" onclick="AMG.showSection('newsSection')">News & Events</button>
-      <button class="nav-btn hidden" id="navProfileBtn" onclick="AMG.showSection('profileSection')">My Profile</button>
-      <button class="nav-btn hidden" id="navLibrarianBtn" onclick="AMG.showSection('librarianSection')">Librarian Desk</button>
+    <nav id="mainNavLinks" class="nav-links liquid-nav" aria-label="Main navigation">
+      <span class="liquid-nav-indicator" aria-hidden="true"></span>
+      <button class="nav-btn active" data-section="heroSection" aria-current="page" onclick="AMG.showSection('heroSection')">Home</button>
+      <button class="nav-btn" data-section="libShelfSection" onclick="AMG.showSection('libShelfSection')">Lib Shelf</button>
+      <button class="nav-btn" data-section="newsSection" onclick="AMG.showSection('newsSection')">News & Events</button>
+      <button class="nav-btn hidden" data-section="profileSection" id="navProfileBtn" onclick="AMG.showSection('profileSection')">My Profile</button>
+      <button class="nav-btn hidden" data-section="librarianSection" id="navLibrarianBtn" onclick="AMG.showSection('librarianSection')">Librarian Desk</button>
       <div id="memberDropdown" class="dropdown">
         <button class="btn btn-primary" onclick="AMG.toggleDropdown()">Become a Member ▾</button>
         <div id="dropdownMenu" class="dropdown-content">

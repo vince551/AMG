@@ -90,6 +90,8 @@ function init() {
   $("cardModal").addEventListener("click", (event) => { if (event.target === $("cardModal")) closeCardModal(); });
   renderBooks();
   renderAnnouncements([]);
+  updateLiquidNav("heroSection");
+  window.addEventListener("resize", () => updateLiquidNav());
   if (!isFirebaseConfigured()) {
     $("setupNotice").classList.remove("hidden");
     document.querySelectorAll("#authModal input, #bookForm input, #bookForm select, #attendanceForm input, #attendanceForm select, #ebookForm input, #newsForm input, #newsForm textarea").forEach(el => el.disabled = true);
@@ -183,6 +185,7 @@ function showSection(sectionId) {
   section.classList.add("active");
   if (sectionId === "profileSection") refreshMemberData();
   if (sectionId === "librarianSection") refreshAdminData();
+  updateLiquidNav(sectionId);
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function toggleDropdown() { $("dropdownMenu").classList.toggle("show"); }
@@ -412,6 +415,34 @@ function toggleMobileNav() {
   const open = header.classList.toggle("mobile-nav-open");
   toggle.setAttribute("aria-expanded", String(open));
   toggle.innerHTML = open ? "✕ <span>Close</span>" : "☰ <span>Menu</span>";
+  if (open) requestAnimationFrame(() => updateLiquidNav());
+}
+function updateLiquidNav(sectionId) {
+  const nav = $("mainNavLinks");
+  if (!nav) return;
+  const buttons = [...nav.querySelectorAll(".nav-btn[data-section]")];
+  const target = buttons.find(button => button.dataset.section === sectionId)
+    || buttons.find(button => button.classList.contains("active") && !button.classList.contains("hidden"))
+    || buttons.find(button => !button.classList.contains("hidden"));
+  buttons.forEach(button => {
+    const active = button === target;
+    button.classList.toggle("active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  const indicator = nav.querySelector(".liquid-nav-indicator");
+  if (!target || !indicator || nav.getClientRects().length === 0) return;
+  const navRect = nav.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const x = targetRect.left - navRect.left - nav.clientLeft + nav.scrollLeft;
+  const y = targetRect.top - navRect.top - nav.clientTop + nav.scrollTop;
+  indicator.style.setProperty("--liquid-x", x + "px");
+  indicator.style.setProperty("--liquid-y", y + "px");
+  indicator.style.setProperty("--liquid-width", targetRect.width + "px");
+  indicator.style.setProperty("--liquid-height", targetRect.height + "px");
+  nav.dataset.liquidReady = "true";
+  indicator.classList.remove("liquid-bounce");
+  requestAnimationFrame(() => indicator.classList.add("liquid-bounce"));
 }
 function switchTab(tabId, button) {
   document.querySelectorAll("#librarianSection .tab-btn").forEach(el=>el.classList.remove("active"));
