@@ -195,3 +195,17 @@ html.amg-compact-device .admin-mobile-tab-picker { display: flex !important; }
 @media (prefers-reduced-motion: reduce) {
   .navbar, .navbar *, .book-card, .admin-quick-card { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
+
+/* Mobile navigation interaction polish: clear keyboard focus and respect reduced motion. */
+@media (max-width: 760px) {
+  .navbar .mobile-nav-toggle:focus-visible,
+  .navbar .nav-links button:focus-visible {
+    outline: 3px solid rgba(8, 127, 91, .42);
+    outline-offset: 2px;
+  }
+  .navbar .nav-links .dropdown-content button { width: 100%; min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .navbar .nav-links, .navbar .nav-links *, .mobile-nav-toggle { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
