@@ -2313,6 +2313,7 @@ html.amg-compact-device .password-toggle {
 :root[data-theme="dark"] .navbar .nav-links.liquid-nav .nav-btn.active { color: #8ce1bd; }
 @media (max-width:760px) {
   .navbar .nav-links.liquid-nav {
+    position: absolute;
     overflow-x: hidden;
     overflow-y: auto;
   }
