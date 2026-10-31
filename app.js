@@ -91,6 +91,8 @@ function init() {
   document.addEventListener("click", (event) => {
     const header = document.querySelector(".navbar");
     if (!header) return;
+    if (!event.target.closest("#memberDropdown")) closeMemberDropdown();
+    if (event.target.closest("#userBadge button")) closeMobileNav();
     if (!header.contains(event.target)) {
       closeMobileNav();
       closeMemberDropdown();
@@ -195,8 +197,8 @@ function updateAuthUI() {
 function showSection(sectionId) {
   const section = $(sectionId);
   if (!section) return;
-  if (sectionId === "profileSection" && !state.user) { openAuthModal("login"); showToast("Log in to view your profile.", "error"); return; }
-  if (sectionId === "librarianSection" && !state.librarian) { showToast("Librarian access requires an authorized Firebase account.", "error"); openAuthModal("login"); return; }
+  if (sectionId === "profileSection" && !state.user) { closeMobileNav(); closeMemberDropdown(); openAuthModal("login"); showToast("Log in to view your profile.", "error"); return; }
+  if (sectionId === "librarianSection" && !state.librarian) { closeMobileNav(); closeMemberDropdown(); showToast("Librarian access requires an authorized Firebase account.", "error"); openAuthModal("login"); return; }
   document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
   section.classList.add("active");
   if (sectionId === "profileSection") refreshMemberData();
