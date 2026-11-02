@@ -322,3 +322,249 @@ label { display: grid; gap: 7px; color: #354b43; font-size: 13px; font-weight: 7
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+
+/* -------------------------------------------------------------------------
+   LIBRARIAN DESK — operational dashboard layer
+   Scoped to #librarianSection; no application or data behavior is changed.
+   ------------------------------------------------------------------------- */
+#librarianSection { --admin-ink: #17352c; --admin-border: #e1ebe5; }
+#librarianSection > .section-header { margin-bottom: 22px; }
+#librarianSection > .section-header h2 { margin-bottom: 7px; font-size: clamp(30px, 4vw, 42px); }
+#librarianSection > .section-header > p:last-child { max-width: 720px; line-height: 1.7; }
+
+#librarianSection .admin-welcome {
+  position: relative; isolation: isolate; display: grid;
+  grid-template-columns: minmax(0,1fr) 230px; align-items: center;
+  gap: 18px 28px; min-height: 250px; margin: 0 0 18px;
+  padding: clamp(26px,4vw,42px); overflow: hidden;
+  border: 1px solid rgba(255,255,255,.16); border-radius: 25px;
+  background:
+    radial-gradient(circle at 83% 18%, rgba(172,231,202,.22), transparent 28%),
+    radial-gradient(circle at 10% 100%, rgba(30,145,107,.4), transparent 40%),
+    linear-gradient(118deg,#073e32 0%,#075b43 55%,#087f5b 100%);
+  box-shadow: 0 18px 42px rgba(7,91,67,.16);
+}
+#librarianSection .admin-welcome::before,
+#librarianSection .admin-welcome::after {
+  position: absolute; z-index: -1; content: ""; border: 1px solid rgba(255,255,255,.09);
+  border-radius: 50%; pointer-events: none;
+}
+#librarianSection .admin-welcome::before { width: 380px; height: 380px; right: -110px; top: -220px; }
+#librarianSection .admin-welcome::after { width: 270px; height: 270px; right: -55px; top: -165px; }
+#librarianSection .admin-welcome-copy { position: relative; z-index: 2; max-width: 640px; }
+#librarianSection .admin-live {
+  display: inline-flex; align-items: center; gap: 9px; margin-bottom: 17px;
+  color: #c5ead8; font-size: 10px; font-weight: 800; letter-spacing: .16em;
+}
+#librarianSection .admin-live i {
+  width: 8px; height: 8px; border-radius: 50%; background: #8de0ae;
+  box-shadow: 0 0 0 5px rgba(141,224,174,.13);
+}
+#librarianSection .admin-welcome h2 {
+  max-width: 580px; margin: 0 0 11px; color: #fff;
+  font-size: clamp(30px,4.2vw,46px); letter-spacing: -.055em; line-height: 1.08;
+}
+#librarianSection .admin-welcome-copy > p {
+  max-width: 510px; margin: 0 0 23px; color: rgba(245,255,249,.78);
+  font-size: 14px; line-height: 1.75;
+}
+#librarianSection .admin-welcome-actions { gap: 10px; }
+#librarianSection .admin-welcome-actions .btn { min-height: 45px; padding-inline: 17px; font-size: 12px; }
+#librarianSection .admin-welcome-actions .btn-primary { color: #075b43; background: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.12); }
+#librarianSection .admin-welcome-actions .btn-primary:hover { background: #effaf3; }
+#librarianSection .admin-ghost { border-color: rgba(255,255,255,.28); color: #fff; background: rgba(255,255,255,.07); }
+#librarianSection .admin-ghost:hover { background: rgba(255,255,255,.15); }
+#librarianSection .admin-welcome-art {
+  position: relative; display: grid; place-items: center; width: 210px; height: 190px;
+  border: 1px solid rgba(255,255,255,.13); border-radius: 48%;
+  background: radial-gradient(circle,rgba(255,255,255,.13),rgba(255,255,255,.025) 68%);
+}
+#librarianSection .admin-art-orbit { position: absolute; border: 1px solid rgba(222,255,236,.35); border-radius: 50%; }
+#librarianSection .orbit-one { width: 150px; height: 150px; transform: rotate(-24deg) scaleY(.55); }
+#librarianSection .orbit-two { width: 178px; height: 178px; transform: rotate(36deg) scaleY(.58); border-color: rgba(222,255,236,.19); }
+#librarianSection .admin-art-book {
+  position: absolute; width: 76px; height: 108px; border: 1px solid rgba(255,255,255,.4);
+  border-radius: 5px 10px 10px 5px; box-shadow: 9px 12px 20px rgba(0,0,0,.18);
+}
+#librarianSection .book-back { transform: translate(13px,-3px) rotate(12deg); background: #9bc9ac; }
+#librarianSection .book-front {
+  display: flex; flex-direction: column; justify-content: space-between; padding: 11px 9px;
+  color: #fff; transform: translate(-8px,5px) rotate(-8deg);
+  background: linear-gradient(145deg,#1d8c67,#07513d);
+}
+#librarianSection .book-front span { font-size: 10px; font-weight: 800; letter-spacing: .14em; }
+#librarianSection .book-front b { font-size: 12px; line-height: 1.3; letter-spacing: .08em; }
+#librarianSection .book-front small { color: rgba(255,255,255,.7); font-size: 6px; letter-spacing: .1em; }
+#librarianSection .admin-art-spark { position: absolute; color: #d5f4df; font-size: 22px; }
+#librarianSection .spark-one { top: 27px; right: 34px; }
+#librarianSection .spark-two { bottom: 29px; left: 27px; font-size: 17px; }
+#librarianSection .admin-date-strip {
+  grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.18);
+  color: rgba(239,255,246,.66); font-size: 10px; font-weight: 700;
+}
+#librarianSection .admin-date-strip span:first-child { letter-spacing: .14em; }
+
+#librarianSection .admin-quick-grid {
+  display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 0 0 20px;
+}
+#librarianSection .admin-quick-card {
+  display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 88px;
+  padding: 15px; border: 1px solid var(--admin-border); border-radius: 16px;
+  color: var(--amg-ink); text-align: left; background: #fff;
+  box-shadow: 0 5px 16px rgba(22,56,43,.035);
+  transition: transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+#librarianSection .admin-quick-card:hover {
+  transform: translateY(-3px); border-color: #b8d8c8; box-shadow: 0 12px 25px rgba(22,56,43,.09);
+}
+#librarianSection .admin-quick-icon {
+  display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px;
+  border-radius: 13px; font-size: 17px; font-weight: 800;
+}
+#librarianSection .quick-blue { color: #2865a1; background: #eaf2fb; }
+#librarianSection .quick-green { color: #087f5b; background: #e8f5ed; }
+#librarianSection .quick-violet { color: #6953a6; background: #f0edfa; }
+#librarianSection .quick-amber { color: #986313; background: #fbf2df; }
+#librarianSection .admin-quick-card > span:nth-child(2) { display: grid; min-width: 0; gap: 4px; }
+#librarianSection .admin-quick-card b { overflow: hidden; color: #1d382f; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+#librarianSection .admin-quick-card small { color: #71827a; font-size: 10px; line-height: 1.4; }
+#librarianSection .admin-quick-card > strong { margin-left: auto; color: #91a59b; font-size: 16px; }
+
+#librarianSection .admin-overview-grid { grid-template-columns: minmax(0,1.15fr) minmax(280px,.85fr); gap: 14px; margin: 0 0 18px; }
+#librarianSection .admin-overview-panel {
+  min-width: 0; padding: 22px; border-color: var(--admin-border); border-radius: 17px;
+  box-shadow: 0 5px 18px rgba(22,56,43,.035);
+}
+#librarianSection .admin-panel-heading { margin-bottom: 17px; }
+#librarianSection .admin-kicker { display: block; margin-bottom: 6px; color: #81968b; font-size: 9px; letter-spacing: .15em; }
+#librarianSection .admin-panel-heading h3 { margin: 0; font-size: 18px; }
+#librarianSection .admin-panel-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; color: #719184; background: #f0f6f2; font-size: 11px; }
+#librarianSection .admin-priority-list { display: grid; gap: 8px; }
+#librarianSection .admin-priority-row {
+  display: grid; grid-template-columns: 36px minmax(0,1fr) auto auto; align-items: center;
+  gap: 10px; min-width: 0; padding: 11px 10px; border: 1px solid #edf2ee;
+  border-radius: 12px; background: #fbfdfb;
+}
+#librarianSection .priority-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; font-size: 14px; font-weight: 800; }
+#librarianSection .priority-blue { color: #2865a1; background: #eaf2fb; }
+#librarianSection .priority-green { color: #087f5b; background: #e8f5ed; }
+#librarianSection .priority-amber { color: #986313; background: #fbf2df; }
+#librarianSection .priority-copy { display: grid; min-width: 0; gap: 3px; }
+#librarianSection .priority-copy b { color: #29443a; font-size: 11px; }
+#librarianSection .priority-copy small { overflow: hidden; color: #7a8b83; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+#librarianSection .priority-count { display: grid; place-items: center; min-width: 27px; height: 27px; padding: 0 7px; border-radius: 9px; color: #6b7e75; background: #edf2ef; font-size: 11px; font-weight: 800; }
+#librarianSection .priority-count.has-work { color: #945c13; background: #fff1d5; }
+#librarianSection .priority-open { border: 0; padding: 7px 8px; border-radius: 8px; color: var(--amg-green-dark); background: #eaf5ef; font-size: 10px; font-weight: 800; white-space: nowrap; }
+#librarianSection .priority-open:hover { background: #d9eee2; }
+#librarianSection .occupancy-number { display: flex; align-items: baseline; gap: 9px; margin: 20px 0 8px; }
+#librarianSection .occupancy-number strong { color: #087f5b; font-size: clamp(38px,5vw,52px); line-height: 1; letter-spacing: -.06em; }
+#librarianSection .occupancy-number span { color: #71827a; font-size: 11px; font-weight: 700; }
+#librarianSection .occupancy-track { height: 10px; margin: 18px 0 15px; background: #eaf1ec; }
+#librarianSection .occupancy-track span { background: linear-gradient(90deg,#0b8a62,#4ab486); transition: width .45s ease; }
+#librarianSection .occupancy-track span.at-capacity { background: #c17b26; }
+#librarianSection .occupancy-footer { align-items: center; flex-wrap: wrap; }
+#librarianSection .occupancy-footer > span { display: inline-flex; align-items: center; gap: 7px; color: #74867d; font-size: 10px; font-weight: 700; }
+#librarianSection .occupancy-dot { width: 7px; height: 7px; border-radius: 50%; background: #1b9b6d; box-shadow: 0 0 0 4px #e7f5ed; }
+#librarianSection .occupancy-footer button { border: 0; padding: 6px 0; color: var(--amg-blue); background: transparent; font-size: 10px; font-weight: 800; }
+
+#librarianSection > .notice-success { padding: 12px 16px; border-color: #d6eade; border-radius: 12px; font-size: 11px; }
+#librarianSection .admin-stats-heading { align-items: end; margin: 27px 0 13px; }
+#librarianSection .admin-stats-heading .eyebrow { margin-bottom: 5px; }
+#librarianSection .admin-stats-heading h3 { font-size: 20px; }
+#librarianSection .admin-stats-heading > span { font-size: 10px; }
+#librarianSection .admin-stats-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 11px; }
+#librarianSection .admin-stats-grid .stat-card {
+  position: relative; display: flex; flex-direction: column; gap: 7px; min-height: 104px;
+  padding: 17px 18px; overflow: hidden; border-color: var(--admin-border); border-radius: 15px;
+  background: linear-gradient(145deg,#fff 0%,#fbfdfb 100%);
+  box-shadow: 0 4px 15px rgba(22,56,43,.03);
+}
+#librarianSection .admin-stats-grid .stat-card::after {
+  position: absolute; top: 0; right: 0; width: 46px; height: 46px; content: "";
+  border-radius: 0 0 0 100%; background: #eef7f1;
+}
+#librarianSection .admin-stats-grid .stat-card strong { position: relative; z-index: 1; color: #087f5b; font-size: 29px; line-height: 1; letter-spacing: -.05em; }
+#librarianSection .admin-stats-grid .stat-card span { color: #6e8077; font-size: 10px; font-weight: 700; }
+
+#librarianSection .admin-tabs {
+  display: flex; flex-wrap: nowrap; gap: 5px; margin: 26px 0 14px; padding: 6px;
+  overflow-x: auto; border-color: var(--admin-border); border-radius: 13px;
+  background: #fff; scrollbar-width: thin;
+}
+#librarianSection .admin-tabs .tab-btn { flex: 0 0 auto; padding: 10px 12px; border-radius: 9px; font-size: 11px; white-space: nowrap; }
+#librarianSection .admin-tabs .tab-btn.active { color: #fff; background: #087f5b; box-shadow: 0 4px 10px rgba(8,127,91,.17); }
+#librarianSection .tab-content {
+  margin: 0 0 16px; padding: clamp(18px,3vw,26px); border-color: var(--admin-border);
+  border-radius: 17px; box-shadow: 0 6px 20px rgba(22,56,43,.035);
+}
+#librarianSection .tab-content > h3 { margin-bottom: 18px; font-size: 19px; }
+#librarianSection .tab-content > h3:not(:first-child) { margin-top: 26px; }
+#librarianSection .tab-content .form-grid { gap: 16px; }
+#librarianSection .tab-content .data-table th { white-space: nowrap; }
+#librarianSection .tab-content .data-table td { vertical-align: middle; }
+#librarianSection .tab-content .data-table td .btn { margin: 2px 4px 2px 0; }
+#librarianSection .tab-content .stack-item { box-shadow: 0 4px 14px rgba(22,56,43,.035); }
+#librarianSection .chart-panel { border-color: var(--admin-border); border-radius: 15px; box-shadow: 0 4px 14px rgba(22,56,43,.025); }
+#librarianSection .bar-chart { display: grid; gap: 12px; }
+#librarianSection .bar-row { display: grid; grid-template-columns: minmax(100px,150px) minmax(60px,1fr) 36px; align-items: center; gap: 10px; }
+#librarianSection .bar-row > span { color: #52685e; font-size: 11px; }
+#librarianSection .bar-track { height: 9px; overflow: hidden; border-radius: 99px; background: #edf3ef; }
+#librarianSection .bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg,#087f5b,#5bb98b); }
+#librarianSection .bar-row > strong { color: #345449; font-size: 11px; text-align: right; }
+
+@media (max-width: 900px) {
+  #librarianSection .admin-quick-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  #librarianSection .admin-overview-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  #librarianSection > .section-header { margin-bottom: 18px; }
+  #librarianSection .admin-welcome {
+    grid-template-columns: minmax(0,1fr); min-height: 0; gap: 0;
+    padding: 25px 20px 16px; border-radius: 20px;
+  }
+  #librarianSection .admin-welcome-copy > p { margin-bottom: 18px; font-size: 13px; }
+  #librarianSection .admin-welcome h2 { max-width: 360px; font-size: clamp(29px,8vw,38px); }
+  #librarianSection .admin-welcome-art { display: none; }
+  #librarianSection .admin-welcome-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  #librarianSection .admin-welcome-actions .btn { width: 100%; min-height: 44px; padding: 10px 8px; font-size: 10px; }
+  #librarianSection .admin-date-strip { margin-top: 20px; padding-top: 12px; font-size: 9px; }
+  #librarianSection .admin-quick-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-bottom: 14px; }
+  #librarianSection .admin-quick-card { min-height: 82px; gap: 8px; padding: 11px 9px; border-radius: 13px; }
+  #librarianSection .admin-quick-icon { flex-basis: 34px; width: 34px; height: 34px; border-radius: 10px; font-size: 14px; }
+  #librarianSection .admin-quick-card b { font-size: 10px; }
+  #librarianSection .admin-quick-card small { font-size: 9px; }
+  #librarianSection .admin-quick-card > strong { font-size: 13px; }
+  #librarianSection .admin-overview-grid { gap: 10px; margin-bottom: 14px; }
+  #librarianSection .admin-overview-panel { padding: 16px 13px; border-radius: 14px; }
+  #librarianSection .admin-panel-heading { margin-bottom: 12px; }
+  #librarianSection .admin-panel-heading h3 { font-size: 16px; }
+  #librarianSection .admin-priority-row { grid-template-columns: 32px minmax(0,1fr) auto; gap: 7px; padding: 9px 7px; }
+  #librarianSection .priority-icon { width: 30px; height: 30px; }
+  #librarianSection .priority-copy b { font-size: 10px; }
+  #librarianSection .priority-copy small { font-size: 8px; }
+  #librarianSection .priority-open { grid-column: 2 / -1; justify-self: start; padding: 4px 7px; font-size: 9px; }
+  #librarianSection .occupancy-number { margin: 14px 0 7px; }
+  #librarianSection .occupancy-number strong { font-size: 42px; }
+  #librarianSection .admin-stats-heading { margin: 21px 0 11px; }
+  #librarianSection .admin-stats-heading > span { line-height: 1.5; }
+  #librarianSection .admin-stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  #librarianSection .admin-stats-grid .stat-card { min-height: 88px; padding: 14px 12px; border-radius: 12px; }
+  #librarianSection .admin-stats-grid .stat-card strong { font-size: 25px; }
+  #librarianSection .admin-stats-grid .stat-card span { max-width: 130px; font-size: 9px; line-height: 1.4; }
+  #librarianSection .admin-mobile-tab-picker { margin: 18px 0 12px; padding: 12px; border: 1px solid var(--admin-border); border-radius: 13px; background: #fff; }
+  #librarianSection .admin-mobile-tab-picker select { margin-top: 2px; }
+  #librarianSection .tab-content { padding: 17px 13px; border-radius: 14px; }
+  #librarianSection .tab-content > h3 { font-size: 17px; }
+  #librarianSection .tab-content .form-grid { gap: 13px; }
+  #librarianSection .bar-row { grid-template-columns: minmax(80px,105px) minmax(35px,1fr) 28px; gap: 7px; }
+  #librarianSection .bar-row > span, #librarianSection .bar-row > strong { font-size: 9px; }
+}
+@media (max-width: 380px) {
+  #librarianSection .admin-quick-card { padding: 9px 7px; }
+  #librarianSection .admin-quick-card small { font-size: 8px; }
+  #librarianSection .admin-welcome-actions { grid-template-columns: 1fr; }
+  #librarianSection .admin-priority-row { grid-template-columns: 30px minmax(0,1fr) auto; }
+  #librarianSection .priority-copy small { white-space: normal; }
+}
