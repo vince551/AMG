@@ -96,3 +96,5 @@ assert(!app.includes('httpsCallable(state.functions, "recordMemberAttendance")')
 assert(app.includes('transaction.set(attendanceRef') && app.includes('transaction.update(activeAttendanceRef'), "Attendance must use Firestore transactions for check-in and check-out");
 assert(firestoreRules.includes("request.resource.data.membershipStatus in ['Approved', 'Denied']"), "Librarian membership decisions must be constrained by Firestore rules");
 assert(firestoreRules.includes("getAfter(/databases/$(database)/documents/attendance/$(request.resource.data.attendanceId))"), "Presence records must be paired with an attendance record in the same transaction");
+
+assert(firestoreRules.includes("resource.data.status == 'Checked out'") && firestoreRules.includes("request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendanceId', 'status', 'updatedAt'])"), "Members must be able to check in again after checking out");
