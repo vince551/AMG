@@ -26,6 +26,7 @@ assert.ok(build.includes('"premium-redesign.css"'), "Static build must include t
 assert.ok(serviceWorker.includes('"./premium-redesign.css"'), "PWA app shell must cache the premium stylesheet");
 assert.ok(premiumCss.includes("@media (max-width: 760px)"), "Premium visual system must include mobile layouts");
 assert.ok(premiumCss.includes("prefers-reduced-motion: reduce"), "Premium visual system must respect reduced motion");
+assert.ok(!html.includes('class="admin-command-hero"'), "Librarian dashboard must not contain a duplicate command hero");
 assert.ok(mobileCss.includes("prefers-reduced-motion: reduce"), "Mobile styling must respect reduced-motion preferences");
 
 function functionSource(name) {
