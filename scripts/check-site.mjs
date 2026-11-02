@@ -46,4 +46,24 @@ for (const name of ["register", "updatePhoto", "registerBook", "recordAttendance
   }
 }
 
-console.log("AMG site structure and async event-handler regression checks passed.");
+
+const librarianTabIds = [
+  "borrowRequestsTab", "pendingLearnersTab", "allLearnersTab",
+  "booksAdminTab", "attendanceTab", "ebooksTab", "newsAdminTab", "statisticsTab"
+];
+for (const tabId of librarianTabIds) {
+  assert.ok(html.includes(`id="${tabId}" class="tab-content`),
+    "Librarian tab panel must exist: " + tabId);
+  assert.ok(html.includes(`data-tab-target="${tabId}"`),
+    "Librarian desktop tab must declare its target: " + tabId);
+  assert.ok(html.includes(`AMG.switchTab('${tabId}')`),
+    "Librarian tab navigation must use the safe switchTab call: " + tabId);
+}
+assert.equal((html.match(/AMG\\.switchTab\\('[^']+',document\\.querySelector/g) || []).length, 0,
+  "Librarian shortcuts must not use nested-quote querySelector calls inside inline HTML attributes");
+assert.ok(app.includes('target.classList.contains("tab-content")'),
+  "Tab switching must validate its target before hiding the active panel");
+assert.ok(app.includes('tabButton.dataset.tabTarget === tabId'),
+  "Active desktop tab must be selected using its explicit data target");
+
+console.log("AMG site structure, librarian navigation and async event-handler regression checks passed.");
