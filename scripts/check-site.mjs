@@ -59,7 +59,7 @@ for (const tabId of librarianTabIds) {
   assert.ok(html.includes(`AMG.switchTab('${tabId}')`),
     "Librarian tab navigation must use the safe switchTab call: " + tabId);
 }
-assert.equal((html.match(/AMG\\.switchTab\\('[^']+',document\\.querySelector/g) || []).length, 0,
+assert.equal(html.includes("document.querySelector('#librarianSection .admin-tabs"), false,
   "Librarian shortcuts must not use nested-quote querySelector calls inside inline HTML attributes");
 assert.ok(app.includes('target.classList.contains("tab-content")'),
   "Tab switching must validate its target before hiding the active panel");
