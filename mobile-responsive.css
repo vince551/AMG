@@ -306,7 +306,6 @@ html.amg-compact-device .navbar .nav-links {
   input[type="file"] { width: 100%; min-width: 0; }
   .registration-actions { display: flex; flex-wrap: wrap; }
   .registration-actions > * { flex: 1 1 130px; min-width: 0; }
-  .auth-modal .close-btn { position: sticky; float: right; }
 
   /* Keep the floating navigation clear of screen edges and system insets. */
   .navbar { margin-left: auto; margin-right: auto; }
