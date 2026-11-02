@@ -39,7 +39,7 @@ assert.ok(cloudFunctions.includes('coverStoragePath') && cloudFunctions.includes
 
 assert.ok(app.includes('announcementKind:"Announcement"') && app.includes('announcementKind:"Event"'), "Announcement cards must identify post type from the source collection");
 assert.ok(app.includes('readingMinutes+" min read"'), "Announcement reading time must be calculated from existing body text");
-assert.ok(app.includes('data-kind=kind.toLowerCase()'), "Announcement card styling must receive its automatically derived kind");
+assert.ok(app.includes("card.dataset.kind=kind.toLowerCase()"), "Announcement card styling must receive its automatically derived kind");
 assert.ok(designCss.includes('#heroSection #homeAnnouncements') && designCss.includes('#newsSection #announcementsList'), "Redesigned announcement cards must cover homepage and News & Events layouts");
 assert.ok(serviceWorker.includes('amg-library-shell-v9'), "PWA cache must refresh for the announcement redesign");
 
