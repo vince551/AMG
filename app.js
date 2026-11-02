@@ -425,14 +425,24 @@ async function updatePhoto(event) {
     event.currentTarget.value = "";
   }
 }
+function formatCardDate(value) {
+  if (!value) return "Not set";
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not set";
+  return new Intl.DateTimeFormat("en-GB",{day:"2-digit",month:"short",year:"numeric"}).format(date).toUpperCase();
+}
 function renderProfileCard(profile) {
   setText("cardFullName",profile.fullName);
-  setText("cardSchool",profile.school);
-  setText("cardStudyLevel",profile.studyLevel);
-  setText("cardEduLevel",profile.eduLevel);
+  setText("cardSchool",profile.school || "—");
+  setText("cardStudyLevel",profile.studyLevel || "—");
+  setText("cardEduLevel",profile.eduLevel || "Learner");
   setText("cardLibraryNum",profile.libraryNumber);
+  setText("cardIssueDate",formatCardDate(profile.createdAt));
+  setText("cardExpiryDate",formatCardDate(profile.expiryDate || profile.expiresAt));
+  setText("cardBackNumber",profile.libraryNumber);
   $("cardImage").src = profile.photoURL || avatarUrl(profile.libraryNumber);
   makeBarcode(profile.libraryNumber,"memberBarcode");
+  makeBarcode(profile.libraryNumber,"memberBackBarcode");
   makeQr(profile.libraryNumber,"memberQr");
 }
 function avatarUrl(seed) { return "https://api.dicebear.com/9.x/initials/svg?seed="+encodeURIComponent(seed||"AMG Member"); }
@@ -795,9 +805,12 @@ async function returnLoan(requestId,loanId) {
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 function viewMemberCard(member) {
-  setText("adminCardName",member.fullName); setText("adminCardSchool",member.school); setText("adminCardStudy",member.studyLevel); setText("adminCardLevel",member.eduLevel); setText("adminCardNumber",member.libraryNumber);
+  setText("adminCardName",member.fullName); setText("adminCardSchool",member.school || "—"); setText("adminCardStudy",member.studyLevel || "—"); setText("adminCardLevel",member.eduLevel || "Learner"); setText("adminCardNumber",member.libraryNumber);
+  setText("adminCardIssueDate",formatCardDate(member.createdAt));
+  setText("adminCardExpiryDate",formatCardDate(member.expiryDate || member.expiresAt));
+  setText("adminCardBackNumber",member.libraryNumber);
   $("adminCardImage").src=member.photoURL||avatarUrl(member.libraryNumber);
-  makeBarcode(member.libraryNumber,"adminMemberBarcode"); makeQr(member.libraryNumber,"adminMemberQr");
+  makeBarcode(member.libraryNumber,"adminMemberBarcode"); makeBarcode(member.libraryNumber,"adminMemberBackBarcode"); makeQr(member.libraryNumber,"adminMemberQr");
   $("cardModal").style.display="flex";
 }
 async function registerBook(event) {
