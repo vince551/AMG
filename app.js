@@ -180,7 +180,11 @@ async function refreshPublicData() {
     }
     renderBooks();
     renderPublicEbooks();
-    renderAnnouncements([...state.announcements, ...state.events].sort((a,b) => dateMillis(b.createdAt)-dateMillis(a.createdAt)));
+    const publicPosts = [
+      ...state.announcements.map(item=>({...item,announcementKind:"Announcement"})),
+      ...state.events.map(item=>({...item,announcementKind:"Event"}))
+    ].sort((a,b) => dateMillis(b.date||b.createdAt)-dateMillis(a.date||a.createdAt));
+    renderAnnouncements(publicPosts);
   } catch (error) {
     // Empty collections may not have documents; permission errors are still surfaced.
     if (error.code !== "permission-denied") showToast(errorMessage(error), "error");
@@ -1148,8 +1152,20 @@ function renderAnnouncements(items) {
     container.replaceChildren();
     if(!items.length) { container.append(node("p","No announcements have been published yet.","muted")); return; }
     items.forEach(item=>{
+      const kind=item.announcementKind==="Event"?"Event":"Announcement";
+      const body=String(item.body||"").trim();
+      const words=body ? body.split(/\s+/).filter(Boolean).length : 0;
+      const readingMinutes=Math.max(1,Math.ceil(words/200));
       const card=node("article",null,"announcement-card");
-      card.append(node("h3",item.title),node("time",item.date?formatDate(item.date):formatDate(item.createdAt)),node("p",item.body||""));
+      card.dataset.kind=kind.toLowerCase();
+      const meta=node("div",null,"announcement-card-meta");
+      meta.append(node("span",kind,"announcement-kind"));
+      meta.append(node("time",formatDate(item.date||item.createdAt)));
+      const heading=node("h3",item.title||"Library update","announcement-card-title");
+      const excerpt=node("p",body,"announcement-card-body");
+      const footer=node("div",null,"announcement-card-footer");
+      footer.append(node("span",readingMinutes+" min read"));
+      card.append(meta,heading,excerpt,footer);
       container.append(card);
     });
   });
