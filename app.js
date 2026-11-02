@@ -386,17 +386,24 @@ async function register(event) {
     state.profile = { ...created.profile };
     updateAuthUI();
     const photo = form.get("photo");
+    const avatarChoice = String(form.get("avatarChoice") || "scholar");
+    const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
+    let photoURL = state.profile.photoURL || ("https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[avatarChoice] || seeds.scholar));
     if (photo instanceof File && photo.size > 0) {
-      if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) throw new Error("Profile photo must be an image smaller than 5 MB.");
-      const target = storageRef(state.storage, "member-photos/"+credential.user.uid+"/"+photo.name.replace(/[^a-zA-Z0-9._-]/g,"_"));
-      await uploadBytes(target, photo, {contentType:photo.type});
-      const photoURL = await getDownloadURL(target);
-      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
-      state.profile.photoURL = photoURL;
-    } else if (!state.profile.photoURL) {
-      const choice = String(form.get("avatarChoice") || "scholar");
-      const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
-      const photoURL = "https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[choice] || seeds.scholar);
+      if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) {
+        showToast("Profile photo was skipped. Choose an image smaller than 5 MB.", "error");
+      } else {
+        try {
+          const target = storageRef(state.storage, "member-photos/"+credential.user.uid+"/"+photo.name.replace(/[^a-zA-Z0-9._-]/g,"_"));
+          await uploadBytes(target, photo, {contentType:photo.type});
+          photoURL = await getDownloadURL(target);
+        } catch (photoError) {
+          // Photo storage is optional; Spark-plan registration must still complete.
+          console.warn("Optional registration photo upload failed:", photoError?.code || "unknown");
+        }
+      }
+    }
+    if (photoURL !== state.profile.photoURL) {
       await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
       state.profile.photoURL = photoURL;
     }
