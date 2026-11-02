@@ -314,8 +314,9 @@ function validateRegistrationStepTwo() {
 }
 async function register(event) {
   event.preventDefault();
+  const formElement = event.currentTarget;
   if (!requireFirebase() || !validateRegistrationStepTwo()) return;
-  const form = new FormData(event.currentTarget);
+  const form = new FormData(formElement);
   const fullName = String(form.get("fullName")).trim();
   const email = String(form.get("email")).trim().toLowerCase();
   const password = String(form.get("password"));
@@ -359,7 +360,7 @@ async function register(event) {
       profile.photoURL = photoURL;
       state.profile.photoURL = photoURL;
     }
-    event.currentTarget.reset();
+    formElement.reset();
     setRegistrationStep(1);
     updateAvatarPreview();
     closeAuthModal();
@@ -397,11 +398,12 @@ function makeQr(value, containerId) {
   if (window.QRCode) new window.QRCode(target,{text:value,width:68,height:68,colorDark:"#111827",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M});
 }
 async function updatePhoto(event) {
-  const photo = event.currentTarget.files?.[0];
+  const inputElement = event.currentTarget;
+  const photo = inputElement.files?.[0];
   if (!photo) return;
   if (!state.user || !state.profile || !state.storage || !state.db) {
     showToast("Log in before updating your profile photo.", "error");
-    event.currentTarget.value = "";
+    inputElement.value = "";
     return;
   }
   if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) {
@@ -422,7 +424,7 @@ async function updatePhoto(event) {
   } catch (error) {
     showToast("Photo could not be updated: " + errorMessage(error), "error");
   } finally {
-    event.currentTarget.value = "";
+    inputElement.value = "";
   }
 }
 function formatCardDate(value) {
@@ -813,14 +815,15 @@ function viewMemberCard(member) {
 }
 async function registerBook(event) {
   event.preventDefault(); if(!state.librarian) return;
-  const form=new FormData(event.currentTarget);
+  const formElement = event.currentTarget;
+  const form=new FormData(formElement);
   const title=String(form.get("title")).trim(), category=String(form.get("category"));
   const quantity=Number(form.get("quantity"));
   if(!title||!Number.isInteger(quantity)||quantity<1||quantity>400) { showToast("Enter a title and between 1 and 400 physical copies.","error"); return; }
   try {
     const createBook = httpsCallable(state.functions,"registerBookCopies");
     const result = await createBook({title,author:String(form.get("author")).trim(),category,quantity,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim()});
-    event.currentTarget.reset(); renderCopyLabels(title, result.data.copies || []); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
+    formElement.reset(); renderCopyLabels(title, result.data.copies || []); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
     await refreshPublicData(); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
@@ -904,11 +907,12 @@ async function processUnifiedCode(rawCode, mode) {
 async function recordAttendance(event) {
   event.preventDefault();
   if (!state.librarian) return;
-  const form = new FormData(event.currentTarget);
+  const formElement = event.currentTarget;
+  const form = new FormData(formElement);
   const code = String(form.get("libraryNumber") || "").trim();
   const mode = String(form.get("action") || "check-in");
   await processUnifiedCode(code, mode);
-  event.currentTarget.reset();
+  formElement.reset();
 }
 async function updateCapacity(event) {
   event.preventDefault(); if(!state.librarian) return;
@@ -971,7 +975,8 @@ async function stopScanner() {
 }
 async function uploadEbook(event) {
   event.preventDefault(); if(!state.librarian) return;
-  const form=new FormData(event.currentTarget), file=form.get("file"), title=String(form.get("title")).trim(), category=String(form.get("category")).trim();
+  const formElement = event.currentTarget;
+  const form=new FormData(formElement), file=form.get("file"), title=String(form.get("title")).trim(), category=String(form.get("category")).trim();
   if(!(file instanceof File)||!file.size) { showToast("Choose a PDF or EPUB file.","error"); return; }
   const isPdf=file.type==="application/pdf"||file.name.toLowerCase().endsWith(".pdf");
   const isEpub=file.type==="application/epub+zip"||file.name.toLowerCase().endsWith(".epub");
@@ -984,7 +989,7 @@ async function uploadEbook(event) {
     await uploadBytes(target,file,{contentType:isPdf?"application/pdf":"application/epub+zip"});
     const url=await getDownloadURL(target);
     await setDoc(record,{title,category,fileName:file.name,storagePath:target.fullPath,downloadUrl:url,size:file.size,uploadedBy:state.user.uid,createdAt:serverTimestamp()});
-    event.currentTarget.reset(); showToast("E-book uploaded."); await refreshAdminData();
+    formElement.reset(); showToast("E-book uploaded."); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 function renderEbooks() {
@@ -1006,11 +1011,12 @@ async function removeEbook(book) {
 }
 async function publishNews(event) {
   event.preventDefault(); if(!state.librarian) return;
-  const form=new FormData(event.currentTarget), type=String(form.get("type")), title=String(form.get("title")).trim(), body=String(form.get("body")).trim(), date=String(form.get("date")||"");
+  const formElement = event.currentTarget;
+  const form=new FormData(formElement), type=String(form.get("type")), title=String(form.get("title")).trim(), body=String(form.get("body")).trim(), date=String(form.get("date")||"");
   try {
     const target=type==="event"?"events":"announcements";
     await addDoc(collection(state.db,target),{title,body,date:date||null,type,createdAt:serverTimestamp(),createdBy:state.user.uid});
-    event.currentTarget.reset(); showToast("Published successfully."); await refreshPublicData(); await refreshAdminData();
+    formElement.reset(); showToast("Published successfully."); await refreshPublicData(); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 function renderAnnouncements(items) {
