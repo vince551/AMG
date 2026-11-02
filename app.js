@@ -508,14 +508,38 @@ function updateLiquidNav(sectionId) {
   requestAnimationFrame(() => indicator.classList.add("liquid-bounce"));
 }
 function switchTab(tabId, button) {
-  document.querySelectorAll("#librarianSection .tab-btn").forEach(el=>el.classList.remove("active"));
-  document.querySelectorAll("#librarianSection .tab-content").forEach(el=>el.classList.remove("active"));
-  const matchingButton = [...document.querySelectorAll("#librarianSection .admin-tabs .tab-btn")].find(el => (el.getAttribute("onclick") || "").includes("'" + tabId + "'"));
-  if (button) button.classList.add("active");
-  else if (matchingButton) matchingButton.classList.add("active");
-  $(tabId)?.classList.add("active");
+  const librarianSection = $("librarianSection");
+  const target = $(tabId);
+
+  // Validate the destination before changing visibility so a bad ID can
+  // never leave the entire librarian workspace blank.
+  if (!librarianSection || !target ||
+      !librarianSection.contains(target) ||
+      !target.classList.contains("tab-content")) {
+    showToast("That librarian section could not be opened. Please choose another section.", "error");
+    return false;
+  }
+
+  librarianSection.querySelectorAll(".tab-content").forEach(panel => {
+    panel.classList.remove("active");
+  });
+  librarianSection.querySelectorAll(".admin-tabs .tab-btn").forEach(tabButton => {
+    tabButton.classList.toggle("active", tabButton.dataset.tabTarget === tabId);
+  });
+
+  // Keep compatibility with callers that explicitly pass a tab button,
+  // but never mark dashboard shortcut buttons as the selected tab.
+  if (button?.matches?.("#librarianSection .admin-tabs .tab-btn")) {
+    button.classList.add("active");
+  }
+
+  target.classList.add("active");
+
   const mobilePicker = $("adminMobileTabSelect");
-  if (mobilePicker && mobilePicker.value !== tabId) mobilePicker.value = tabId;
+  if (mobilePicker && mobilePicker.value !== tabId) {
+    mobilePicker.value = tabId;
+  }
+  return true;
 }
 function starredIds() {
   try { return JSON.parse(localStorage.getItem("amg_starred_"+(state.user?.uid||"guest"))||"[]"); } catch (_) { return []; }
