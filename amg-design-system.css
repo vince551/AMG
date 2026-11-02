@@ -637,7 +637,7 @@ label { display: grid; gap: 7px; color: #354b43; font-size: 13px; font-weight: 7
 #librarianSection #statisticsTab .bar-chart > .muted { padding: 16px; border-radius: 11px; color: #819188; background: #f6faf7; font-size: 11px; }
 @keyframes amgBarGrow { from { transform: scaleX(.08); opacity: .45; } to { transform: scaleX(1); opacity: 1; } }
 @media (min-width: 960px) {
-  #librarianSection #statisticsTab { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
+  #librarianSection #statisticsTab.active { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
   #librarianSection #statisticsTab > h3,
   #librarianSection #statisticsTab > p.muted,
   #librarianSection #statisticsSummary { grid-column: 1 / -1; }
