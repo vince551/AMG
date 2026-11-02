@@ -408,7 +408,7 @@ async function updatePhoto(event) {
   }
   if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) {
     showToast("Choose an image smaller than 5 MB.", "error");
-    event.currentTarget.value = "";
+    inputElement.value = "";
     return;
   }
   try {
