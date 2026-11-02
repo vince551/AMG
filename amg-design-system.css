@@ -659,3 +659,281 @@ label { display: grid; gap: 7px; color: #354b43; font-size: 13px; font-weight: 7
 @media (prefers-reduced-motion: reduce) {
   #librarianSection #statisticsTab .bar-fill { animation: none; }
 }
+
+
+/* -------------------------------------------------------------------------
+   LEARNER DESK — member profile and activity layer
+   Scoped to #profileSection; presentation only, no data or app behavior.
+   ------------------------------------------------------------------------- */
+#profileSection {
+  --learner-border: #e0ebe4;
+  --learner-ink: #18372d;
+}
+#profileSection > .section-header {
+  position: relative;
+  margin-bottom: 24px;
+  padding: 26px 30px;
+  overflow: hidden;
+  border: 1px solid #dcebe1;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(115,190,151,.17), transparent 26%),
+    linear-gradient(115deg,#f0f8f2 0%,#fff 58%,#eff5fa 100%);
+}
+#profileSection > .section-header::after {
+  position: absolute;
+  right: 34px;
+  bottom: -64px;
+  width: 190px;
+  height: 190px;
+  border: 1px solid rgba(8,127,91,.12);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+#profileSection > .section-header h2 {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 8px;
+  color: var(--learner-ink);
+  font-size: clamp(29px,4vw,40px);
+  letter-spacing: -.05em;
+}
+#profileSection > .section-header p:last-child {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+#profileSection > .notice {
+  padding: 14px 18px;
+  border-radius: 13px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+#profileSection .profile-layout {
+  grid-template-columns: minmax(0,1.08fr) minmax(320px,.92fr);
+  align-items: stretch;
+  gap: 18px;
+}
+#profileSection .card-preview-wrapper {
+  min-width: 0;
+  padding: clamp(14px,2.2vw,22px);
+  border: 1px solid var(--learner-border);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(8,127,91,.07),transparent 35%),
+    linear-gradient(145deg,#f1f7f3,#eaf1ed);
+  box-shadow: 0 8px 24px rgba(22,56,43,.045);
+}
+#profileSection .amg-card-pair { gap: 14px; }
+#profileSection .amg-id-card {
+  min-width: 0;
+  min-height: 224px;
+  border: 1px solid rgba(17,68,48,.1);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(20,54,40,.12);
+}
+#profileSection .amg-id-brand-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 80% 12%,rgba(255,255,255,.2),transparent 28%),
+    linear-gradient(155deg,#075b43,#087f5b);
+}
+#profileSection .amg-id-brand-panel::after {
+  position: absolute;
+  z-index: -1;
+  right: -35px;
+  bottom: -55px;
+  width: 145px;
+  height: 145px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 50%;
+  content: "";
+}
+#profileSection .amg-id-brand-name { letter-spacing: -.04em; }
+#profileSection .amg-id-front-content { align-content: center; }
+#profileSection .amg-id-person { gap: 13px; }
+#profileSection .amg-id-photo {
+  flex: 0 0 64px;
+  border: 2px solid #e7f0ea;
+  box-shadow: 0 3px 10px rgba(20,54,40,.1);
+}
+#profileSection .amg-id-details h3 {
+  overflow-wrap: anywhere;
+  color: #17372c;
+  font-size: clamp(14px,1.5vw,17px);
+}
+#profileSection .amg-id-details strong {
+  color: #087f5b;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+#profileSection .amg-id-pills span {
+  border: 1px solid #d8ebdf;
+  font-weight: 800;
+}
+#profileSection .amg-id-front-barcode {
+  min-height: 35px;
+  padding-top: 4px;
+}
+#profileSection .amg-id-back {
+  background:
+    radial-gradient(circle at 100% 0%,rgba(8,127,91,.07),transparent 34%),
+    #fff;
+}
+#profileSection .amg-id-back header {
+  padding-bottom: 9px;
+  border-bottom: 1px solid #e5eee8;
+  color: #245442;
+  letter-spacing: .04em;
+}
+#profileSection .amg-id-back-content h3 { color: #087f5b; letter-spacing: .08em; }
+#profileSection .amg-id-back-content ol { color: #5c7066; line-height: 1.7; }
+#profileSection .amg-id-dates b { color: #6d8176; font-size: 9px; letter-spacing: .08em; }
+#profileSection .amg-id-dates strong { color: #1b4435; }
+#profileSection .amg-id-back footer {
+  padding-top: 10px;
+  border-top: 1px solid #e5eee8;
+  color: #587166;
+}
+#profileSection .card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 15px;
+}
+#profileSection .card-actions .btn {
+  min-width: 0;
+  min-height: 43px;
+  padding-inline: 10px;
+  font-size: 12px;
+}
+#profileSection .card-actions .upload-label { justify-content: center; }
+#profileSection .profile-layout > .panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(18px,2.5vw,26px);
+  border-color: var(--learner-border);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(22,56,43,.045);
+}
+#profileSection .profile-layout > .panel > h3 {
+  margin-bottom: 16px;
+  color: var(--learner-ink);
+  font-size: 19px;
+}
+#profileSection #myLoansList { gap: 9px; }
+#profileSection #myLoansList > .stack-item {
+  position: relative;
+  min-width: 0;
+  padding: 14px 15px 13px 17px;
+  border: 1px solid #e7eee9;
+  border-radius: 13px;
+  background: linear-gradient(120deg,#fff,#fbfdfb);
+  box-shadow: 0 3px 12px rgba(22,56,43,.025);
+  transition: border-color .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+#profileSection #myLoansList > .stack-item:hover {
+  transform: translateY(-2px);
+  border-color: #c8dfd1;
+  box-shadow: 0 8px 18px rgba(22,56,43,.06);
+}
+#profileSection #myLoansList > .stack-item h4 {
+  margin-bottom: 6px;
+  color: #244638;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+#profileSection #myLoansList > .stack-item p {
+  margin: 3px 0 0;
+  color: #718279;
+  font-size: 11px;
+  line-height: 1.55;
+}
+#profileSection .profile-layout .section-header.top-gap {
+  margin: 24px 0 12px !important;
+  padding-top: 18px;
+  border-top: 1px solid #e8efea;
+}
+#profileSection .profile-layout .section-header.top-gap h3 {
+  margin: 0;
+  color: var(--learner-ink);
+  font-size: 17px;
+}
+#profileSection #learnerStats {
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 9px;
+  margin-top: 2px;
+}
+#profileSection #learnerStats > .stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #e3ede6;
+  border-radius: 13px;
+  background: linear-gradient(145deg,#fff,#f8fbf8);
+}
+#profileSection #learnerStats > .stat-card strong {
+  color: #087f5b;
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: -.05em;
+}
+#profileSection #learnerStats > .stat-card span {
+  color: #718279;
+  font-size: 10px;
+  font-weight: 800;
+}
+@media (max-width: 900px) {
+  #profileSection .profile-layout {
+    grid-template-columns: minmax(0,1fr);
+  }
+  #profileSection .card-preview-wrapper { max-width: 760px; width: 100%; }
+}
+@media (max-width: 680px) {
+  #profileSection > .section-header {
+    margin-bottom: 16px;
+    padding: 21px 19px;
+    border-radius: 17px;
+  }
+  #profileSection > .section-header::after {
+    right: -65px;
+    bottom: -95px;
+    width: 160px;
+    height: 160px;
+  }
+  #profileSection > .section-header h2 { font-size: 29px; }
+  #profileSection > .section-header p:last-child { max-width: 290px; font-size: 12px; }
+  #profileSection .profile-layout { gap: 12px; }
+  #profileSection .card-preview-wrapper { padding: 10px; border-radius: 15px; }
+  #profileSection .amg-id-card { border-radius: 12px; }
+  #profileSection .amg-id-brand-panel { min-height: 86px; padding: 14px 16px; }
+  #profileSection .amg-id-brand-name { font-size: 17px; }
+  #profileSection .amg-id-front-content { gap: 8px; padding: 12px; }
+  #profileSection .amg-id-person { gap: 9px; }
+  #profileSection .amg-id-photo { flex-basis: 54px; width: 54px; height: 66px; }
+  #profileSection .amg-id-qr-block { font-size: 8px; }
+  #profileSection .qr-holder { min-width: 66px; min-height: 66px; }
+  #profileSection .amg-id-back { padding: 14px; }
+  #profileSection .amg-id-back-content { gap: 8px; }
+  #profileSection .amg-id-back footer { flex-wrap: wrap; font-size: 9px; }
+  #profileSection .card-actions { grid-template-columns: 1fr; }
+  #profileSection .card-actions .btn { width: 100%; }
+  #profileSection .profile-layout > .panel { padding: 17px 14px; border-radius: 15px; }
+  #profileSection #myLoansList > .stack-item { padding: 12px; }
+  #profileSection #learnerStats { gap: 8px; }
+  #profileSection #learnerStats > .stat-card { padding: 13px 11px; }
+  #profileSection #learnerStats > .stat-card strong { font-size: 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #profileSection #myLoansList > .stack-item { transition: none; }
+}
