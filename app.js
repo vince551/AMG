@@ -826,9 +826,23 @@ async function reviewLearner(uid,decision) {
   const action=decision==="Approved"?"approve":"deny";
   if(!member || !confirm("Are you sure you want to "+action+" "+member.fullName+"'s membership?")) return;
   try {
-    const review=httpsCallable(state.functions,"reviewLearnerMembership");
-    const result=await review({uid,decision});
-    showToast(result.data.message || "Membership decision saved.");
+    const memberRef=doc(state.db,"users",uid);
+    const memberSnap=await getDoc(memberRef);
+    if(!memberSnap.exists()) throw new Error("The learner profile no longer exists.");
+    const current=memberSnap.data();
+    if(current.role!=="learner" || current.isApproved===true || current.membershipStatus==="Denied") {
+      throw new Error("This membership application has already been decided or is not a learner profile.");
+    }
+    const now=serverTimestamp();
+    await updateDoc(memberRef,{
+      isApproved:decision==="Approved",
+      membershipStatus:decision,
+      decisionAt:now,
+      decisionBy:state.user.uid,
+      updatedAt:now,
+      ...(decision==="Approved"?{approvedAt:now}:{deniedAt:now})
+    });
+    showToast("Membership "+decision.toLowerCase()+" successfully.");
     await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
@@ -1000,9 +1014,50 @@ async function processUnifiedCode(rawCode, mode) {
   if (!code) return;
   try {
     if (mode === "check-in" || mode === "check-out") {
-      const call = httpsCallable(state.functions, "recordMemberAttendance");
-      const result = await call({libraryNumber:code, action:mode});
-      showToast(result.data.message || "Attendance recorded.");
+      const members=await getDocs(query(collection(state.db,"users"),where("libraryNumber","==",code),limit(1)));
+      if(members.empty) throw new Error("No member matches that library number.");
+      const memberDoc=members.docs[0], member=memberDoc.data();
+      if(member.role!=="learner" || member.isApproved!==true) throw new Error("This member is not approved.");
+      const presenceRef=doc(state.db,"memberPresence",memberDoc.id);
+      const presenceSnap=await getDoc(presenceRef);
+      const attendanceRef=presenceSnap.exists() && mode==="check-out"
+        ? doc(state.db,"attendance",presenceSnap.data().attendanceId)
+        : doc(collection(state.db,"attendance"));
+      if(mode==="check-in") {
+        if(presenceSnap.exists() && presenceSnap.data().status==="In library") throw new Error("This member is already checked in.");
+        const active=await getDocs(query(collection(state.db,"memberPresence"),where("status","==","In library")));
+        if(active.size>=state.capacity) throw new Error("The library has reached its configured capacity.");
+      } else if(!presenceSnap.exists() || presenceSnap.data().status!=="In library" || !presenceSnap.data().attendanceId) {
+        throw new Error("This member has no active check-in.");
+      }
+      await runTransaction(state.db,async transaction=>{
+        const [latestPresence,latestMember]=await Promise.all([
+          transaction.get(presenceRef),transaction.get(memberDoc.ref)
+        ]);
+        if(!latestMember.exists() || latestMember.data().isApproved!==true || latestMember.data().role!=="learner") {
+          throw new Error("This member is not approved.");
+        }
+        if(mode==="check-in") {
+          if(latestPresence.exists() && latestPresence.data().status==="In library") throw new Error("This member is already checked in.");
+          transaction.set(attendanceRef,{
+            uid:memberDoc.id,memberName:member.fullName,libraryNumber:member.libraryNumber,
+            checkInAt:serverTimestamp(),checkOutAt:null,status:"In library",recordedBy:state.user.uid
+          });
+          transaction.set(presenceRef,{
+            uid:memberDoc.id,attendanceId:attendanceRef.id,status:"In library",updatedAt:serverTimestamp()
+          });
+        } else {
+          if(!latestPresence.exists() || latestPresence.data().status!=="In library") throw new Error("This member has no active check-in.");
+          const activeAttendanceRef=doc(state.db,"attendance",latestPresence.data().attendanceId);
+          const activeAttendance=await transaction.get(activeAttendanceRef);
+          if(!activeAttendance.exists() || activeAttendance.data().status!=="In library") throw new Error("The active attendance record could not be found.");
+          transaction.update(activeAttendanceRef,{
+            checkOutAt:serverTimestamp(),status:"Checked out",checkedOutBy:state.user.uid
+          });
+          transaction.update(presenceRef,{status:"Checked out",updatedAt:serverTimestamp()});
+        }
+      });
+      showToast(member.fullName+(mode==="check-in"?" checked in.":" checked out."));
     } else if (mode === "issue-book") {
       if (!state.scanMemberCode) {
         state.scanMemberCode = code;

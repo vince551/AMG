@@ -54,12 +54,29 @@ service cloud.firestore {
       allow read: if own(uid) || librarian();
       // Learners can only update their own safe profile fields, never role,
       // approval status, library number, guardian data or account identity.
-      allow update: if librarian() || (own(uid)
-        && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['photoURL', 'starredBookIds', 'updatedAt'])
-        && request.resource.data.uid == resource.data.uid
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.isApproved == resource.data.isApproved);
+      allow update: if (librarian()
+        && resource.data.role == 'learner'
+        && resource.data.isApproved == false
+        && resource.data.membershipStatus == 'Pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'isApproved', 'membershipStatus', 'decisionAt', 'decisionBy',
+          'approvedAt', 'deniedAt', 'updatedAt'
+        ])
+        && request.resource.data.isApproved == (request.resource.data.membershipStatus == 'Approved')
+        && request.resource.data.membershipStatus in ['Approved', 'Denied']
+        && request.resource.data.decisionBy == request.auth.uid
+        && request.resource.data.decisionAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && ((request.resource.data.membershipStatus == 'Approved'
+          && request.resource.data.approvedAt == request.time)
+          || (request.resource.data.membershipStatus == 'Denied'
+          && request.resource.data.deniedAt == request.time)))
+        || (own(uid)
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['photoURL', 'starredBookIds', 'updatedAt'])
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.isApproved == resource.data.isApproved);
       allow delete: if librarian();
     }
 
@@ -88,7 +105,31 @@ service cloud.firestore {
 
     match /attendance/{attendanceId} {
       allow read: if librarian();
-      allow create, update, delete: if false;
+      allow create: if librarian()
+        && request.resource.data.keys().hasOnly([
+          'uid', 'memberName', 'libraryNumber', 'checkInAt', 'checkOutAt',
+          'status', 'recordedBy'
+        ])
+        && request.resource.data.uid is string
+        && get(/databases/$(database)/documents/users/$(request.resource.data.uid)).data.role == 'learner'
+        && get(/databases/$(database)/documents/users/$(request.resource.data.uid)).data.isApproved == true
+        && get(/databases/$(database)/documents/users/$(request.resource.data.uid)).data.libraryNumber == request.resource.data.libraryNumber
+        && request.resource.data.checkInAt == request.time
+        && request.resource.data.checkOutAt == null
+        && request.resource.data.status == 'In library'
+        && request.resource.data.recordedBy == request.auth.uid;
+      allow update: if librarian()
+        && resource.data.status == 'In library'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'checkOutAt', 'status', 'checkedOutBy'
+        ])
+        && request.resource.data.status == 'Checked out'
+        && request.resource.data.checkOutAt == request.time
+        && request.resource.data.checkedOutBy == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.recordedBy == resource.data.recordedBy
+        && getAfter(/databases/$(database)/documents/memberPresence/$(resource.data.uid)).data.status == 'Checked out';
+      allow delete: if false;
     }
 
     match /bookCopies/{copyId} {
@@ -98,7 +139,22 @@ service cloud.firestore {
 
     match /memberPresence/{uid} {
       allow read: if librarian() || own(uid);
-      allow write: if false;
+      allow create: if librarian()
+        && request.resource.data.keys().hasOnly(['uid', 'attendanceId', 'status', 'updatedAt'])
+        && request.resource.data.uid == uid
+        && request.resource.data.status == 'In library'
+        && request.resource.data.updatedAt == request.time
+        && getAfter(/databases/$(database)/documents/attendance/$(request.resource.data.attendanceId)).data.uid == uid
+        && getAfter(/databases/$(database)/documents/attendance/$(request.resource.data.attendanceId)).data.status == 'In library';
+      allow update: if librarian()
+        && resource.data.uid == uid
+        && resource.data.status == 'In library'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status == 'Checked out'
+        && request.resource.data.updatedAt == request.time
+        && getAfter(/databases/$(database)/documents/attendance/$(resource.data.attendanceId)).data.status == 'Checked out'
+        && getAfter(/databases/$(database)/documents/attendance/$(resource.data.attendanceId)).data.uid == uid;
+      allow delete: if false;
     }
 
     match /announcements/{announcementId} {
