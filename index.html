@@ -17,7 +17,6 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#087f5b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -26,12 +25,6 @@
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="description" content="AMG Library — learner membership, book discovery, borrowing, e-books and library services.">
   <title>AMG Library | Learn. Discover. Grow.</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="app.css">
-  <link rel="stylesheet" href="amg-polish.css">
-  <link rel="stylesheet" href="mobile-responsive.css">
-  <link rel="stylesheet" href="premium-redesign.css">
-  <link rel="stylesheet" href="mobile-experience.css">
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
@@ -303,7 +296,6 @@
 
   <div id="cardModal" class="modal" role="dialog" aria-modal="true"><div class="modal-content card-modal-content"><button class="close-btn" onclick="AMG.closeCardModal()">×</button><div id="adminCardPrint" class="amg-card-pair"><article id="adminCardTarget" class="amg-id-card amg-id-front"><div class="amg-id-brand-panel"><div class="amg-id-bookmark" aria-hidden="true">▤</div><div class="amg-id-brand-name">AMG LIBRARY</div><div class="amg-id-tagline">YOUR LEARNING PARTNER</div><div class="amg-id-stripes" aria-hidden="true"></div></div><div class="amg-id-front-content"><div class="amg-id-qr-block"><span>SCAN MEMBER ID</span><div id="adminMemberQr" class="qr-holder"></div></div><div class="amg-id-person"><img id="adminCardImage" class="amg-id-photo" alt="Member photo"><div class="amg-id-details"><h3 id="adminCardName"></h3><div class="amg-id-pills"><span id="adminCardLevel"></span><span id="adminCardStudy"></span></div><small>MEMBER NO.</small><strong id="adminCardNumber"></strong><small id="adminCardSchool"></small></div></div><div class="amg-id-front-barcode"><svg id="adminMemberBarcode"></svg></div></div></article><article class="amg-id-card amg-id-back"><header>AMG LIBRARY <span>•</span> LEARNER ID — BACK</header><div class="amg-id-back-content"><section><h3>LIBRARY RULES</h3><ol><li>This card is property of AMG Library.</li><li>Must be presented to access library services.</li><li>Report loss immediately.</li><li>Valid while membership is active.</li></ol><div class="amg-id-dates"><div><b>ISSUE DATE</b><strong id="adminCardIssueDate">Not set</strong></div><div class="amg-id-signature">LIBRARIAN SIGNATURE: __________________</div></div></section><section class="amg-id-back-code"><svg id="adminMemberBackBarcode"></svg><strong id="adminCardBackNumber"></strong></section></div><footer><span>edwinmuga99@gmail.com</span><span>+254 726 908936</span><b>LEARN • DISCOVER • GROW</b></footer></article></div><button class="btn btn-primary top-gap" onclick="AMG.downloadCard('adminCardPrint')">Download both sides</button></div></div>
 
-  <script src="mobile-effects.js" defer></script>
   <script type="module" src="app.js"></script>
   <script>if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" }).catch(() => {}));</script>
 </body>
