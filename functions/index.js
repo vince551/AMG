@@ -76,9 +76,11 @@ exports.reviewLearnerMembership=onCall(async request=>{
 exports.registerBookCopies=onCall(async request=>{
  requireLibrarian(request);
  const title=clean(request.data?.title),author=clean(request.data?.author,120),category=clean(request.data?.category,80),quantity=Number(request.data?.quantity);
+ const coverUrl=clean(request.data?.coverUrl,1000),coverStoragePath=clean(request.data?.coverStoragePath,500);
  if(!title||!Number.isInteger(quantity)||quantity<1||quantity>400)throw new HttpsError("invalid-argument","Provide a title and between 1 and 400 physical copies.");
+ if(coverStoragePath&&!coverStoragePath.startsWith("book-covers/"+request.auth.uid+"/"))throw new HttpsError("permission-denied","Book cover uploads must belong to the authenticated librarian.");
  const batch=db.batch(),bookRef=db.collection("books").doc(),titleCode="AMG-TITLE-"+randomBytes(6).toString("hex").toUpperCase();
- batch.create(bookRef,{title,author,category,quantity,available:quantity,barcode:titleCode,libraryNumber:titleCode,coverUrl:clean(request.data?.coverUrl,1000),description:clean(request.data?.description,500),createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp(),createdBy:request.auth.uid});
+ batch.create(bookRef,{title,author,category,quantity,available:quantity,barcode:titleCode,libraryNumber:titleCode,coverUrl,coverStoragePath,description:clean(request.data?.description,500),createdAt:FieldValue.serverTimestamp(),updatedAt:FieldValue.serverTimestamp(),createdBy:request.auth.uid});
  const copies=[];
  for(let i=1;i<=quantity;i++){const ref=db.collection("bookCopies").doc(),barcode=makeCopyBarcode();batch.create(ref,{bookId:bookRef.id,title,barcode,copyNumber:i,status:"Available",createdAt:FieldValue.serverTimestamp()});copies.push({copyNumber:i,barcode});}
  await batch.commit();return {bookId:bookRef.id,bookBarcode:titleCode,copies,message:quantity+" individual copy barcodes created."};

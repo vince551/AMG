@@ -16,6 +16,14 @@ service firebase.storage {
             && request.resource.contentType.matches('image/.*')));
     }
 
+    match /book-covers/{uid}/{fileName} {
+      allow read: if true;
+      allow write: if librarian() && request.auth.uid == uid
+        && (request.resource == null
+          || (request.resource.size < 5 * 1024 * 1024
+            && request.resource.contentType.matches('image/(jpeg|png|webp)')));
+    }
+
     match /ebooks/{fileName} {
       allow read: if signedIn();
       allow write: if librarian()

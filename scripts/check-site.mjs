@@ -1,12 +1,14 @@
 import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 
-const [html, app, designCss, serviceWorker, build] = await Promise.all([
+const [html, app, designCss, serviceWorker, build, storageRules, cloudFunctions] = await Promise.all([
   readFile("index.html", "utf8"),
   readFile("app.js", "utf8"),
   readFile("amg-design-system.css", "utf8"),
   readFile("service-worker.js", "utf8"),
-  readFile("scripts/build-static.mjs", "utf8")
+  readFile("scripts/build-static.mjs", "utf8"),
+  readFile("storage.rules", "utf8"),
+  readFile("functions/index.js", "utf8")
 ]);
 
 const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]);
@@ -23,6 +25,18 @@ assert.ok(serviceWorker.includes('"./amg-design-system.css"'), "PWA app shell mu
 assert.ok(designCss.includes("@media (max-width: 680px)"), "Design system must include mobile layouts");
 assert.ok(designCss.includes("prefers-reduced-motion: reduce"), "Design system must respect reduced motion");
 assert.ok(!html.includes('class="admin-command-hero"'), "Librarian dashboard must not contain a duplicate command hero");
+
+assert.ok(html.includes('id="bookCoverGalleryInput"'), "Book registration must offer a device image picker");
+assert.ok(html.includes('id="bookCoverCameraInput"') && html.includes('capture="environment"'), "Book registration must offer a rear-camera cover capture input");
+assert.ok(!html.includes('name="coverUrl"'), "Book registration must not require a manually entered cover URL");
+assert.ok(app.includes('book-covers/"+state.user.uid+"/'), "Book cover images must upload into a librarian-scoped Storage path");
+assert.ok(app.includes('BrowserMultiFormatReader'), "Attendance camera scanning must include a compatible QR/barcode fallback");
+assert.ok(app.includes('handleCameraScan(codes[0].rawValue)'), "Native camera detection must use the unified scan handler");
+assert.ok(html.includes('send Enter after each scan'), "USB scanner instructions must explain the Enter suffix");
+assert.ok(storageRules.includes('match /book-covers/{uid}/{fileName}') && storageRules.includes("request.auth.uid == uid"), "Book cover uploads must be restricted to the signed-in librarian's folder");
+assert.ok(cloudFunctions.includes('coverStoragePath') && cloudFunctions.includes('book-covers/"+request.auth.uid+"/'), "Book registration callable must validate and persist the cover storage path");
+assert.ok(serviceWorker.includes('amg-library-shell-v8'), "PWA shell cache must be refreshed for the scanner and cover updates");
+
 
 
 function functionSource(name) {
