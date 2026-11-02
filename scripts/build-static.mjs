@@ -8,11 +8,7 @@ const files = [
   "amg.html",
   "app.js",
   "mobile-effects.js",
-  "app.css",
-  "style.css",
-  "amg-polish.css",
-  "mobile-responsive.css",
-  "premium-redesign.css",
+  "amg-design-system.css",
   "firebase-config.js",
   "manifest.webmanifest",
   "service-worker.js"
