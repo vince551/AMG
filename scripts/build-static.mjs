@@ -12,6 +12,7 @@ const files = [
   "style.css",
   "amg-polish.css",
   "mobile-responsive.css",
+  "premium-redesign.css",
   "firebase-config.js",
   "manifest.webmanifest",
   "service-worker.js"
