@@ -937,3 +937,161 @@ label { display: grid; gap: 7px; color: #354b43; font-size: 13px; font-weight: 7
 @media (prefers-reduced-motion: reduce) {
   #profileSection #myLoansList > .stack-item { transition: none; }
 }
+
+
+/* -------------------------------------------------------------------------
+   NEWS & EVENTS — public notice and event cards
+   Scoped to #newsSection; existing announcement/event data is untouched.
+   ------------------------------------------------------------------------- */
+#newsSection {
+  --news-ink: #18372d;
+  --news-muted: #718279;
+  --news-line: #e1ebe4;
+}
+#newsSection > .section-header {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-bottom: 22px;
+  padding: clamp(24px,3.5vw,36px);
+  border: 1px solid #dcebe1;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 88% 18%,rgba(103,180,139,.19),transparent 27%),
+    radial-gradient(circle at 100% 100%,rgba(71,135,181,.10),transparent 32%),
+    linear-gradient(115deg,#eff8f1 0%,#fff 62%,#f1f6fa 100%);
+}
+#newsSection > .section-header::after {
+  position: absolute;
+  z-index: -1;
+  right: 42px;
+  bottom: -76px;
+  width: 210px;
+  height: 210px;
+  border: 1px solid rgba(8,127,91,.13);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(8,127,91,.025),0 0 0 46px rgba(8,127,91,.02);
+  content: "";
+  pointer-events: none;
+}
+#newsSection > .section-header h2 {
+  margin: 0 0 8px;
+  color: var(--news-ink);
+  font-size: clamp(30px,4vw,42px);
+  letter-spacing: -.055em;
+}
+#newsSection > .section-header p:last-child {
+  max-width: 580px;
+  margin: 0;
+  color: #62766b;
+  font-size: 14px;
+  line-height: 1.75;
+}
+#newsSection #announcementsList {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  align-items: stretch;
+  gap: 16px;
+}
+#newsSection #announcementsList > .announcement-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  padding: clamp(19px,2.4vw,25px);
+  border: 1px solid var(--news-line);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(8,127,91,.045),transparent 34%),
+    linear-gradient(145deg,#fff,#fbfdfb);
+  box-shadow: 0 7px 22px rgba(22,56,43,.045);
+  transition: transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+#newsSection #announcementsList > .announcement-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg,#0b8b62,#75b88d);
+  content: "";
+}
+#newsSection #announcementsList > .announcement-card:nth-child(3n + 2)::before {
+  background: linear-gradient(180deg,#367eaa,#8bb9d2);
+}
+#newsSection #announcementsList > .announcement-card:nth-child(3n)::before {
+  background: linear-gradient(180deg,#9a8545,#d8c58c);
+}
+#newsSection #announcementsList > .announcement-card:hover {
+  transform: translateY(-3px);
+  border-color: #c8dfd1;
+  box-shadow: 0 14px 30px rgba(22,56,43,.085);
+}
+#newsSection #announcementsList > .announcement-card h3 {
+  margin: 0 0 11px;
+  color: var(--news-ink);
+  font-size: clamp(16px,1.7vw,19px);
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: -.025em;
+  overflow-wrap: anywhere;
+}
+#newsSection #announcementsList > .announcement-card time {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 13px;
+  padding: 6px 10px;
+  border: 1px solid #e1eee5;
+  border-radius: 999px;
+  background: #f1f8f3;
+  color: #387354;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .055em;
+}
+#newsSection #announcementsList > .announcement-card p {
+  margin: 0;
+  color: #64776d;
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+#newsSection #announcementsList > .muted {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 30px 22px;
+  border: 1px dashed #cbded1;
+  border-radius: 16px;
+  background: #f8fbf8;
+  color: #718279;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  #newsSection > .section-header {
+    margin-bottom: 16px;
+    padding: 23px 20px;
+    border-radius: 17px;
+  }
+  #newsSection > .section-header::after {
+    right: -75px;
+    bottom: -105px;
+    width: 175px;
+    height: 175px;
+  }
+  #newsSection > .section-header h2 { font-size: 30px; }
+  #newsSection > .section-header p:last-child { max-width: 290px; font-size: 12px; }
+  #newsSection #announcementsList { grid-template-columns: 1fr; gap: 11px; }
+  #newsSection #announcementsList > .announcement-card {
+    padding: 18px 17px 18px 20px;
+    border-radius: 15px;
+  }
+  #newsSection #announcementsList > .announcement-card h3 { font-size: 16px; }
+  #newsSection #announcementsList > .announcement-card p { font-size: 12px; line-height: 1.75; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #newsSection #announcementsList > .announcement-card { transition: none; }
+  #newsSection #announcementsList > .announcement-card:hover { transform: none; }
+}
