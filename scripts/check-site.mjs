@@ -17,10 +17,10 @@ const missingIds = [...new Set(referencedIds.filter(id => !ids.includes(id)))];
 assert.deepEqual(missingIds, [], "Every static app.js ID lookup must exist in index.html");
 
 assert.match(html, /name=["']viewport["'][^>]*width=device-width/i, "Responsive viewport meta tag is required");
-assert.match(html, /href=["']mobile-responsive\.css["']/i, "Mobile stylesheet must be linked");
-assert.match(build, /"mobile-responsive\.css"/, "Static build must include the mobile stylesheet");
-assert.match(serviceWorker, /"\.\/mobile-responsive\.css"/, "PWA app shell must cache the mobile stylesheet");
-assert.match(mobileCss, /prefers-reduced-motion:\s*reduce/, "Mobile styling must respect reduced-motion preferences");
+assert.ok(html.includes('href="mobile-responsive.css"'), "Mobile stylesheet must be linked");
+assert.ok(build.includes('"mobile-responsive.css"'), "Static build must include the mobile stylesheet");
+assert.ok(serviceWorker.includes('"./mobile-responsive.css"'), "PWA app shell must cache the mobile stylesheet");
+assert.ok(mobileCss.includes("prefers-reduced-motion: reduce"), "Mobile styling must respect reduced-motion preferences");
 
 function functionSource(name) {
   const marker = "async function " + name + "(";
