@@ -937,3 +937,130 @@ label { display: grid; gap: 7px; color: #354b43; font-size: 13px; font-weight: 7
 @media (prefers-reduced-motion: reduce) {
   #profileSection #myLoansList > .stack-item { transition: none; }
 }
+
+
+/* Book-cover picker and unified attendance scanner controls */
+#booksAdminTab .book-cover-field {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+#booksAdminTab .book-cover-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  color: #29483a;
+  font-size: 13px;
+  font-weight: 800;
+}
+#booksAdminTab .book-cover-label small {
+  color: #829087;
+  font-size: 10px;
+  font-weight: 600;
+}
+#booksAdminTab .book-cover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+#booksAdminTab .book-cover-actions .btn { min-height: 42px; }
+#booksAdminTab .book-cover-preview {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: min(100%,440px);
+  padding: 11px;
+  border: 1px solid #dce9e0;
+  border-radius: 14px;
+  background: linear-gradient(135deg,#f7fbf8,#fff);
+}
+#booksAdminTab .book-cover-preview img {
+  display: block;
+  width: 76px;
+  height: 96px;
+  flex: 0 0 76px;
+  border: 1px solid #e2eae4;
+  border-radius: 8px;
+  background: #edf3ef;
+  object-fit: contain;
+}
+#booksAdminTab .book-cover-preview > div {
+  display: grid;
+  min-width: 0;
+  justify-items: start;
+  gap: 5px;
+}
+#booksAdminTab .book-cover-preview strong {
+  max-width: 100%;
+  color: #244638;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+#booksAdminTab .book-cover-preview small {
+  color: #718279;
+  font-size: 10px;
+}
+#attendanceTab .scanner-method-hints {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+#attendanceTab .scanner-method-hints > span {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid #e1ebe4;
+  border-radius: 13px;
+  background: linear-gradient(140deg,#f5faf6,#fff);
+}
+#attendanceTab .scanner-method-hints b {
+  color: #245442;
+  font-size: 12px;
+}
+#attendanceTab .scanner-method-hints small {
+  color: #718279;
+  font-size: 11px;
+  line-height: 1.55;
+}
+#attendanceTab #attendanceCodeInput {
+  min-width: 0;
+  font-family: ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing: .025em;
+}
+#attendanceTab .scanner-box {
+  width: min(100%,560px);
+  padding: 12px;
+  border: 1px solid #dce9e0;
+  border-radius: 16px;
+  background: #f4f8f5;
+}
+#attendanceTab .scanner-box video {
+  display: block;
+  width: 100%;
+  max-height: 420px;
+  border-radius: 11px;
+  background: #12251d;
+  object-fit: cover;
+}
+#attendanceTab .scanner-camera-help {
+  margin: 2px 0;
+  color: #5e7467;
+  font-size: 11px;
+  line-height: 1.55;
+}
+@media (max-width:680px) {
+  #booksAdminTab .book-cover-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  #booksAdminTab .book-cover-actions .btn { display: flex; align-items: center; justify-content: center; padding-inline: 8px; font-size: 11px; }
+  #attendanceTab .scanner-method-hints { grid-template-columns: 1fr; gap: 8px; }
+  #attendanceTab .scanner-method-hints > span { padding: 11px 12px; }
+  #attendanceTab #attendanceForm { align-items: stretch; }
+  #attendanceTab #attendanceForm > * { min-width: 0; }
+  #attendanceTab .scanner-box { padding: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #booksAdminTab .book-cover-preview,
+  #attendanceTab .scanner-box { scroll-behavior: auto; }
+}
