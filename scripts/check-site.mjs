@@ -1,14 +1,15 @@
 import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 
-const [html, app, designCss, serviceWorker, build, storageRules, cloudFunctions] = await Promise.all([
+const [html, app, designCss, serviceWorker, build, storageRules, cloudFunctions, firestoreRules] = await Promise.all([
   readFile("index.html", "utf8"),
   readFile("app.js", "utf8"),
   readFile("amg-design-system.css", "utf8"),
   readFile("service-worker.js", "utf8"),
   readFile("scripts/build-static.mjs", "utf8"),
   readFile("storage.rules", "utf8"),
-  readFile("functions/index.js", "utf8")
+  readFile("functions/index.js", "utf8"),
+  readFile("firestore.rules", "utf8")
 ]);
 
 const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]);
@@ -85,9 +86,7 @@ assert.ok(app.includes('tabButton.dataset.tabTarget === tabId'),
 console.log("AMG site structure, librarian navigation and async event-handler regression checks passed.");
 
 
-const sparkRegistrationApp = readFileSync("app.js", "utf8");
-const sparkRegistrationRules = readFileSync("firestore.rules", "utf8");
-assert(sparkRegistrationApp.includes("createLearnerProfileOnSpark"), "Learner registration must not depend on callable Cloud Functions");
-assert(sparkRegistrationApp.includes("signInWithEmailAndPassword(state.auth, email, password)"), "Registration must recover Auth accounts created before profile failure");
-assert(sparkRegistrationRules.includes("getAfter(/databases/$(database)/documents/memberNumbers/$(request.resource.data.libraryNumber))"), "Profile creation must be paired with a member-number reservation");
-assert(sparkRegistrationRules.includes("request.resource.data.isApproved == false"), "Self-registration must never grant approval");
+assert(app.includes("createLearnerProfileOnSpark"), "Learner registration must not depend on callable Cloud Functions");
+assert(app.includes("signInWithEmailAndPassword(state.auth, email, password)"), "Registration must recover Auth accounts created before profile failure");
+assert(firestoreRules.includes("getAfter(/databases/$(database)/documents/memberNumbers/$(request.resource.data.libraryNumber))"), "Profile creation must be paired with a member-number reservation");
+assert(firestoreRules.includes("request.resource.data.isApproved == false"), "Self-registration must never grant approval");
