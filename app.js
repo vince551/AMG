@@ -437,8 +437,7 @@ function renderProfileCard(profile) {
   setText("cardStudyLevel",profile.studyLevel || "—");
   setText("cardEduLevel",profile.eduLevel || "Learner");
   setText("cardLibraryNum",profile.libraryNumber);
-  setText("cardIssueDate",formatCardDate(profile.createdAt));
-  setText("cardExpiryDate",formatCardDate(profile.expiryDate || profile.expiresAt));
+  setText("cardIssueDate",formatCardDate(profile.approvedAt || profile.decisionAt));
   setText("cardBackNumber",profile.libraryNumber);
   $("cardImage").src = profile.photoURL || avatarUrl(profile.libraryNumber);
   makeBarcode(profile.libraryNumber,"memberBarcode");
@@ -806,8 +805,7 @@ async function returnLoan(requestId,loanId) {
 }
 function viewMemberCard(member) {
   setText("adminCardName",member.fullName); setText("adminCardSchool",member.school || "—"); setText("adminCardStudy",member.studyLevel || "—"); setText("adminCardLevel",member.eduLevel || "Learner"); setText("adminCardNumber",member.libraryNumber);
-  setText("adminCardIssueDate",formatCardDate(member.createdAt));
-  setText("adminCardExpiryDate",formatCardDate(member.expiryDate || member.expiresAt));
+  setText("adminCardIssueDate",formatCardDate(member.approvedAt || member.decisionAt));
   setText("adminCardBackNumber",member.libraryNumber);
   $("adminCardImage").src=member.photoURL||avatarUrl(member.libraryNumber);
   makeBarcode(member.libraryNumber,"adminMemberBarcode"); makeBarcode(member.libraryNumber,"adminMemberBackBarcode"); makeQr(member.libraryNumber,"adminMemberQr");
