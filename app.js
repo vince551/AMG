@@ -1016,10 +1016,11 @@ async function handleCameraScan(rawCode) {
   const code=String(rawCode||"").trim();
   if(!code||state.scanBusy) return;
   const now=Date.now();
+  const mode=$("attendanceForm").elements.action.value;
+  if(mode==="issue-book" && state.scanMemberCode && code===state.scanMemberCode) return;
   if(code===state.lastScanValue && now-state.lastScanAt<1600) return;
   state.lastScanValue=code; state.lastScanAt=now; state.scanBusy=true;
   try {
-    const mode=$("attendanceForm").elements.action.value;
     await processUnifiedCode(code,mode);
     if(mode!=="issue-book" || !state.scanMemberCode) await stopScanner();
   } finally {
