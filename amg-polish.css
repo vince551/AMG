@@ -896,3 +896,51 @@ body:has(#librarianSection.active) #userBadge > button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   body:has(#librarianSection.active) #userBadge > button { transition: none; }
 }
+
+
+/* AMG learner ID cards — front and back, inspired by the supplied reference. */
+.amg-card-pair{display:grid;gap:18px;width:min(100%,680px);margin:0 auto}
+.amg-id-card{position:relative;display:grid;grid-template-columns:42% 58%;width:100%;aspect-ratio:1.55/1;min-width:0;overflow:hidden;border:1px solid #d9e2e8;border-radius:22px;background:#fff;color:#10243a;box-shadow:0 12px 28px rgba(15,36,58,.16);font-family:Arial,Helvetica,sans-serif;isolation:isolate}
+.amg-id-brand-panel{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;padding:7%;background:#12518e;color:#fff;border-radius:0 24% 24% 0}
+.amg-id-bookmark{font-size:clamp(34px,6vw,64px);line-height:1;margin-bottom:10%}
+.amg-id-brand-name{font-size:clamp(16px,2.8vw,30px);font-weight:900;letter-spacing:.015em;text-align:center}
+.amg-id-tagline{margin-top:8px;font-size:clamp(8px,1.25vw,13px);font-weight:700;letter-spacing:.04em;text-align:center}
+.amg-id-stripes{position:absolute;left:-12%;right:-10%;bottom:-13%;height:30%;transform:skewY(-34deg);background:linear-gradient(90deg,transparent 0 8%,#f28a2e 8% 18%,#12518e 18% 21%,#0e9c9b 21% 38%,#12518e 38% 42%,#f28a2e 42% 54%,transparent 54% 58%,#0e9c9b 58% 66%,transparent 66%)}
+.amg-id-front-content{position:relative;display:flex;flex-direction:column;justify-content:space-between;min-width:0;padding:5% 6% 4%}
+.amg-id-qr-block{position:absolute;top:5%;right:6%;display:flex;flex-direction:column;align-items:center;gap:3px;z-index:2}
+.amg-id-qr-block>span{font-size:clamp(7px,1vw,10px);font-weight:800;color:#137c7d}
+.amg-id-qr-block .qr-holder{margin:0;padding:3px;background:#fff}
+.amg-id-qr-block .qr-holder img,.amg-id-qr-block .qr-holder canvas{width:clamp(42px,6.5vw,66px)!important;height:clamp(42px,6.5vw,66px)!important;max-width:none;max-height:none}
+.amg-id-person{display:flex;align-items:center;gap:4%;min-width:0;margin-top:17%;padding-right:1%}
+.amg-id-photo{width:clamp(76px,13vw,142px);height:clamp(76px,13vw,142px);flex:0 0 auto;object-fit:cover;object-position:center;border:6px solid #138f98;border-radius:50%;background:#eef3f5}
+.amg-id-details{display:flex;flex-direction:column;gap:5px;min-width:0}
+.amg-id-details h3{margin:0;color:#10243a;font-size:clamp(14px,2.35vw,26px);font-weight:800;line-height:1.12;overflow-wrap:anywhere}
+.amg-id-details small{font-size:clamp(7px,1vw,10px);color:#5c6875;font-weight:700;letter-spacing:.04em}
+.amg-id-details>strong{font-size:clamp(12px,2vw,22px);line-height:1.1;overflow-wrap:anywhere}
+.amg-id-pills{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0 8px}
+.amg-id-pills span{padding:4px 7px;border-radius:999px;background:#f08b2e;color:#fff;font-size:clamp(7px,1vw,10px);font-weight:800}
+.amg-id-pills span+span{background:#e8a05c;color:#174d53}
+.amg-id-front-barcode{margin-top:auto;padding-top:3%;text-align:center}
+.amg-id-front-barcode svg{display:block;width:100%;height:clamp(24px,4vw,42px);background:#fff}
+.amg-id-front-barcode svg rect{shape-rendering:crispEdges}
+.amg-id-back{display:block;padding:0}
+.amg-id-back>header{padding:4% 6%;background:#12518e;color:#fff;font-size:clamp(12px,2vw,23px);font-weight:900;letter-spacing:.015em}
+.amg-id-back>header span{color:#f28a2e}
+.amg-id-back-content{display:grid;grid-template-columns:1.15fr .85fr;gap:5%;padding:3.5% 6% 2%;align-items:center}
+.amg-id-back-content h3{margin:0 0 5px;color:#12518e;font-size:clamp(13px,2vw,22px)}
+.amg-id-back-content ol{margin:0;padding-left:1.25em;color:#1d2937;font-size:clamp(8px,1.25vw,13px);line-height:1.45}
+.amg-id-dates{margin-top:3%;padding:3% 4%;border:1px solid #d7dde2;border-radius:10px;display:grid;gap:4px}
+.amg-id-dates div:not(.amg-id-signature){display:flex;flex-direction:column;gap:1px}
+.amg-id-dates b{font-size:clamp(7px,1vw,10px);color:#12518e}
+.amg-id-dates strong{font-size:clamp(9px,1.35vw,14px);font-weight:500;color:#1d2937}
+.amg-id-signature{margin-top:3%;padding-top:3%;border-top:1px solid #aab4bd;font-size:clamp(6px,.9vw,9px);font-weight:700;color:#344256}
+.amg-id-back-code{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.amg-id-back-code svg{width:100%;height:clamp(36px,6vw,76px);background:#fff}
+.amg-id-back-code strong{margin-top:4px;font-size:clamp(8px,1.15vw,12px);font-weight:500;overflow-wrap:anywhere}
+.amg-id-back>footer{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap;padding:2.2% 5%;border-top:1px solid #e1e8eb;background:#f7fafb;color:#24415b;font-size:clamp(6px,.95vw,10px)}
+.amg-id-back>footer b{width:100%;text-align:center;color:#12518e;font-size:clamp(9px,1.5vw,15px)}
+.card-preview-wrapper .amg-card-pair{max-width:680px}
+.card-modal-content{width:min(760px,96vw)!important;max-width:760px!important}
+.card-modal-content .amg-card-pair{width:100%}
+@media(max-width:600px){.amg-card-pair{gap:12px}.amg-id-card{border-radius:13px}.amg-id-photo{border-width:3px}.amg-id-back>header{padding:3.5% 5%}.amg-id-back-content{padding:3% 5% 1%;gap:3%}.amg-id-dates{padding:2.5% 3%}.amg-id-back>footer{padding:1.7% 4%}}
+@media(prefers-reduced-motion:reduce){.amg-id-card{scroll-behavior:auto}}
