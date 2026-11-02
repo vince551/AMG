@@ -127,7 +127,8 @@ service cloud.firestore {
         && request.resource.data.checkOutAt == request.time
         && request.resource.data.checkedOutBy == request.auth.uid
         && request.resource.data.uid == resource.data.uid
-        && request.resource.data.recordedBy == resource.data.recordedBy;
+        && request.resource.data.recordedBy == resource.data.recordedBy
+        && getAfter(/databases/$(database)/documents/memberPresence/$(resource.data.uid)).data.status == 'Checked out';
       allow delete: if false;
     }
 
@@ -150,7 +151,9 @@ service cloud.firestore {
         && resource.data.status == 'In library'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
         && request.resource.data.status == 'Checked out'
-        && request.resource.data.updatedAt == request.time;
+        && request.resource.data.updatedAt == request.time
+        && getAfter(/databases/$(database)/documents/attendance/$(resource.data.attendanceId)).data.status == 'Checked out'
+        && getAfter(/databases/$(database)/documents/attendance/$(resource.data.attendanceId)).data.uid == uid;
       allow delete: if false;
     }
 
