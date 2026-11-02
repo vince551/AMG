@@ -16,7 +16,7 @@ import { firebaseConfig, isFirebaseConfigured } from "./firebase-config.js";
 const $ = (id) => document.getElementById(id);
 const state = { app:null, auth:null, db:null, storage:null, functions:null, user:null, profile:null, librarian:false, scanMemberCode:"",
   books:[], requests:[], members:[], loans:[], attendance:[], ebooks:[], announcements:[], events:[],
-  capacity:100, scanner:null, scanStream:null, toastTimer:null };
+  capacity:100, scanner:null, scanStream:null, scanControls:null, scanBusy:false, lastScanValue:"", lastScanAt:0, bookCoverFile:null, bookCoverPreviewUrl:"", toastTimer:null };
 const categories = {
   "PP / Pre-Primary":"PP", "Primary":"PRI", "Junior Secondary":"JSS",
   "Senior Secondary":"SSS", "High School":"HS", "University":"UNI",
@@ -79,6 +79,9 @@ function init() {
   });
   $("avatarChoice").addEventListener("change", updateAvatarPreview);
   $("bookForm").addEventListener("submit", registerBook);
+  $("bookCoverGalleryInput").addEventListener("change",event=>handleBookCoverSelection(event.currentTarget));
+  $("bookCoverCameraInput").addEventListener("change",event=>handleBookCoverSelection(event.currentTarget));
+  $("removeBookCoverBtn").addEventListener("click",clearBookCoverSelection);
   $("attendanceForm").addEventListener("submit", recordAttendance);
   $("capacityForm").addEventListener("submit", updateCapacity);
   $("ebookForm").addEventListener("submit", uploadEbook);
@@ -837,19 +840,71 @@ function viewMemberCard(member) {
   makeBarcode(member.libraryNumber,"adminMemberBarcode"); makeBarcode(member.libraryNumber,"adminMemberBackBarcode"); makeQr(member.libraryNumber,"adminMemberQr");
   $("cardModal").style.display="flex";
 }
+function clearBookCoverSelection() {
+  state.bookCoverFile = null;
+  if (state.bookCoverPreviewUrl) URL.revokeObjectURL(state.bookCoverPreviewUrl);
+  state.bookCoverPreviewUrl = "";
+  ["bookCoverGalleryInput","bookCoverCameraInput"].forEach(id=>{ if($(id)) $(id).value=""; });
+  if ($("bookCoverPreview")) $("bookCoverPreview").removeAttribute("src");
+  $("bookCoverPreviewWrap")?.classList.add("hidden");
+  setText("bookCoverFileName","Selected cover");
+}
+function handleBookCoverSelection(inputElement) {
+  const file = inputElement.files?.[0];
+  if (!file) return;
+  const allowed = ["image/jpeg","image/png","image/webp"];
+  if (!allowed.includes(file.type)) {
+    inputElement.value = "";
+    showToast("Choose a JPEG, PNG or WebP image for the book cover.","error");
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    inputElement.value = "";
+    showToast("Book cover images must be 5 MB or smaller.","error");
+    return;
+  }
+  state.bookCoverFile = file;
+  ["bookCoverGalleryInput","bookCoverCameraInput"].forEach(id=>{ if($(id) && $(id)!==inputElement) $(id).value=""; });
+  if (state.bookCoverPreviewUrl) URL.revokeObjectURL(state.bookCoverPreviewUrl);
+  state.bookCoverPreviewUrl = URL.createObjectURL(file);
+  $("bookCoverPreview").src = state.bookCoverPreviewUrl;
+  setText("bookCoverFileName",file.name || "Camera photo");
+  $("bookCoverPreviewWrap").classList.remove("hidden");
+}
 async function registerBook(event) {
   event.preventDefault(); if(!state.librarian) return;
   const formElement = event.currentTarget;
   const form=new FormData(formElement);
+  const coverFile = state.bookCoverFile;
   const title=String(form.get("title")).trim(), category=String(form.get("category"));
   const quantity=Number(form.get("quantity"));
   if(!title||!Number.isInteger(quantity)||quantity<1||quantity>400) { showToast("Enter a title and between 1 and 400 physical copies.","error"); return; }
+  let uploadedCover = null, bookCreated = false;
   try {
+    if (coverFile) {
+      const extension = coverFile.type==="image/png"?"png":coverFile.type==="image/webp"?"webp":"jpg";
+      const path = "book-covers/"+state.user.uid+"/"+Date.now()+"-"+Math.random().toString(36).slice(2)+"."+extension;
+      const target = storageRef(state.storage,path);
+      await uploadBytes(target,coverFile,{contentType:coverFile.type});
+      uploadedCover = {path:target.fullPath,url:await getDownloadURL(target)};
+    }
     const createBook = httpsCallable(state.functions,"registerBookCopies");
-    const result = await createBook({title,author:String(form.get("author")).trim(),category,quantity,coverUrl:String(form.get("coverUrl")||"").trim(),description:String(form.get("description")||"").trim()});
-    formElement.reset(); renderCopyLabels(title, result.data.copies || []); showToast("Book registered. "+quantity+" individual copy barcodes generated.");
+    const result = await createBook({
+      title,author:String(form.get("author")).trim(),category,quantity,
+      coverUrl:uploadedCover?.url || "",coverStoragePath:uploadedCover?.path || "",
+      description:String(form.get("description")||"").trim()
+    });
+    bookCreated = true;
+    formElement.reset(); clearBookCoverSelection();
+    renderCopyLabels(title, result.data.copies || []);
+    showToast("Book registered. "+quantity+" individual copy barcodes generated.");
     await refreshPublicData(); await refreshAdminData();
-  } catch(error) { showToast(errorMessage(error),"error"); }
+  } catch(error) {
+    if (uploadedCover && !bookCreated) {
+      try { await deleteObject(storageRef(state.storage,uploadedCover.path)); } catch(_) {}
+    }
+    showToast(errorMessage(error),"error");
+  }
 }
 function renderCopyLabels(title, copies) {
   const panel = $("copyLabelsPanel");
@@ -891,7 +946,9 @@ async function deleteBook(book) {
   if(!state.librarian || !confirm("Delete “"+book.title+"” from the catalogue? This is only allowed if the book has no active loans.")) return;
   try {
     if(Number(book.available||0)!==Number(book.quantity||0)) throw new Error("This book has active loans. Return all copies before deleting it.");
-    await deleteDoc(doc(state.db,"books",book.id)); showToast("Book removed from catalogue."); await refreshPublicData(); await refreshAdminData();
+    await deleteDoc(doc(state.db,"books",book.id));
+    if (book.coverStoragePath) { try { await deleteObject(storageRef(state.storage,book.coverStoragePath)); } catch(_) {} }
+    showToast("Book removed from catalogue."); await refreshPublicData(); await refreshAdminData();
   } catch(error) { showToast(errorMessage(error),"error"); }
 }
 async function processUnifiedCode(rawCode, mode) {
@@ -937,6 +994,7 @@ async function recordAttendance(event) {
   const mode = String(form.get("action") || "check-in");
   await processUnifiedCode(code, mode);
   formElement.reset();
+  $("attendanceCodeInput")?.focus();
 }
 async function updateCapacity(event) {
   event.preventDefault(); if(!state.librarian) return;
@@ -954,46 +1012,83 @@ function renderAttendance() {
   setText("currentCapacity","Library occupancy: "+inside+" / "+state.capacity+" · Remaining capacity: "+Math.max(0,state.capacity-inside));
   $("capacityForm").elements.capacity.value=state.capacity;
 }
+async function handleCameraScan(rawCode) {
+  const code=String(rawCode||"").trim();
+  if(!code||state.scanBusy) return;
+  const now=Date.now();
+  if(code===state.lastScanValue && now-state.lastScanAt<1600) return;
+  state.lastScanValue=code; state.lastScanAt=now; state.scanBusy=true;
+  try {
+    const mode=$("attendanceForm").elements.action.value;
+    await processUnifiedCode(code,mode);
+    if(mode!=="issue-book" || !state.scanMemberCode) await stopScanner();
+  } finally {
+    state.scanBusy=false;
+  }
+}
 async function startScanner() {
   if (!state.librarian) return;
-  if (!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia) {
-    showToast("Camera scanning is unavailable in this browser. Use a USB/Bluetooth scanner or enter the code manually.", "error");
+  if (!navigator.mediaDevices?.getUserMedia) {
+    showToast("Camera access is unavailable. Use a USB barcode scanner connected to the code field.", "error");
     return;
   }
+  const video=$("scannerVideo");
+  $("scannerBox").classList.remove("hidden");
+  setText("scannerInstruction","Starting camera. Allow camera access when your browser asks.");
   try {
-    const detector = new BarcodeDetector({formats:["code_128","qr_code","ean_13","ean_8","upc_a","upc_e"]});
-    state.scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}});
-    const video = $("scannerVideo");
-    video.srcObject = state.scanStream;
-    await video.play();
-    $("scannerBox").classList.remove("hidden");
-    const scan = async () => {
-      if (!state.scanStream) return;
+    if ("BarcodeDetector" in window) {
       try {
-        const codes = await detector.detect(video);
-        if (codes.length && codes[0].rawValue) {
-          const mode = $("attendanceForm").elements.action.value;
-          await processUnifiedCode(codes[0].rawValue, mode);
-          if (mode !== "issue-book" || !state.scanMemberCode) {
-            await stopScanner();
-            return;
-          }
+        const formats=["code_128","qr_code","ean_13","ean_8","upc_a","upc_e"];
+        const supported=await BarcodeDetector.getSupportedFormats?.();
+        const usable=supported?formats.filter(format=>supported.includes(format)):formats;
+        if(usable.length) {
+          const detector=new BarcodeDetector({formats:usable});
+          state.scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}});
+          video.srcObject=state.scanStream;
+          await video.play();
+          const scan=async()=>{
+            if(!state.scanStream) return;
+            try {
+              if(!state.scanBusy) {
+                const codes=await detector.detect(video);
+                if(codes.length&&codes[0].rawValue) await handleCameraScan(codes[0].rawValue);
+              }
+            } catch(_) {}
+            if(state.scanStream) state.scanner=requestAnimationFrame(scan);
+          };
+          setText("scannerInstruction","Camera ready. Scan a membership card or book-copy label.");
+          scan();
+          return;
         }
-      } catch(_) {}
-      state.scanner = requestAnimationFrame(scan);
-    };
-    scan();
+      } catch(nativeError) {
+        if(state.scanStream) state.scanStream.getTracks().forEach(track=>track.stop());
+        state.scanStream=null;
+        video.srcObject=null;
+      }
+    }
+    const {BrowserMultiFormatReader}=await import("https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/+esm");
+    const reader=new BrowserMultiFormatReader();
+    setText("scannerInstruction","Loading the compatible barcode and QR camera reader…");
+    state.scanControls=await reader.decodeFromVideoDevice(undefined,video,(result)=>{
+      if(result) void handleCameraScan(result.getText());
+    });
+    setText("scannerInstruction","Camera ready. Scan a membership card or book-copy label.");
   } catch(error) {
     await stopScanner();
-    showToast("Could not open camera: " + errorMessage(error), "error");
+    showToast("Could not start camera scanning: "+errorMessage(error)+". Check camera permission and use HTTPS, or connect a USB scanner.","error");
   }
 }
 async function stopScanner() {
   if(state.scanner) cancelAnimationFrame(state.scanner);
   state.scanner=null;
+  if(state.scanControls) { try { state.scanControls.stop(); } catch(_) {} }
+  state.scanControls=null;
   if(state.scanStream) state.scanStream.getTracks().forEach(track=>track.stop());
-  state.scanMemberCode = "";
+  state.scanMemberCode="";
   state.scanStream=null;
+  state.scanBusy=false;
+  state.lastScanValue="";
+  state.lastScanAt=0;
   if($("scannerVideo")) $("scannerVideo").srcObject=null;
   $("scannerBox")?.classList.add("hidden");
 }
