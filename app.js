@@ -319,6 +319,41 @@ function validateRegistrationStepTwo() {
   }
   return true;
 }
+async function createLearnerProfileOnSpark(uid, email, profileInput) {
+  const userRef = doc(state.db, "users", uid);
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const random = new Uint32Array(1);
+    crypto.getRandomValues(random);
+    const libraryNumber = "AMG-" + String(100000 + (random[0] % 900000));
+    const numberRef = doc(state.db, "memberNumbers", libraryNumber);
+    const result = await runTransaction(state.db, async (transaction) => {
+      const [existingProfile, reservedNumber] = await Promise.all([
+        transaction.get(userRef), transaction.get(numberRef)
+      ]);
+      if (existingProfile.exists()) {
+        const existing = existingProfile.data();
+        if (existing.role !== "learner" || existing.email !== email) {
+          throw new Error("This account already has a different library profile. Please contact the librarian.");
+        }
+        return { profile: existing, created: false };
+      }
+      if (reservedNumber.exists()) return null;
+      const timestamp = serverTimestamp();
+      const profile = {
+        uid, ...profileInput, email, libraryNumber,
+        role: "learner", isApproved: false, membershipStatus: "Pending",
+        photoURL: "", starredBookIds: [],
+        createdAt: timestamp, updatedAt: timestamp
+      };
+      transaction.set(numberRef, { uid, createdAt: timestamp });
+      transaction.set(userRef, profile);
+      return { profile: { ...profile, createdAt: new Date(), updatedAt: new Date() }, created: true };
+    });
+    if (result) return result;
+  }
+  throw new Error("A library number could not be allocated. Please try again.");
+}
+
 async function register(event) {
   event.preventDefault();
   const formElement = event.currentTarget;
@@ -333,7 +368,13 @@ async function register(event) {
   }
   let credential;
   try {
-    credential = await createUserWithEmailAndPassword(state.auth, email, password);
+    try {
+      credential = await createUserWithEmailAndPassword(state.auth, email, password);
+    } catch (authError) {
+      // Recover accounts created by an earlier attempt that failed before Firestore.
+      if (authError?.code !== "auth/email-already-in-use") throw authError;
+      credential = await signInWithEmailAndPassword(state.auth, email, password);
+    }
     await updateProfile(credential.user, {displayName:fullName});
     const profileInput = {
       fullName, gender:String(form.get("gender")), school:String(form.get("school")).trim(),
@@ -341,40 +382,38 @@ async function register(event) {
       guardianName:String(form.get("guardianName")).trim(), guardianRelation:String(form.get("guardianRelation")),
       guardianPhone
     };
-    const createProfile = httpsCallable(state.functions,"createLearnerProfile");
-    const created = await createProfile(profileInput);
-    const libraryNumber = created.data.libraryNumber;
-    const profile = {
-      uid:credential.user.uid, ...profileInput, email, libraryNumber,
-      role:"learner", isApproved:false, membershipStatus:"Pending", photoURL:"",
-      starredBookIds:[], createdAt:new Date(), updatedAt:new Date()
-    };
-    state.profile = { ...profile, createdAt:new Date(), updatedAt:new Date() };
+    const created = await createLearnerProfileOnSpark(credential.user.uid, email, profileInput);
+    state.profile = { ...created.profile };
     updateAuthUI();
     const photo = form.get("photo");
+    const avatarChoice = String(form.get("avatarChoice") || "scholar");
+    const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
+    let photoURL = state.profile.photoURL || ("https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[avatarChoice] || seeds.scholar));
     if (photo instanceof File && photo.size > 0) {
-      if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) throw new Error("Profile photo must be an image smaller than 5 MB.");
-      const target = storageRef(state.storage, "member-photos/"+credential.user.uid+"/"+photo.name.replace(/[^a-zA-Z0-9._-]/g,"_"));
-      await uploadBytes(target, photo, {contentType:photo.type});
-      const photoURL = await getDownloadURL(target);
+      if (!photo.type.startsWith("image/") || photo.size > 5*1024*1024) {
+        showToast("Profile photo was skipped. Choose an image smaller than 5 MB.", "error");
+      } else {
+        try {
+          const target = storageRef(state.storage, "member-photos/"+credential.user.uid+"/"+photo.name.replace(/[^a-zA-Z0-9._-]/g,"_"));
+          await uploadBytes(target, photo, {contentType:photo.type});
+          photoURL = await getDownloadURL(target);
+        } catch (photoError) {
+          // Photo storage is optional; Spark-plan registration must still complete.
+          console.warn("Optional registration photo upload failed:", photoError?.code || "unknown");
+        }
+      }
+    }
+    if (photoURL !== state.profile.photoURL) {
       await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
-      profile.photoURL = photoURL; state.profile.photoURL = photoURL;
-    } else {
-      const choice = String(form.get("avatarChoice") || "scholar");
-      const seeds = {scholar:"AMG-Scholar",reader:"AMG-Book-Lover",explorer:"AMG-Explorer",creative:"AMG-Creative-Learner",classic:"AMG-Classic-Portrait"};
-      const photoURL = "https://api.dicebear.com/9.x/avataaars/svg?seed=" + encodeURIComponent(seeds[choice] || seeds.scholar);
-      await updateDoc(doc(state.db,"users",credential.user.uid), {photoURL,updatedAt:serverTimestamp()});
-      profile.photoURL = photoURL;
       state.profile.photoURL = photoURL;
     }
     formElement.reset();
     setRegistrationStep(1);
     updateAvatarPreview();
     closeAuthModal();
-    showToast("Registration submitted. Please wait for librarian approval.");
+    showToast(created.created ? "Registration submitted. Please wait for librarian approval." : "Your existing membership profile has been restored.");
     await refreshMemberData();
   } catch (error) {
-    // Auth account may exist if a later Firestore/photo step failed; never log credentials.
     showToast("Registration could not be completed: "+errorMessage(error), "error");
   }
 }

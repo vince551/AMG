@@ -1,14 +1,15 @@
 import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 
-const [html, app, designCss, serviceWorker, build, storageRules, cloudFunctions] = await Promise.all([
+const [html, app, designCss, serviceWorker, build, storageRules, cloudFunctions, firestoreRules] = await Promise.all([
   readFile("index.html", "utf8"),
   readFile("app.js", "utf8"),
   readFile("amg-design-system.css", "utf8"),
   readFile("service-worker.js", "utf8"),
   readFile("scripts/build-static.mjs", "utf8"),
   readFile("storage.rules", "utf8"),
-  readFile("functions/index.js", "utf8")
+  readFile("functions/index.js", "utf8"),
+  readFile("firestore.rules", "utf8")
 ]);
 
 const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]);
@@ -38,7 +39,7 @@ assert.ok(cloudFunctions.includes('coverStoragePath') && cloudFunctions.includes
 
 assert.ok(app.includes('announcementKind:"Announcement"') && app.includes('announcementKind:"Event"'), "Announcement cards must identify post type from the source collection");
 assert.ok(app.includes('readingMinutes+" min read"'), "Announcement reading time must be calculated from existing body text");
-assert.ok(app.includes('data-kind=kind.toLowerCase()'), "Announcement card styling must receive its automatically derived kind");
+assert.ok(app.includes("card.dataset.kind=kind.toLowerCase()"), "Announcement card styling must receive its automatically derived kind");
 assert.ok(designCss.includes('#heroSection #homeAnnouncements') && designCss.includes('#newsSection #announcementsList'), "Redesigned announcement cards must cover homepage and News & Events layouts");
 assert.ok(serviceWorker.includes('amg-library-shell-v9'), "PWA cache must refresh for the announcement redesign");
 
@@ -83,3 +84,9 @@ assert.ok(app.includes('tabButton.dataset.tabTarget === tabId'),
   "Active desktop tab must be selected using its explicit data target");
 
 console.log("AMG site structure, librarian navigation and async event-handler regression checks passed.");
+
+
+assert(app.includes("createLearnerProfileOnSpark"), "Learner registration must not depend on callable Cloud Functions");
+assert(app.includes("signInWithEmailAndPassword(state.auth, email, password)"), "Registration must recover Auth accounts created before profile failure");
+assert(firestoreRules.includes("getAfter(/databases/$(database)/documents/memberNumbers/$(request.resource.data.libraryNumber))"), "Profile creation must be paired with a member-number reservation");
+assert(firestoreRules.includes("request.resource.data.isApproved == false"), "Self-registration must never grant approval");

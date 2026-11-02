@@ -12,12 +12,45 @@ service cloud.firestore {
     }
 
     match /memberNumbers/{libraryNumber} {
-      allow read, write: if false;
+      // A signed-in learner may reserve a number only for their own UID.
+      // The paired profile must be created atomically in the same transaction.
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && libraryNumber.matches('AMG-[0-9]{6}');
+      allow update, delete: if false;
     }
 
     match /users/{uid} {
-      // Membership profiles and short member-number reservations are created only by the trusted callable backend.
-      allow create: if false;
+      // Learner self-registration is restricted to a pending profile paired
+      // atomically with its matching member-number reservation.
+      allow create: if own(uid)
+        && request.resource.data.keys().hasAll([
+          'uid', 'fullName', 'email', 'gender', 'school', 'studyLevel', 'eduLevel',
+          'guardianName', 'guardianRelation', 'guardianPhone', 'libraryNumber',
+          'role', 'isApproved', 'membershipStatus', 'photoURL', 'starredBookIds',
+          'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'uid', 'fullName', 'email', 'gender', 'school', 'studyLevel', 'eduLevel',
+          'guardianName', 'guardianRelation', 'guardianPhone', 'libraryNumber',
+          'role', 'isApproved', 'membershipStatus', 'photoURL', 'starredBookIds',
+          'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == 'learner'
+        && request.resource.data.isApproved == false
+        && request.resource.data.membershipStatus == 'Pending'
+        && request.resource.data.libraryNumber.matches('AMG-[0-9]{6}')
+        && getAfter(/databases/$(database)/documents/memberNumbers/$(request.resource.data.libraryNumber)).data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.fullName is string
+        && request.resource.data.guardianPhone is string
+        && request.resource.data.starredBookIds is list;
       allow read: if own(uid) || librarian();
       // Learners can only update their own safe profile fields, never role,
       // approval status, library number, guardian data or account identity.
