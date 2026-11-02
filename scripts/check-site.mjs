@@ -83,3 +83,11 @@ assert.ok(app.includes('tabButton.dataset.tabTarget === tabId'),
   "Active desktop tab must be selected using its explicit data target");
 
 console.log("AMG site structure, librarian navigation and async event-handler regression checks passed.");
+
+
+const sparkRegistrationApp = readFileSync("app.js", "utf8");
+const sparkRegistrationRules = readFileSync("firestore.rules", "utf8");
+assert(sparkRegistrationApp.includes("createLearnerProfileOnSpark"), "Learner registration must not depend on callable Cloud Functions");
+assert(sparkRegistrationApp.includes("signInWithEmailAndPassword(state.auth, email, password)"), "Registration must recover Auth accounts created before profile failure");
+assert(sparkRegistrationRules.includes("getAfter(/databases/$(database)/documents/memberNumbers/$(request.resource.data.libraryNumber))"), "Profile creation must be paired with a member-number reservation");
+assert(sparkRegistrationRules.includes("request.resource.data.isApproved == false"), "Self-registration must never grant approval");
