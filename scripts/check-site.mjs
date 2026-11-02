@@ -90,3 +90,9 @@ assert(app.includes("createLearnerProfileOnSpark"), "Learner registration must n
 assert(app.includes("signInWithEmailAndPassword(state.auth, email, password)"), "Registration must recover Auth accounts created before profile failure");
 assert(firestoreRules.includes("getAfter(/databases/$(database)/documents/memberNumbers/$(request.resource.data.libraryNumber))"), "Profile creation must be paired with a member-number reservation");
 assert(firestoreRules.includes("request.resource.data.isApproved == false"), "Self-registration must never grant approval");
+
+assert(!app.includes('httpsCallable(state.functions,"reviewLearnerMembership")'), "Membership approval must not require Cloud Functions on Spark");
+assert(!app.includes('httpsCallable(state.functions, "recordMemberAttendance")'), "Attendance check-in/out must not require Cloud Functions on Spark");
+assert(app.includes('transaction.set(attendanceRef') && app.includes('transaction.update(activeAttendanceRef'), "Attendance must use Firestore transactions for check-in and check-out");
+assert(firestoreRules.includes("request.resource.data.membershipStatus in ['Approved', 'Denied']"), "Librarian membership decisions must be constrained by Firestore rules");
+assert(firestoreRules.includes("getAfter(/databases/$(database)/documents/attendance/$(request.resource.data.attendanceId))"), "Presence records must be paired with an attendance record in the same transaction");
