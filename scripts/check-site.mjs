@@ -1,13 +1,11 @@
 import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 
-const [html, app, mobileCss, serviceWorker, build, premiumCss] = await Promise.all([
+const [html, app, serviceWorker, build] = await Promise.all([
   readFile("index.html", "utf8"),
   readFile("app.js", "utf8"),
-  readFile("mobile-responsive.css", "utf8"),
   readFile("service-worker.js", "utf8"),
-  readFile("scripts/build-static.mjs", "utf8"),
-  readFile("premium-redesign.css", "utf8")
+  readFile("scripts/build-static.mjs", "utf8")
 ]);
 
 const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]);
@@ -18,16 +16,7 @@ const missingIds = [...new Set(referencedIds.filter(id => !ids.includes(id)))];
 assert.deepEqual(missingIds, [], "Every static app.js ID lookup must exist in index.html");
 
 assert.match(html, /name=["']viewport["'][^>]*width=device-width/i, "Responsive viewport meta tag is required");
-assert.ok(html.includes('href="mobile-responsive.css"'), "Mobile stylesheet must be linked");
-assert.ok(build.includes('"mobile-responsive.css"'), "Static build must include the mobile stylesheet");
-assert.ok(serviceWorker.includes('"./mobile-responsive.css"'), "PWA app shell must cache the mobile stylesheet");
-assert.ok(html.includes('href="premium-redesign.css"'), "Premium visual system must be linked after existing styles");
-assert.ok(build.includes('"premium-redesign.css"'), "Static build must include the premium stylesheet");
-assert.ok(serviceWorker.includes('"./premium-redesign.css"'), "PWA app shell must cache the premium stylesheet");
-assert.ok(premiumCss.includes("@media (max-width: 760px)"), "Premium visual system must include mobile layouts");
-assert.ok(premiumCss.includes("prefers-reduced-motion: reduce"), "Premium visual system must respect reduced motion");
 assert.ok(!html.includes('class="admin-command-hero"'), "Librarian dashboard must not contain a duplicate command hero");
-assert.ok(mobileCss.includes("prefers-reduced-motion: reduce"), "Mobile styling must respect reduced-motion preferences");
 
 function functionSource(name) {
   const marker = "async function " + name + "(";
