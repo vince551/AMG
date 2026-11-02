@@ -994,6 +994,7 @@ async function recordAttendance(event) {
   const mode = String(form.get("action") || "check-in");
   await processUnifiedCode(code, mode);
   formElement.reset();
+  formElement.elements.action.value = mode;
   $("attendanceCodeInput")?.focus();
 }
 async function updateCapacity(event) {
