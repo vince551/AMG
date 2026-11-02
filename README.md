@@ -6,8 +6,7 @@ AMG Library is a learner-focused library portal for discovering books, applying 
 
 - `index.html` — public website, learner profile, membership forms and librarian workspace.
 - `app.js` — Firebase Authentication, Firestore, Storage and callable Functions integration.
-- `style.css`, `app.css`, `amg-polish.css` — base styling and the existing AMG visual system.
-- `mobile-responsive.css` — phone, tablet and narrow-screen layout rules.
+- `amg-design-system.css` — the new responsive visual foundation for the public site, member area and librarian workspace.
 - `mobile-effects.js` — progressive scroll reveals, counters and reading progress.
 - `firebase-config.js` — Firebase web-app configuration. Firebase web config values are public identifiers; never put service-account credentials here.
 - `firestore.rules`, `storage.rules` — database and file-access rules.
