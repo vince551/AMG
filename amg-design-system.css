@@ -568,3 +568,94 @@ label { display: grid; gap: 7px; color: #354b43; font-size: 13px; font-weight: 7
   #librarianSection .admin-priority-row { grid-template-columns: 30px minmax(0,1fr) auto; }
   #librarianSection .priority-copy small { white-space: normal; }
 }
+
+
+/* Librarian analytics — chart-led statistics presentation */
+#librarianSection #statisticsTab { padding: clamp(17px,3vw,28px); }
+#librarianSection #statisticsTab > h3 { margin-bottom: 7px; font-size: clamp(21px,2.6vw,27px); letter-spacing: -.035em; }
+#librarianSection #statisticsTab > p.muted { max-width: 680px; margin-bottom: 22px; color: #74867d; font-size: 12px; line-height: 1.65; }
+#librarianSection #statisticsSummary {
+  display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 11px; margin: 0 0 20px;
+}
+#librarianSection #statisticsSummary .stat-card {
+  position: relative; min-width: 0; min-height: 104px; justify-content: center;
+  gap: 9px; padding: 16px; overflow: hidden; border: 1px solid #e1ebe5;
+  border-radius: 15px; background: linear-gradient(145deg,#fff 0%,#f8fcf9 100%);
+  box-shadow: 0 5px 16px rgba(22,56,43,.04);
+}
+#librarianSection #statisticsSummary .stat-card::before {
+  position: absolute; right: -15px; bottom: -23px; width: 82px; height: 82px;
+  content: ""; border: 12px solid #edf6f0; border-radius: 50%; opacity: .9;
+}
+#librarianSection #statisticsSummary .stat-card strong {
+  position: relative; z-index: 1; color: #087f5b; font-size: clamp(24px,3vw,32px);
+  line-height: 1; letter-spacing: -.055em; font-variant-numeric: tabular-nums;
+}
+#librarianSection #statisticsSummary .stat-card span {
+  position: relative; z-index: 1; max-width: 145px; color: #6e8077;
+  font-size: 10px; font-weight: 750; line-height: 1.4;
+}
+#librarianSection #statisticsTab .chart-panel {
+  position: relative; min-width: 0; margin: 0 0 13px; padding: 20px 21px;
+  overflow: hidden; border: 1px solid #e1ebe5; border-radius: 17px;
+  background: #fff; box-shadow: 0 5px 18px rgba(22,56,43,.035);
+}
+#librarianSection #statisticsTab .chart-panel h4 {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 20px;
+  color: #1d3d31; font-size: 14px; font-weight: 800; letter-spacing: -.015em;
+}
+#librarianSection #statisticsTab .chart-panel h4::before {
+  width: 4px; height: 19px; flex: 0 0 4px; content: "";
+  border-radius: 8px; background: linear-gradient(180deg,#0b9a6c,#8ac9a4);
+}
+#librarianSection #statisticsTab .bar-chart { display: grid; gap: 15px; min-width: 0; }
+#librarianSection #statisticsTab .bar-row {
+  display: grid; grid-template-columns: minmax(115px,175px) minmax(60px,1fr) 42px;
+  align-items: center; gap: 13px; min-width: 0;
+}
+#librarianSection #statisticsTab .bar-row > span {
+  overflow: hidden; color: #536b60; font-size: 11px; font-weight: 650;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+#librarianSection #statisticsTab .bar-track {
+  position: relative; height: 13px; overflow: hidden; border-radius: 99px;
+  background-color: #edf3ef;
+  background-image: linear-gradient(to right,rgba(117,148,130,.16) 1px,transparent 1px);
+  background-size: 25% 100%;
+}
+#librarianSection #statisticsTab .bar-fill {
+  position: relative; min-width: 3px; height: 100%; border-radius: inherit;
+  background: linear-gradient(90deg,#087f5b 0%,#35a879 100%);
+  box-shadow: 0 2px 6px rgba(8,127,91,.16);
+  animation: amgBarGrow .7s cubic-bezier(.2,.75,.25,1) both;
+  transform-origin: left center;
+}
+#librarianSection #statisticsTab .bar-row > strong {
+  color: #294d3e; font-size: 11px; font-weight: 850;
+  font-variant-numeric: tabular-nums; text-align: right;
+}
+#librarianSection #statisticsTab .bar-chart > .muted { padding: 16px; border-radius: 11px; color: #819188; background: #f6faf7; font-size: 11px; }
+@keyframes amgBarGrow { from { transform: scaleX(.08); opacity: .45; } to { transform: scaleX(1); opacity: 1; } }
+@media (min-width: 960px) {
+  #librarianSection #statisticsTab { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
+  #librarianSection #statisticsTab > h3,
+  #librarianSection #statisticsTab > p.muted,
+  #librarianSection #statisticsSummary { grid-column: 1 / -1; }
+  #librarianSection #statisticsTab .chart-panel { margin: 0; }
+}
+@media (max-width: 760px) {
+  #librarianSection #statisticsSummary { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-bottom: 14px; }
+  #librarianSection #statisticsSummary .stat-card { min-height: 86px; padding: 13px; border-radius: 12px; }
+  #librarianSection #statisticsSummary .stat-card strong { font-size: 25px; }
+  #librarianSection #statisticsSummary .stat-card span { font-size: 9px; }
+  #librarianSection #statisticsTab .chart-panel { padding: 16px 13px; border-radius: 14px; }
+  #librarianSection #statisticsTab .chart-panel h4 { margin-bottom: 16px; font-size: 12px; }
+  #librarianSection #statisticsTab .bar-chart { gap: 13px; }
+  #librarianSection #statisticsTab .bar-row { grid-template-columns: minmax(82px,110px) minmax(35px,1fr) 30px; gap: 8px; }
+  #librarianSection #statisticsTab .bar-row > span,
+  #librarianSection #statisticsTab .bar-row > strong { font-size: 9px; }
+  #librarianSection #statisticsTab .bar-track { height: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #librarianSection #statisticsTab .bar-fill { animation: none; }
+}
