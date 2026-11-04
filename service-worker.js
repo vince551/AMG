@@ -1,7 +1,8 @@
-const CACHE_NAME = "amg-library-shell-v9";
+const CACHE_NAME = "amg-library-shell-v10";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./amg-design-system.css",
   "./amg-design-system.css",
   "./app.js",
   "./mobile-effects.js",
