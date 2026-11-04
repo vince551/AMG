@@ -18,7 +18,7 @@ async function findCopy(code){
  if(snap.empty)throw new HttpsError("not-found","No physical book copy matches that barcode.");
  return snap.docs[0];
 }
-exports.createLearnerProfile=onCall(async request=>{
+exports.createLearnerProfile=onCall({cors:["https://libra-dusky.vercel.app"]},async request=>{
  if(!request.auth)throw new HttpsError("unauthenticated","Sign in before submitting a membership application.");
  const uid=request.auth.uid,email=clean(request.auth.token.email,254).toLowerCase();
  if(!email)throw new HttpsError("failed-precondition","The signed-in account must have an email address.");
@@ -58,7 +58,7 @@ exports.createLearnerProfile=onCall(async request=>{
  }
  throw new HttpsError("resource-exhausted","A unique membership number could not be allocated. Please try again.");
 });
-exports.reviewLearnerMembership=onCall(async request=>{
+exports.reviewLearnerMembership=onCall({cors:["https://libra-dusky.vercel.app"]},async request=>{
  requireLibrarian(request);
  const uid=clean(request.data?.uid,128),decision=clean(request.data?.decision,20);
  if(!uid||!["Approved","Denied"].includes(decision))throw new HttpsError("invalid-argument","Choose a learner and approve or deny the application.");
@@ -73,7 +73,7 @@ exports.reviewLearnerMembership=onCall(async request=>{
  });
  return {decision,message:"Membership "+decision.toLowerCase()+" successfully."};
 });
-exports.registerBookCopies=onCall(async request=>{
+exports.registerBookCopies=onCall({cors:["https://libra-dusky.vercel.app"]},async request=>{
  requireLibrarian(request);
  const title=clean(request.data?.title),author=clean(request.data?.author,120),category=clean(request.data?.category,80),quantity=Number(request.data?.quantity);
  const coverUrl=clean(request.data?.coverUrl,1000),coverStoragePath=clean(request.data?.coverStoragePath,500);
@@ -85,7 +85,7 @@ exports.registerBookCopies=onCall(async request=>{
  for(let i=1;i<=quantity;i++){const ref=db.collection("bookCopies").doc(),barcode=makeCopyBarcode();batch.create(ref,{bookId:bookRef.id,title,barcode,copyNumber:i,status:"Available",createdAt:FieldValue.serverTimestamp()});copies.push({copyNumber:i,barcode});}
  await batch.commit();return {bookId:bookRef.id,bookBarcode:titleCode,copies,message:quantity+" individual copy barcodes created."};
 });
-exports.recordMemberAttendance=onCall(async request=>{
+exports.recordMemberAttendance=onCall({cors:["https://libra-dusky.vercel.app"]},async request=>{
  requireLibrarian(request);const action=clean(request.data?.action,20);
  if(!["check-in","check-out"].includes(action))throw new HttpsError("invalid-argument","Choose check-in or check-out.");
  const member=await findMember(request.data?.libraryNumber),presenceRef=db.collection("memberPresence").doc(member.id),attendanceRef=db.collection("attendance").doc();
@@ -106,7 +106,7 @@ exports.recordMemberAttendance=onCall(async request=>{
  });
  return {message:member.data.fullName+(action==="check-in"?" checked in.":" checked out.")};
 });
-exports.issueBookCopy=onCall(async request=>{
+exports.issueBookCopy=onCall({cors:["https://libra-dusky.vercel.app"]},async request=>{
  requireLibrarian(request);const member=await findMember(request.data?.libraryNumber),copy=await findCopy(request.data?.copyBarcode),loanRef=db.collection("loans").doc();
  await db.runTransaction(async tx=>{
   const [copySnap,bookSnap]=await Promise.all([tx.get(copy.ref),tx.get(db.collection("books").doc(copy.data().bookId))]);
@@ -119,7 +119,7 @@ exports.issueBookCopy=onCall(async request=>{
  });
  return {message:member.data.fullName+" — "+copy.data().title+" issued."};
 });
-exports.returnBookCopy=onCall(async request=>{
+exports.returnBookCopy=onCall({cors:["https://libra-dusky.vercel.app"]},async request=>{
  requireLibrarian(request);const copy=await findCopy(request.data?.copyBarcode);
  const matches=await db.collection("loans").where("bookCopyId","==",copy.id).get();
  const loanDoc=matches.docs.find(d=>d.data().status==="Borrowed");
