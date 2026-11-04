@@ -826,25 +826,17 @@ async function reviewLearner(uid,decision) {
   const action=decision==="Approved"?"approve":"deny";
   if(!member || !confirm("Are you sure you want to "+action+" "+member.fullName+"'s membership?")) return;
   try {
-    const memberRef=doc(state.db,"users",uid);
-    const memberSnap=await getDoc(memberRef);
-    if(!memberSnap.exists()) throw new Error("The learner profile no longer exists.");
-    const current=memberSnap.data();
-    if(current.role!=="learner" || current.isApproved===true || current.membershipStatus==="Denied") {
-      throw new Error("This membership application has already been decided or is not a learner profile.");
-    }
-    const now=serverTimestamp();
-    await updateDoc(memberRef,{
-      isApproved:decision==="Approved",
-      membershipStatus:decision,
-      decisionAt:now,
-      decisionBy:state.user.uid,
-      updatedAt:now,
-      ...(decision==="Approved"?{approvedAt:now}:{deniedAt:now})
-    });
-    showToast("Membership "+decision.toLowerCase()+" successfully.");
+    // Membership decisions are performed by the callable Admin SDK function.
+    // This keeps approval writes out of the browser and enforces the librarian
+    // custom claim on the server, even if deployed Firestore rules are stale.
+    const reviewMembership=httpsCallable(state.functions,"reviewLearnerMembership");
+    const result=await reviewMembership({uid,decision});
+    showToast(result.data?.message || "Membership "+decision.toLowerCase()+" successfully.");
     await refreshAdminData();
-  } catch(error) { showToast(errorMessage(error),"error"); }
+  } catch(error) {
+    console.error("Membership review failed:",error?.code || error?.message || error);
+    showToast(errorMessage(error),"error");
+  }
 }
 async function processRequest(requestId,status) {
   if(!state.librarian) return;
