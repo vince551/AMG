@@ -177,7 +177,9 @@ service cloud.firestore {
     }
 
     match /ebooks/{ebookId} {
-      allow read: if signedIn();
+      // The catalogue is public so visitors can browse titles before signing up.
+      // The files themselves stay behind Storage rules that require an account.
+      allow read: if true;
       allow create, update, delete: if librarian();
     }
 
