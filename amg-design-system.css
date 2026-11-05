@@ -115,6 +115,8 @@ p { color: var(--amg-muted); }
 .featured-heading h2 { max-width: 650px; margin-bottom: 8px; }
 .featured-heading p { margin-bottom: 0; }
 .featured-books-grid, .book-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 18px; }
+/* Panels carry no top margin, so the catalogue grid owns the space below it. */
+.book-grid { margin-bottom: 24px; }
 .featured-empty, .empty-state { grid-column: 1 / -1; padding: 24px; border: 1px dashed #bfd2c8; border-radius: 14px; color: var(--amg-muted); text-align: center; background: #fbfdfb; }
 .featured-book-card, .book-card { min-width: 0; overflow: hidden; border: 1px solid var(--amg-line); border-radius: 16px; background: white; transition: transform .2s, box-shadow .2s; }
 .featured-book-card:hover, .book-card:hover { transform: translateY(-4px); box-shadow: var(--amg-shadow); }
