@@ -1,4 +1,4 @@
-import { mkdir, rm, copyFile, cp } from "node:fs/promises";
+import { mkdir, rm, copyFile, cp, stat } from "node:fs/promises";
 import { resolve, join } from "node:path";
 
 const root = process.cwd();
@@ -22,4 +22,13 @@ for (const file of files) {
 }
 
 await cp(join(root, "AMG.images"), join(out, "AMG.images"), { recursive: true });
-console.log(`Built AMG Library static site: ${files.length} files and AMG.images copied to dist/.`);
+
+// Verify the deployable output here instead of relying on shell `test -f`,
+// which only exists on POSIX hosts.
+const required = [...files, join("AMG.images", "logo.jpg"), join("AMG.images", "pwa-icon.svg"), join("AMG.images", "learn.jpg")];
+for (const file of required) {
+  const info = await stat(join(out, file));
+  if (!info.isFile() || info.size === 0) throw new Error("Static build is missing or produced an empty file: " + file);
+}
+
+console.log(`Built AMG Library static site: ${required.length} verified files in dist/.`);

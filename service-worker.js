@@ -3,7 +3,6 @@ const APP_SHELL = [
   "./",
   "./index.html",
   "./amg-design-system.css",
-  "./amg-design-system.css",
   "./app.js",
   "./mobile-effects.js",
   "./firebase-config.js",

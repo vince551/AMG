@@ -41,7 +41,9 @@ assert.ok(app.includes('announcementKind:"Announcement"') && app.includes('annou
 assert.ok(app.includes('readingMinutes+" min read"'), "Announcement reading time must be calculated from existing body text");
 assert.ok(app.includes("card.dataset.kind=kind.toLowerCase()"), "Announcement card styling must receive its automatically derived kind");
 assert.ok(designCss.includes('#heroSection #homeAnnouncements') && designCss.includes('#newsSection #announcementsList'), "Redesigned announcement cards must cover homepage and News & Events layouts");
-assert.ok(serviceWorker.includes('amg-library-shell-v9'), "PWA cache must refresh for the announcement redesign");
+const cacheVersion = serviceWorker.match(/const CACHE_NAME = "amg-library-shell-v(\d+)"/);
+assert.ok(cacheVersion, "Service worker must declare a versioned AMG shell cache");
+assert.ok(Number(cacheVersion[1]) >= 10, "PWA shell cache version must not move backwards");
 
 
 
@@ -91,8 +93,10 @@ assert(app.includes("signInWithEmailAndPassword(state.auth, email, password)"), 
 assert(firestoreRules.includes("getAfter(/databases/$(database)/documents/memberNumbers/$(request.resource.data.libraryNumber))"), "Profile creation must be paired with a member-number reservation");
 assert(firestoreRules.includes("request.resource.data.isApproved == false"), "Self-registration must never grant approval");
 
-assert(!app.includes('httpsCallable(state.functions,"reviewLearnerMembership")'), "Membership approval must not require Cloud Functions on Spark");
-assert(!app.includes('httpsCallable(state.functions, "recordMemberAttendance")'), "Attendance check-in/out must not require Cloud Functions on Spark");
+assert(app.includes('httpsCallable(state.functions,"reviewLearnerMembership")'), "Membership approval must go through the librarian-only callable");
+assert(cloudFunctions.includes("exports.reviewLearnerMembership=onCall"), "Membership approval callable must exist in functions/index.js");
+assert(cloudFunctions.includes('request.auth.token.librarian!==true'), "Membership approval callable must verify the librarian claim");
+assert(!app.includes('httpsCallable(state.functions, "recordMemberAttendance")'), "Attendance check-in/out must stay on Firestore transactions");
 assert(app.includes('transaction.set(attendanceRef') && app.includes('transaction.update(activeAttendanceRef'), "Attendance must use Firestore transactions for check-in and check-out");
 assert(firestoreRules.includes("request.resource.data.membershipStatus in ['Approved', 'Denied']"), "Librarian membership decisions must be constrained by Firestore rules");
 assert(firestoreRules.includes("getAfter(/databases/$(database)/documents/attendance/$(request.resource.data.attendanceId))"), "Presence records must be paired with an attendance record in the same transaction");
