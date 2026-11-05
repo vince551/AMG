@@ -122,6 +122,23 @@ p { color: var(--amg-muted); }
 .featured-book-cover img, .book-cover img { width: 100%; height: 190px; object-fit: cover; }
 .featured-book-card h3, .book-card h3 { margin: 14px 14px 6px; font-size: 16px; }
 .featured-book-card p, .book-card p { margin: 0 14px 14px; font-size: 13px; }
+/* Lib Shelf card internals. These nested classes were never styled, so the
+   details column, star toggle and generated covers are defined here. */
+.book-card { position: relative; display: flex; flex-direction: column; }
+.book-card .book-details { display: flex; flex: 1; flex-direction: column; gap: 7px; padding: 14px; }
+.book-card .book-details > * { margin: 0; }
+.book-card .book-title { font-size: 16px; line-height: 1.35; }
+.book-card .book-author { color: var(--amg-muted); font-size: 12px; }
+.book-card .book-category { align-self: flex-start; padding: 3px 9px; border-radius: 999px; color: var(--amg-green-dark); background: var(--amg-green-soft); font-size: 10px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.book-card .book-description { display: -webkit-box; overflow: hidden; color: #4d635a; font-size: 12px; line-height: 1.55; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.book-card .book-stock { color: var(--amg-muted); font-size: 11px; font-weight: 700; }
+.book-card .book-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 4px; }
+.book-card .star-btn { position: absolute; top: 9px; right: 9px; display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid rgba(7,91,67,.12); border-radius: 50%; color: var(--amg-green-dark); background: rgba(255,255,255,.94); font-size: 15px; line-height: 1; cursor: pointer; }
+.book-card .star-btn:hover { background: #fff; transform: scale(1.07); }
+.book-demo-badge { position: absolute; top: 9px; left: 9px; z-index: 1; padding: 3px 8px; border-radius: 999px; color: #28547c; background: rgba(255,255,255,.93); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.demo-cover { position: relative; display: grid; place-content: center; align-self: stretch; justify-self: stretch; background: linear-gradient(155deg, hsl(var(--demo-hue), 46%, 94%), hsl(var(--demo-hue), 38%, 77%)); }
+.demo-cover::before { content: ""; position: absolute; top: 0; bottom: 0; left: 13px; width: 3px; background: rgba(0,0,0,.07); }
+.demo-cover-code { color: hsl(var(--demo-hue), 42%, 25%); font-size: 27px; font-weight: 800; letter-spacing: .14em; }
 .home-purpose-grid, .home-feature-grid, .values-grid, .journey-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin: 24px 0; }
 .purpose-card, .home-feature, .values-grid article, .journey-grid article { padding: 24px; border: 1px solid var(--amg-line); border-radius: 16px; background: white; }
 .purpose-card h2 { font-size: 23px; }

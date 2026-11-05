@@ -1,11 +1,9 @@
-const CACHE_NAME = "amg-library-shell-v10";
+const CACHE_NAME = "amg-library-shell-v12";
+// Only stable, unhashed files belong here. The hashed Vite bundles in
+// dist/assets are picked up by the runtime cache below on first request.
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./amg-design-system.css",
-  "./app.js",
-  "./mobile-effects.js",
-  "./firebase-config.js",
   "./manifest.webmanifest",
   "./AMG.images/logo.jpg",
   "./AMG.images/pwa-icon.svg",
