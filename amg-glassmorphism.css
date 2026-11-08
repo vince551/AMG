@@ -1,0 +1,220 @@
+/* AMG Library — full-site glassmorphism layer.
+   Presentation-only overrides. Keep this file separate so the existing
+   design foundation and all application behavior remain intact. */
+:root {
+  --amg-glass: rgba(255,255,255,.58);
+  --amg-glass-strong: rgba(255,255,255,.76);
+  --amg-glass-border: rgba(255,255,255,.78);
+  --amg-glass-shadow: 0 14px 38px rgba(21,73,51,.09), inset 0 1px 0 rgba(255,255,255,.72);
+  --amg-glass-blur: 18px;
+  --amg-canvas: #edf5f0;
+}
+html { background: #edf5f0; }
+body {
+  background:
+    radial-gradient(ellipse at 8% 8%, rgba(86,174,130,.19), transparent 34rem),
+    radial-gradient(ellipse at 94% 22%, rgba(93,151,194,.15), transparent 32rem),
+    radial-gradient(ellipse at 55% 92%, rgba(123,190,151,.12), transparent 36rem),
+    linear-gradient(135deg,#f4f8f5 0%,#edf4f0 48%,#f0f5f8 100%);
+  background-attachment: fixed;
+}
+.navbar {
+  background: rgba(247,252,248,.68);
+  border: 1px solid rgba(255,255,255,.76);
+  border-top: 0;
+  box-shadow: 0 8px 28px rgba(22,65,47,.07);
+  backdrop-filter: blur(24px) saturate(155%);
+  -webkit-backdrop-filter: blur(24px) saturate(155%);
+}
+.navbar.amg-scrolled { background: rgba(247,252,248,.82); box-shadow: 0 12px 34px rgba(22,65,47,.1); }
+.nav-links { padding: 5px; border: 1px solid rgba(255,255,255,.68); border-radius: 999px; background: rgba(255,255,255,.32); }
+.nav-btn:hover, .nav-btn.active { background: rgba(8,127,91,.12); }
+.dropdown-content, .navbar .nav-links, .mobile-nav-toggle {
+  border-color: rgba(255,255,255,.78);
+  background: rgba(255,255,255,.72);
+  box-shadow: var(--amg-glass-shadow);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+.container { position: relative; }
+.hero {
+  border: 1px solid rgba(255,255,255,.8);
+  background:
+    radial-gradient(circle at 88% 12%,rgba(255,255,255,.7),transparent 30%),
+    linear-gradient(125deg,rgba(222,242,229,.72),rgba(255,255,255,.58) 52%,rgba(225,238,248,.68));
+  box-shadow: 0 24px 65px rgba(23,75,53,.09), inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+}
+.hero-image-note, .amg-counter,
+.home-featured-section, .home-intro, .home-services, .home-journey,
+.home-levels, .home-values, .panel, .purpose-card, .home-feature,
+.values-grid article, .journey-grid article, .featured-book-card, .book-card,
+.stats-grid > *, .stack-list > *, .announcement-grid > *,
+#heroSection #homeAnnouncements > .announcement-card,
+#newsSection #announcementsList > .announcement-card,
+#profileSection .card-preview-wrapper, #profileSection .profile-layout > .panel,
+#librarianSection .admin-overview-panel, #librarianSection .admin-quick-card,
+#librarianSection .admin-stats-grid .stat-card,
+#librarianSection #statisticsSummary .stat-card,
+#librarianSection #statisticsTab .chart-panel,
+#librarianSection .tab-content, #librarianSection .chart-panel,
+.chart-panel, .table-responsive, .tabs, .copy-labels-panel,
+#booksAdminTab .book-cover-preview, #attendanceTab .scanner-box,
+#attendanceTab .scanner-method-hints > span {
+  border: 1px solid var(--amg-glass-border);
+  background: var(--amg-glass);
+  box-shadow: var(--amg-glass-shadow);
+  backdrop-filter: blur(var(--amg-glass-blur)) saturate(145%);
+  -webkit-backdrop-filter: blur(var(--amg-glass-blur)) saturate(145%);
+}
+.featured-book-card, .book-card, #librarianSection .admin-quick-card,
+#newsSection #announcementsList > .announcement-card,
+#heroSection #homeAnnouncements > .announcement-card {
+  background: rgba(255,255,255,.56);
+}
+.featured-book-card:hover, .book-card:hover,
+#librarianSection .admin-quick-card:hover,
+#newsSection #announcementsList > .announcement-card:hover,
+#heroSection #homeAnnouncements > .announcement-card:hover {
+  background: rgba(255,255,255,.78);
+  border-color: rgba(255,255,255,.95);
+  box-shadow: 0 18px 42px rgba(22,73,51,.13), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.purpose-card, .home-feature, .values-grid article, .journey-grid article { background: rgba(255,255,255,.48); }
+.amg-counter-strip { gap: 16px; }
+.amg-counter { border-radius: 18px; }
+.home-cta {
+  border: 1px solid rgba(255,255,255,.24);
+  background: linear-gradient(120deg,rgba(5,91,67,.91),rgba(8,127,91,.83));
+  box-shadow: 0 18px 42px rgba(7,91,67,.16), inset 0 1px 0 rgba(255,255,255,.18);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+input, select, textarea,
+#authModal input:not([type="file"]), #authModal select {
+  border: 1px solid rgba(255,255,255,.9);
+  background: rgba(255,255,255,.64);
+  box-shadow: inset 0 1px 3px rgba(29,73,51,.035), 0 4px 14px rgba(29,73,51,.035);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+input:hover, select:hover, textarea:hover { background: rgba(255,255,255,.82); border-color: rgba(8,127,91,.28); }
+input:focus, select:focus, textarea:focus {
+  background: rgba(255,255,255,.9);
+  border-color: rgba(8,127,91,.52);
+  box-shadow: 0 0 0 4px rgba(8,127,91,.1);
+}
+.btn-secondary, .btn-outline, .pill, .tab-btn:not(.active),
+.mobile-nav-toggle, .camera-picker, .close-btn, .password-toggle {
+  border-color: rgba(255,255,255,.82);
+  background: rgba(255,255,255,.52);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.btn-primary, .tab-btn.active, .pill.active {
+  box-shadow: 0 8px 20px rgba(8,127,91,.2), inset 0 1px 0 rgba(255,255,255,.18);
+}
+.notice, .notice-warning, .notice-info, .notice-success {
+  border-color: rgba(255,255,255,.78);
+  background: rgba(255,255,255,.55);
+  box-shadow: 0 8px 22px rgba(22,65,47,.045);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.table-responsive { overflow-x: auto; }
+.data-table { background: transparent; }
+.data-table th { background: rgba(8,127,91,.075); }
+.data-table td { background: rgba(255,255,255,.2); }
+.data-table th, .data-table td { border-bottom-color: rgba(255,255,255,.7); }
+.site-footer {
+  border-top: 1px solid rgba(255,255,255,.78);
+  background: rgba(255,255,255,.38);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.modal {
+  background: rgba(7,31,22,.48);
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+}
+.modal-content, #authModal .auth-modal, #authModal .auth-form-panel {
+  border: 1px solid rgba(255,255,255,.82);
+  background: rgba(250,253,250,.88);
+  box-shadow: 0 30px 90px rgba(5,35,25,.24), inset 0 1px 0 rgba(255,255,255,.9);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+#authModal .auth-art {
+  background:
+    radial-gradient(circle at 8% 90%,rgba(79,174,133,.32),transparent 35%),
+    radial-gradient(circle at 100% 8%,rgba(83,145,201,.25),transparent 34%),
+    linear-gradient(145deg,rgba(6,63,49,.96),rgba(7,91,67,.92) 56%,rgba(8,127,91,.9));
+}
+#librarianSection .admin-welcome {
+  border: 1px solid rgba(255,255,255,.34);
+  background:
+    radial-gradient(circle at 83% 18%,rgba(172,231,202,.25),transparent 28%),
+    radial-gradient(circle at 10% 100%,rgba(30,145,107,.4),transparent 40%),
+    linear-gradient(118deg,rgba(7,62,50,.91),rgba(7,91,67,.88) 55%,rgba(8,127,91,.86));
+  box-shadow: 0 20px 48px rgba(7,91,67,.16), inset 0 1px 0 rgba(255,255,255,.22);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+#librarianSection .admin-priority-row,
+#librarianSection .admin-mobile-tab-picker,
+#profileSection #myLoansList > .stack-item,
+#profileSection #learnerStats > .stat-card {
+  border-color: rgba(255,255,255,.78);
+  background: rgba(255,255,255,.48);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+#profileSection > .section-header, #newsSection > .section-header {
+  border-color: rgba(255,255,255,.86);
+  background:
+    radial-gradient(circle at 90% 10%,rgba(255,255,255,.7),transparent 30%),
+    linear-gradient(115deg,rgba(225,243,230,.68),rgba(255,255,255,.62) 60%,rgba(230,240,248,.68));
+  box-shadow: var(--amg-glass-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+#profileSection .amg-id-card { box-shadow: 0 14px 32px rgba(20,54,40,.14); }
+#profileSection .card-preview-wrapper { background: rgba(255,255,255,.35); }
+#booksAdminTab .book-cover-preview { background: rgba(255,255,255,.56); }
+#attendanceTab .scanner-box { background: rgba(255,255,255,.52); }
+#attendanceTab .scanner-box video { background: #12251d; }
+.toast { box-shadow: 0 16px 38px rgba(5,35,25,.22); }
+@media (max-width: 680px) {
+  body { background-attachment: scroll; }
+  .navbar { background: rgba(247,252,248,.84); }
+  .nav-links { border-radius: 18px; }
+  .hero, .home-featured-section, .home-intro, .home-services, .home-journey,
+  .home-levels, .home-values, .home-cta, .panel, #profileSection .profile-layout > .panel,
+  #librarianSection .admin-overview-panel, #librarianSection .tab-content {
+    background: rgba(255,255,255,.66);
+  }
+  #librarianSection .admin-welcome { background: linear-gradient(125deg,rgba(7,62,50,.96),rgba(8,127,91,.92)); }
+  #authModal .auth-modal { background: rgba(250,253,250,.96); }
+  .modal-content { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .navbar, .nav-links, .dropdown-content, .hero, .hero-image-note,
+  .amg-counter, .home-featured-section, .home-intro, .home-services,
+  .home-journey, .home-levels, .home-values, .home-cta, .panel,
+  .purpose-card, .home-feature, .values-grid article, .journey-grid article,
+  .featured-book-card, .book-card, .stats-grid > *, .stack-list > *,
+  .announcement-grid > *, .notice, .modal-content, #authModal .auth-modal,
+  #librarianSection .admin-overview-panel, #librarianSection .admin-quick-card,
+  #librarianSection .tab-content, #librarianSection #statisticsTab .chart-panel,
+  #profileSection .profile-layout > .panel, #newsSection #announcementsList > .announcement-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(255,255,255,.96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; }
+}
