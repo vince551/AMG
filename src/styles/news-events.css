@@ -291,13 +291,13 @@
   letter-spacing: -.04em;
 }
 
-#newsSection .news-empty-state h3 {
+#newsSection .announcement-empty-state h3 {
   margin: 0 0 7px;
   color: #244638;
   font-size: 18px;
 }
 
-#newsSection .news-empty-state p {
+#newsSection .announcement-empty-state p {
   max-width: 440px;
   margin: 0;
   color: #748279;
