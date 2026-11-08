@@ -5,7 +5,7 @@ export function AnnouncementCards({ id, items = [], emptyText }) {
   if (!items.length) {
     return (
       <div id={id} className="announcement-grid">
-        <div className="news-empty-state" role="status">
+        <div className="announcement-empty-state muted" role="status">
           <span className="news-empty-mark" aria-hidden="true">AMG</span>
           <h3>Something to look forward to</h3>
           <p>{emptyText || "No announcements have been published yet."}</p>
