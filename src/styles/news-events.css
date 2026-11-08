@@ -265,7 +265,7 @@
   content: "";
 }
 
-#newsSection .news-empty-state {
+#newsSection .announcement-empty-state {
   grid-column: 1 / -1;
   display: grid;
   justify-items: center;
