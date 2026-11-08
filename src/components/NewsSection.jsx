@@ -21,7 +21,7 @@ export function NewsSection({ active, posts = [] }) {
           <span className="news-stat-divider" aria-hidden="true" />
           <span className="news-stat">
             <strong>{eventCount}</strong>
-            <span>{eventCount === 1 ? "Upcoming event" : "Events"}</span>
+            <span>{eventCount === 1 ? "Event" : "Events"}</span>
           </span>
         </div>
         <span className="news-header-orbit news-orbit-one" aria-hidden="true" />
