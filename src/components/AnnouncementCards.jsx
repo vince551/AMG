@@ -1,11 +1,15 @@
 import { formatDate, readingMinutes } from "../lib/format";
 
 /** Shared announcement grid used by the home page and the News & Events section. */
-export function AnnouncementCards({ id, items, emptyText }) {
+export function AnnouncementCards({ id, items = [], emptyText }) {
   if (!items.length) {
     return (
       <div id={id} className="announcement-grid">
-        <p className="muted">{emptyText || "No announcements have been published yet."}</p>
+        <div className="announcement-empty-state muted" role="status">
+          <span className="news-empty-mark" aria-hidden="true">AMG</span>
+          <h3>Something to look forward to</h3>
+          <p>{emptyText || "No announcements have been published yet."}</p>
+        </div>
       </div>
     );
   }
