@@ -1,14 +1,35 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import {
-  createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail,
-  signInWithEmailAndPassword, signOut, updateProfile
-} from "firebase/auth";
-import { doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
-import { firebaseConfig, getFirebase } from "../lib/firebase";
-import { createLearnerProfile } from "../lib/learnerProfile";
-import { MAX_IMAGE_BYTES, avatarSeedUrl, errorMessage, safeFileName } from "../lib/format";
+import { api, getToken, setToken } from "../lib/api";
 import { useToast } from "./ToastProvider";
+
+/**
+ * Normalize a Laravel user (snake_case) into the camelCase shape the
+ * existing UI components expect.
+ */
+function normalizeUser(u) {
+  if (!u) return null;
+  return {
+    // keep raw fields too so nothing breaks if a component uses either form
+    ...u,
+    uid: u.uid,
+    email: u.email,
+    role: u.role,
+    fullName: u.full_name ?? u.fullName ?? "",
+    photoURL: u.photo_url ?? u.photoURL ?? "",
+    libraryNumber: u.library_number ?? u.libraryNumber ?? "",
+    isApproved: u.is_approved ?? u.isApproved ?? false,
+    membershipStatus: u.membership_status ?? u.membershipStatus ?? "Pending",
+    starredBookIds: u.starred_book_ids ?? u.starredBookIds ?? [],
+    school: u.school ?? "",
+    studyLevel: u.study_level ?? u.studyLevel ?? "",
+    eduLevel: u.edu_level ?? u.eduLevel ?? "",
+    guardianName: u.guardian_name ?? u.guardianName ?? "",
+    guardianRelation: u.guardian_relation ?? u.guardianRelation ?? "",
+    guardianPhone: u.guardian_phone ?? u.guardianPhone ?? "",
+    approvedAt: u.approved_at ?? u.approvedAt ?? null,
+    createdAt: u.created_at ?? u.createdAt ?? null,
+  };
+}
 
 const AuthContext = createContext(null);
 
@@ -16,200 +37,143 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-const NOT_CONFIGURED = "Firebase is not configured yet. Follow the setup steps in README.md.";
-
 export function AuthProvider({ children }) {
   const { showToast } = useToast();
-  const fb = getFirebase();
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
+
+  const [user, setUser] = useState(null);   // raw Laravel user object
+  const [profile, setProfile] = useState(null);   // same object, aliased for compatibility
   const [librarian, setLibrarian] = useState(false);
-  const [ready, setReady] = useState(!fb);
+  const [ready, setReady] = useState(false);
 
+  // ── Bootstrap: restore session from stored JWT ───────────────────────────
   useEffect(() => {
-    if (!fb) return undefined;
-    return onAuthStateChanged(fb.auth, async (nextUser) => {
-      setUser(nextUser);
-      setProfile(null);
-      setLibrarian(false);
-      if (nextUser) {
-        try {
-          const token = await nextUser.getIdTokenResult(true);
-          setLibrarian(token.claims.librarian === true);
-          const snap = await getDoc(doc(fb.db, "users", nextUser.uid));
-          setProfile(snap.exists() ? snap.data() : null);
-        } catch (error) {
-          showToast(errorMessage(error), "error");
-        }
-      }
-      setReady(true);
-    });
-  }, [fb, showToast]);
+    const token = getToken();
+    if (!token) { setReady(true); return; }
 
-  const refreshProfile = useCallback(async () => {
-    if (!fb || !user) return null;
-    const snap = await getDoc(doc(fb.db, "users", user.uid));
-    const next = snap.exists() ? snap.data() : null;
-    setProfile(next);
-    return next;
-  }, [fb, user]);
+    api.get("/auth/me")
+      .then((data) => {
+        const u = normalizeUser(data?.user ?? data);
+        setUser(u);
+        setProfile(u);
+        setLibrarian(u?.role === "librarian");
+      })
+      .catch(() => {
+        setToken(null);
+      })
+      .finally(() => setReady(true));
+  }, []);
 
+  // ── Login ────────────────────────────────────────────────────────────────
   const login = useCallback(async (loginName, password) => {
-    if (!fb) {
-      showToast(NOT_CONFIGURED, "error");
-      return false;
-    }
     const trimmed = String(loginName || "").trim();
-    const isLibrarianLogin = trimmed.toLowerCase() === "librarian";
-    // The librarian username maps to the authorized account email; member
-    // full-name login still needs a secure username mapping service.
-    const email = isLibrarianLogin
-      ? String(firebaseConfig.librarianEmail || "").trim()
-      : (trimmed.includes("@") ? trimmed : "");
-    if (!email || email.startsWith("REPLACE_")) {
-      showToast(isLibrarianLogin
-        ? "Librarian login is not configured yet. Set librarianEmail in firebase-config.js to the authorized Firebase account email."
-        : "Member full-name login needs a secure username mapping service. Until it is configured, enter the email address linked to your account.", "error");
+    const email = trimmed.includes("@") ? trimmed : "";
+    if (!email) {
+      showToast("Enter the email address linked to your account.", "error");
       return false;
     }
+
     try {
-      await signInWithEmailAndPassword(fb.auth, email, password);
+      const data = await api.post("/auth/login", { email, password });
+      setToken(data.token);
+      const u = normalizeUser(data.user);
+      setUser(u);
+      setProfile(u);
+      setLibrarian(u?.role === "librarian");
       showToast("Login successful.");
       return true;
-    } catch (error) {
-      showToast(errorMessage(error), "error");
+    } catch (err) {
+      showToast(err.message || "The email or password is incorrect.", "error");
       return false;
     }
-  }, [fb, showToast]);
+  }, [showToast]);
 
+  // ── Register ─────────────────────────────────────────────────────────────
   const register = useCallback(async (formData) => {
-    if (!fb) {
-      showToast(NOT_CONFIGURED, "error");
-      return false;
-    }
-    const fullName = String(formData.get("fullName") || "").trim();
-    const email = String(formData.get("email") || "").trim().toLowerCase();
-    const password = String(formData.get("password") || "");
-    const guardianPhone = String(formData.get("guardianPhone") || "").trim();
-    if (fullName.length < 2 || !guardianPhone || password.length < 8) {
-      showToast("Complete all required fields and use a password of at least 8 characters.", "error");
-      return false;
-    }
-
+    // formData is a FormData instance from the existing AuthModal
     try {
-      let credential;
-      try {
-        credential = await createUserWithEmailAndPassword(fb.auth, email, password);
-      } catch (authError) {
-        if (authError?.code !== "auth/email-already-in-use") throw authError;
-        // Recover accounts created by an earlier attempt that failed before Firestore.
-        credential = await signInWithEmailAndPassword(fb.auth, email, password);
-      }
-      await updateProfile(credential.user, { displayName: fullName });
-
-      const profileInput = {
-        fullName,
-        gender: String(formData.get("gender") || ""),
-        school: String(formData.get("school") || "").trim(),
-        studyLevel: String(formData.get("studyLevel") || "").trim(),
-        eduLevel: String(formData.get("eduLevel") || ""),
-        guardianName: String(formData.get("guardianName") || "").trim(),
-        guardianRelation: String(formData.get("guardianRelation") || ""),
-        guardianPhone
-      };
-
-      const created = await createLearnerProfile(fb.db, credential.user.uid, email, profileInput);
-      let nextProfile = { ...created.profile };
-
-      const photo = formData.get("photo");
-      const avatarChoice = String(formData.get("avatarChoice") || "scholar");
-      let photoURL = nextProfile.photoURL || avatarSeedUrl(avatarChoice);
-
-      if (photo instanceof File && photo.size > 0) {
-        if (!photo.type.startsWith("image/") || photo.size > MAX_IMAGE_BYTES) {
-          showToast("Profile photo was skipped. Choose an image smaller than 5 MB.", "error");
-        } else {
-          try {
-            const target = storageRef(fb.storage, "member-photos/" + credential.user.uid + "/" + safeFileName(photo.name, "profile-photo"));
-            await uploadBytes(target, photo, { contentType: photo.type });
-            photoURL = await getDownloadURL(target);
-          } catch (photoError) {
-            // Photo storage is optional; registration must still complete.
-            console.warn("Optional registration photo upload failed:", photoError?.code || "unknown");
-          }
-        }
-      }
-
-      if (photoURL !== nextProfile.photoURL) {
-        await updateDoc(doc(fb.db, "users", credential.user.uid), { photoURL, updatedAt: serverTimestamp() });
-        nextProfile = { ...nextProfile, photoURL };
-      }
-
-      setProfile(nextProfile);
-      showToast(created.created
-        ? "Registration submitted. Please wait for librarian approval."
-        : "Your existing membership profile has been restored.");
+      const data = await api.post("/auth/register", formData);
+      setToken(data.token);
+      const u = normalizeUser(data.user);
+      setUser(u);
+      setProfile(u);
+      setLibrarian(u?.role === "librarian");
+      if (data.warning) showToast(data.warning, "error");
+      showToast("Registration submitted. Please wait for librarian approval.");
       return true;
-    } catch (error) {
-      showToast("Registration could not be completed: " + errorMessage(error), "error");
+    } catch (err) {
+      // Surface validation errors if present
+      if (err.errors) {
+        const first = Object.values(err.errors)[0];
+        showToast(Array.isArray(first) ? first[0] : first, "error");
+      } else {
+        showToast(err.message || "Registration could not be completed.", "error");
+      }
       return false;
     }
-  }, [fb, showToast]);
+  }, [showToast]);
 
-  const logout = useCallback(async () => {
-    if (!fb) return;
-    try {
-      await signOut(fb.auth);
-      showToast("You have logged out.");
-    } catch (error) {
-      showToast(errorMessage(error), "error");
-    }
-  }, [fb, showToast]);
+  // ── Logout ───────────────────────────────────────────────────────────────
+  const logout = useCallback(() => {
+    setToken(null);
+    setUser(null);
+    setProfile(null);
+    setLibrarian(false);
+    showToast("You have logged out.");
+  }, [showToast]);
 
+  // ── Password reset ───────────────────────────────────────────────────────
   const resetPassword = useCallback(async (loginName) => {
-    if (!fb) {
-      showToast(NOT_CONFIGURED, "error");
-      return;
-    }
     const trimmed = String(loginName || "").trim();
-    const email = trimmed.toLowerCase() === "librarian"
-      ? String(firebaseConfig.librarianEmail || "").trim()
-      : trimmed;
-    if (!email || !email.includes("@") || email.startsWith("REPLACE_")) {
+    const email = trimmed.toLowerCase() === "librarian" ? "" : trimmed;
+    if (!email || !email.includes("@")) {
       showToast("Enter the account email address to reset the password.", "error");
       return;
     }
     try {
-      await sendPasswordResetEmail(fb.auth, email);
+      await api.post("/auth/password-reset", { email });
       showToast("If an account exists for that email, a password reset email has been sent.");
-    } catch (error) {
-      showToast(errorMessage(error), "error");
+    } catch {
+      // Intentionally silent — don't leak email existence
+      showToast("If an account exists for that email, a password reset email has been sent.");
     }
-  }, [fb, showToast]);
+  }, [showToast]);
 
+  // ── Update photo ─────────────────────────────────────────────────────────
   const updatePhoto = useCallback(async (file) => {
-    if (!fb || !user) {
-      showToast("Log in before updating your profile photo.", "error");
-      return false;
-    }
+    if (!user) { showToast("Log in before updating your profile photo.", "error"); return false; }
     if (!file) return false;
-    if (!file.type.startsWith("image/") || file.size > MAX_IMAGE_BYTES) {
+    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
       showToast("Choose an image smaller than 5 MB.", "error");
       return false;
     }
     try {
-      const target = storageRef(fb.storage, "member-photos/" + user.uid + "/" + Date.now() + "-" + safeFileName(file.name, "profile-photo"));
-      await uploadBytes(target, file, { contentType: file.type });
-      const photoURL = await getDownloadURL(target);
-      await updateDoc(doc(fb.db, "users", user.uid), { photoURL, updatedAt: serverTimestamp() });
-      setProfile(current => (current ? { ...current, photoURL } : current));
+      const form = new FormData();
+      form.append("photo", file);
+      const data = await api.post("/auth/me/photo", form);
+      const updated = normalizeUser({ ...user, photo_url: data.photoURL });
+      setUser(updated);
+      setProfile(updated);
       showToast("Profile photo updated.");
       return true;
-    } catch (error) {
-      showToast("Photo could not be updated: " + errorMessage(error), "error");
+    } catch (err) {
+      showToast(err.message || "Photo could not be updated.", "error");
       return false;
     }
-  }, [fb, user, showToast]);
+  }, [user, showToast]);
+
+  // ── Refresh profile ──────────────────────────────────────────────────────
+  const refreshProfile = useCallback(async () => {
+    if (!getToken()) return null;
+    try {
+      const data = await api.get("/auth/me");
+      const u = normalizeUser(data?.user ?? data);
+      setUser(u);
+      setProfile(u);
+      return u;
+    } catch {
+      return null;
+    }
+  }, []);
 
   const value = useMemo(() => ({
     user, profile, librarian, ready,

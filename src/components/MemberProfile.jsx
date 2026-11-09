@@ -32,7 +32,7 @@ export function MemberProfile({ active }) {
   const items = [
     ...myRequests.map(item => ({ ...item, kind: "Request" })),
     ...myLoans.map(item => ({ ...item, kind: "Loan" }))
-  ].sort((a, b) => dateMillis(b.createdAt) - dateMillis(a.createdAt));
+  ].sort((a, b) => dateMillis(b.created_at ?? b.createdAt) - dateMillis(a.created_at ?? a.createdAt));
 
   const stats = [
     ["Requests", myRequests.length],
@@ -87,9 +87,9 @@ export function MemberProfile({ active }) {
               <p className="muted">No requests or loans yet.</p>
             ) : items.map(item => (
               <div key={item.id} className="stack-item">
-                <h4>{item.bookTitle || "Library book"}</h4>
+                <h4>{item.book_title ?? item.bookTitle ?? "Library book"}</h4>
                 <p>{item.kind} · {item.status || "Pending"}</p>
-                {item.dueAt ? <p>Due: {formatDate(item.dueAt)}</p> : null}
+                {(item.due_at ?? item.dueAt) ? <p>Due: {formatDate(item.due_at ?? item.dueAt)}</p> : null}
               </div>
             ))}
           </div>

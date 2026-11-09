@@ -100,12 +100,12 @@ export function LibShelf({ active, onOpenAuth }) {
         ) : visible.map(book => {
           const available = Math.max(0, Number(book.available || 0));
           const starred = stars.includes(book.id);
-          const borrowDisabled = Boolean(book.demo) || !user || !profile?.isApproved || available < 1;
+          const borrowDisabled = Boolean(book.demo) || !user || !(profile?.isApproved ?? profile?.is_approved) || available < 1;
           const borrowHint = book.demo
             ? "Sample card — the librarian has not registered this book yet"
             : !user
               ? "Log in to request a book"
-              : !profile?.isApproved ? "Await librarian approval" : "Request this book";
+              : !(profile?.isApproved ?? profile?.is_approved) ? "Await librarian approval" : "Request this book";
           return (
             <article key={book.id} className="book-card">
               <div className="book-cover">

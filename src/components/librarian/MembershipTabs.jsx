@@ -3,8 +3,10 @@ import { useLibrary } from "../../store/LibraryProvider";
 const tabClass = (active) => "tab-content" + (active ? " active" : "");
 
 const memberStatus = (member) => {
-  if (member.isApproved) return "Approved";
-  return member.membershipStatus === "Denied" ? "Denied" : "Pending";
+  const approved = member.isApproved ?? member.is_approved;
+  const status = member.membershipStatus ?? member.membership_status;
+  if (approved) return "Approved";
+  return status === "Denied" ? "Denied" : "Pending";
 };
 
 export function BorrowRequestsTab({ active }) {
@@ -20,12 +22,13 @@ export function BorrowRequestsTab({ active }) {
           </thead>
           <tbody id="borrowRequestsTable">
             {requests.map(request => {
-              const loan = request.loanId ? loans.find(item => item.id === request.loanId) : null;
+              const loanId = request.loan_id ?? request.loanId;
+              const loan = loanId ? loans.find(item => item.id === loanId) : null;
               return (
                 <tr key={request.id}>
-                  <td>{request.userName}</td>
-                  <td>{request.bookTitle}</td>
-                  <td>{request.bookCategory}</td>
+                  <td>{request.user_name ?? request.userName}</td>
+                  <td>{request.book_title ?? request.bookTitle}</td>
+                  <td>{request.book_category ?? request.bookCategory}</td>
                   <td>{request.status}</td>
                   <td>
                     {request.status === "Pending" ? (
@@ -34,7 +37,7 @@ export function BorrowRequestsTab({ active }) {
                         <button className="btn btn-sm btn-danger" type="button" onClick={() => processRequest(request.id, "Declined")}>Decline</button>
                       </>
                     ) : request.status === "Approved" && loan && loan.status === "Borrowed" ? (
-                      <button className="btn btn-sm btn-outline" type="button" onClick={() => returnLoan(request.id, request.loanId)}>Return book</button>
+                      <button className="btn btn-sm btn-outline" type="button" onClick={() => returnLoan(request.id, loanId)}>Return book</button>
                     ) : "Processed"}
                   </td>
                 </tr>
@@ -49,11 +52,15 @@ export function BorrowRequestsTab({ active }) {
 
 export function PendingLearnersTab({ active }) {
   const { members, reviewLearner } = useLibrary();
-  const pending = members.filter(member => !member.isApproved && member.membershipStatus !== "Denied");
+  const pending = members.filter(member =>
+    !(member.isApproved ?? member.is_approved) &&
+    (member.membershipStatus ?? member.membership_status) !== "Denied"
+  );
 
   const decide = (member, decision) => {
+    const name = member.fullName ?? member.full_name ?? "this member";
     const action = decision === "Approved" ? "approve" : "deny";
-    if (!window.confirm("Are you sure you want to " + action + " " + member.fullName + "'s membership?")) return;
+    if (!window.confirm("Are you sure you want to " + action + " " + name + "'s membership?")) return;
     void reviewLearner(member.uid, decision);
   };
 
@@ -68,10 +75,10 @@ export function PendingLearnersTab({ active }) {
           <tbody id="pendingLearnersTable">
             {pending.map(member => (
               <tr key={member.uid}>
-                <td>{member.fullName}</td>
+                <td>{member.fullName ?? member.full_name}</td>
                 <td>{member.school}</td>
-                <td>{member.eduLevel}</td>
-                <td>{(member.guardianName || "") + " · " + (member.guardianPhone || "")}</td>
+                <td>{member.eduLevel ?? member.edu_level}</td>
+                <td>{((member.guardianName ?? member.guardian_name) || "") + " · " + ((member.guardianPhone ?? member.guardian_phone) || "")}</td>
                 <td>
                   <button className="btn btn-sm btn-success" type="button" onClick={() => decide(member, "Approved")}>Approve</button>
                   <button className="btn btn-sm btn-danger" type="button" onClick={() => decide(member, "Denied")}>Deny</button>
@@ -99,9 +106,9 @@ export function AllLearnersTab({ active, onViewCard }) {
           <tbody id="allLearnersTable">
             {members.map(member => (
               <tr key={member.id || member.uid}>
-                <td>{member.libraryNumber}</td>
-                <td>{member.fullName}</td>
-                <td>{(member.school || "") + " / " + (member.eduLevel || "")}</td>
+                <td>{member.library_number ?? member.libraryNumber}</td>
+                <td>{member.full_name ?? member.fullName}</td>
+                <td>{((member.school) || "") + " / " + ((member.edu_level ?? member.eduLevel) || "")}</td>
                 <td>{memberStatus(member)}</td>
                 <td>
                   <button className="btn btn-sm btn-outline" type="button" onClick={() => onViewCard(member)}>

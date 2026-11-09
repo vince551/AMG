@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ToastProvider, useToast } from "./store/ToastProvider";
 import { AuthProvider, useAuth } from "./store/AuthProvider";
 import { LibraryProvider, useLibrary } from "./store/LibraryProvider";
-import { configured, firebaseConfig } from "./lib/firebase";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { LibShelf } from "./components/LibShelf";
@@ -33,24 +32,17 @@ function Shell() {
       return;
     }
     if (routedUid.current === user.uid) return;
-    if (librarian) {
+    const isLibrarian = user.role === "librarian";
+    if (isLibrarian) {
       routedUid.current = user.uid;
       setSection("librarianSection");
       return;
     }
-    if (profile) {
+    if (user) {
       routedUid.current = user.uid;
       setSection("profileSection");
-      return;
     }
-    routedUid.current = user.uid;
-    if (user.email && user.email.toLowerCase() === String(firebaseConfig.librarianEmail || "").trim().toLowerCase()) {
-      showToast(
-        "You are signed in, but librarian permissions have not been assigned yet. The librarian account needs the secure librarian claim before the desk can open.",
-        "error"
-      );
-    }
-  }, [ready, user, profile, librarian, showToast]);
+  }, [ready, user, librarian]);
 
   const showSection = useCallback((id) => {
     if (id === "profileSection" && !user) {
@@ -60,7 +52,7 @@ function Shell() {
       return;
     }
     if (id === "librarianSection" && !librarian) {
-      showToast("Librarian access requires an authorized Firebase account.", "error");
+      showToast("Librarian access requires an authorized account.", "error");
       setAuthMode("login");
       setAuthOpen(true);
       return;
@@ -79,13 +71,7 @@ function Shell() {
       <Navbar section={section} onNavigate={showSection} onOpenAuth={openAuth} />
 
       <main className="container">
-        {configured ? null : (
-          <div id="setupNotice" className="notice notice-warning" role="status">
-            <strong>Firebase setup required.</strong> The interface is ready, but this deployment is not connected to a
-            Firebase project yet. Add your web app config to <code>firebase-config.js</code>, enable Email/Password
-            Authentication, then deploy the included Firestore and Storage rules. See README.md.
-          </div>
-        )}
+        {section === "heroSection" && null}
 
         <Hero
           active={section === "heroSection"}

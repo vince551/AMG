@@ -41,7 +41,10 @@ export function Desk({ active }) {
   }, [active, refreshAdmin]);
 
   const pendingRequests = requests.filter(request => request.status === "Pending").length;
-  const pendingMembers = members.filter(member => !member.isApproved && member.membershipStatus !== "Denied").length;
+  const pendingMembers = members.filter(member =>
+    !(member.isApproved ?? member.is_approved) &&
+    (member.membershipStatus ?? member.membership_status) !== "Denied"
+  ).length;
   const lowStock = books.filter(book => Number(book.available || 0) <= 1).length;
   const inside = attendance.filter(record => record.status === "In library").length;
   const places = Math.max(1, Number(capacity) || 100);
@@ -150,7 +153,7 @@ export function Desk({ active }) {
       </div>
 
       <div className="notice notice-success">
-        Librarian access is granted through Firebase custom claims. A visible button alone never grants administrative permissions.
+        Librarian access is controlled by the account role. Only accounts with the librarian role can access this workspace.
       </div>
 
       <div className="admin-stats-heading">

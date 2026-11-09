@@ -194,8 +194,8 @@ export function AuthModal({ open, mode, onClose, onModeChange }) {
 
           {registerMode ? null : (
             <p className="muted auth-help">
-              Librarian: use username <strong>Librarian</strong> and the password assigned to the authorized staff account.
-              Members: use the email linked to your account until secure full-name login is configured.
+              Librarian: enter the librarian email address and password.
+              Members: enter the email address linked to your account.
             </p>
           )}
 
@@ -206,8 +206,8 @@ export function AuthModal({ open, mode, onClose, onModeChange }) {
             onSubmit={submitLogin}
           >
             <label>
-              Full name / librarian username
-              <input name="loginName" type="text" autoComplete="username" required placeholder="Librarian or your account email" />
+              Email address
+              <input name="loginName" type="email" autoComplete="username" required placeholder="your@email.com" />
             </label>
             <PasswordField id="loginPasswordInput" name="password" label="Password" autoComplete="current-password" />
             <button className="btn btn-primary" type="submit" disabled={busy}>Log In</button>
