@@ -18,7 +18,7 @@ class MemberController extends Controller
     {
         $members = User::where('role', 'learner')
             ->orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage($request));
 
         // Librarians can see guardian fields
         $members->getCollection()->transform(
@@ -35,7 +35,7 @@ class MemberController extends Controller
             ->where('is_approved', false)
             ->where('membership_status', 'Pending')
             ->orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage($request));
 
         $members->getCollection()->transform(
             fn (User $u) => $u->makeVisible(['guardian_name', 'guardian_relation', 'guardian_phone'])
@@ -49,6 +49,7 @@ class MemberController extends Controller
     {
         $data = $request->validate([
             'decision' => ['required', Rule::in(['Approved', 'Denied'])],
+            'reason' => ['required_if:decision,Denied', 'nullable', 'string', 'max:1000'],
         ]);
 
         $member = User::where('uid', $uid)->where('role', 'learner')->firstOrFail();
@@ -56,7 +57,8 @@ class MemberController extends Controller
         $updated = $this->memberService->reviewMembership(
             $member,
             $data['decision'],
-            Auth::user()->uid
+            Auth::user()->uid,
+            $data['reason'] ?? null
         );
 
         return response()->json(

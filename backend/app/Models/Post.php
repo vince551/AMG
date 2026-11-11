@@ -15,12 +15,14 @@ class Post extends Model
         'body',
         'date',
         'created_by',
+        'is_published',
     ];
 
     protected function casts(): array
     {
         return [
             'date' => 'date',
+            'is_published' => 'boolean',
         ];
     }
 

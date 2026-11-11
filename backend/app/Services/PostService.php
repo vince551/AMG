@@ -11,13 +11,19 @@ class PostService
 
     public function publish(array $data, string $creatorUid): Post
     {
-        return Post::create([
-            'type'       => $data['type'],
-            'title'      => $data['title'],
-            'body'       => $data['body'],
-            'date'       => $data['date'] ?? null,
-            'created_by' => $creatorUid,
-        ]);
+        return LibraryTransaction::run(function () use ($data, $creatorUid) {
+            $post = Post::create([
+                'type' => $data['type'],
+                'title' => $data['title'],
+                'body' => $data['body'],
+                'date' => $data['date'] ?? null,
+                'created_by' => $creatorUid,
+                'is_published' => $data['is_published'] ?? true,
+            ]);
+            ActivityService::record('post.created', 'post', $post->id, [], $creatorUid);
+
+            return $post;
+        });
     }
 
     /**
@@ -25,12 +31,12 @@ class PostService
      */
     public function combinedFeed(): Collection
     {
-        $announcements = Post::where('type', 'announcement')
+        $announcements = Post::where('type', 'announcement')->where('is_published', true)
             ->orderByRaw('COALESCE(date, created_at) DESC')
             ->limit(self::MAX_PER_TYPE)
             ->get();
 
-        $events = Post::where('type', 'event')
+        $events = Post::where('type', 'event')->where('is_published', true)
             ->orderByRaw('COALESCE(date, created_at) DESC')
             ->limit(self::MAX_PER_TYPE)
             ->get();
@@ -40,7 +46,7 @@ class PostService
             ->values()
             ->map(fn (Post $p) => array_merge($p->toArray(), [
                 'announcementKind' => $p->announcement_kind,
-                'source'           => $p->source,
+                'source' => $p->source,
             ]));
     }
 }

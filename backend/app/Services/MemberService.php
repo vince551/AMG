@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\ConflictException;
 use App\Models\User;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,14 +16,16 @@ class MemberService
     public function updateProfile(User $user, array $data): User
     {
         // Only allow starredBookIds — strip any protected fields silently
-        $allowed = array_intersect_key($data, array_flip(['starredBookIds']));
+        $allowed = array_intersect_key($data, array_flip(array_merge(UserService::PROFILE_FIELDS, ['starredBookIds'])));
 
         if (isset($allowed['starredBookIds'])) {
             $user->starred_book_ids = $allowed['starredBookIds'];
             $user->save();
         }
 
-        return $user->fresh();
+        $user->fill(array_intersect_key($allowed, array_flip(UserService::PROFILE_FIELDS)))->save();
+
+        return $user->fresh()->makeVisible(['guardian_name', 'guardian_relation', 'guardian_phone']);
     }
 
     /**
@@ -31,20 +34,24 @@ class MemberService
      */
     public function updatePhoto(User $user, UploadedFile $photo): User
     {
-        // Delete old photo if stored
-        if ($user->photo_storage_path) {
-            Storage::disk('public')->delete($user->photo_storage_path);
-        }
-
+        $oldPath = $user->photo_storage_path;
         $path = $photo->store('photos', 'public');
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk     = Storage::disk('public');
+        if (! $path) {
+            throw new \RuntimeException('Photo could not be stored.');
+        }
+        /** @var FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
         $photoUrl = $disk->url($path);
 
-        $user->update([
-            'photo_url'          => $photoUrl,
-            'photo_storage_path' => $path,
-        ]);
+        try {
+            $user->update(['photo_url' => $photoUrl, 'photo_storage_path' => $path]);
+        } catch (\Throwable $error) {
+            Storage::disk('public')->delete($path);
+            throw $error;
+        }
+        if ($oldPath) {
+            Storage::disk('public')->delete($oldPath);
+        }
 
         return $user->fresh();
     }
@@ -52,30 +59,37 @@ class MemberService
     /**
      * Approve or deny a pending membership application.
      */
-    public function reviewMembership(User $member, string $decision, string $librarianUid): User
+    public function reviewMembership(User $member, string $decision, string $librarianUid, ?string $reason = null): User
     {
-        if ($member->membership_status !== 'Pending') {
-            throw new ConflictException('This membership application has already been reviewed.');
-        }
+        return LibraryTransaction::run(function () use ($member, $decision, $librarianUid, $reason) {
+            $member->refresh();
+            if ($member->membership_status !== 'Pending') {
+                throw new ConflictException('This membership application has already been reviewed.');
+            }
 
-        $now = now();
+            $now = now();
 
-        if ($decision === 'Approved') {
-            $member->update([
-                'is_approved'       => true,
-                'membership_status' => 'Approved',
-                'approved_at'       => $now,
-                'decision_by'       => $librarianUid,
-            ]);
-        } else {
-            $member->update([
-                'is_approved'       => false,
-                'membership_status' => 'Denied',
-                'denied_at'         => $now,
-                'decision_by'       => $librarianUid,
-            ]);
-        }
+            if ($decision === 'Approved') {
+                $member->update([
+                    'is_approved' => true,
+                    'membership_status' => 'Approved',
+                    'approved_at' => $now,
+                    'decision_by' => $librarianUid,
+                ]);
+            } else {
+                $member->update([
+                    'is_approved' => false,
+                    'membership_status' => 'Denied',
+                    'denied_at' => $now,
+                    'decision_by' => $librarianUid,
+                ]);
+            }
 
-        return $member->fresh();
+            $member->update(['decision_reason' => $reason]);
+            ActivityService::record('membership.reviewed', 'user', $member->uid, ['status' => $decision], $librarianUid);
+            ActivityService::notify($member->uid, 'Membership '.$decision, $reason ?: 'Your membership has been '.strtolower($decision).'.', 'profile');
+
+            return $member->fresh();
+        });
     }
 }

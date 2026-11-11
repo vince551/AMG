@@ -21,11 +21,23 @@ export default defineConfig({
             "firebase/firestore",
             "firebase/storage",
             "firebase/functions"
-          ],
+          ],u8``
           libraries: ["html2canvas", "jsbarcode", "qrcode"]
         }
       }
     }
   },
-  server: { port: 5173 }
+  server: {
+    port: 5173,
+    // Apache serves the Laravel API at /AMG/api. Proxying it through the dev
+    // server keeps development same-origin, so Sanctum's cookie session and
+    // CSRF token work exactly as they do in production.
+    proxy: {
+      "/api": {
+        target: "http://localhost",
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, "/AMG/api")
+      }
+    }
+  }
 });

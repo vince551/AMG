@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BorrowRequest;
 use App\Services\BorrowService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,8 +15,13 @@ class BorrowRequestController extends Controller
     /** GET /borrow-requests — librarian, all requests */
     public function index(Request $request): JsonResponse
     {
-        $requests = \App\Models\BorrowRequest::orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 15));
+        $size = $this->perPage($request);
+        $query = BorrowRequest::query();
+        $this->search($query, $request, ['user_name', 'book_title']);
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        $requests = $query->latest()->paginate($size);
 
         return response()->json($requests);
     }
@@ -23,9 +29,13 @@ class BorrowRequestController extends Controller
     /** GET /my/requests — member's own requests */
     public function myRequests(Request $request): JsonResponse
     {
-        $requests = \App\Models\BorrowRequest::where('user_id', Auth::user()->uid)
-            ->orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 15));
+        $size = $this->perPage($request);
+        $query = BorrowRequest::where('user_id', Auth::user()->uid);
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        $this->search($query, $request, ['book_title']);
+        $requests = $query->latest()->paginate($size);
 
         return response()->json($requests);
     }
@@ -43,20 +53,29 @@ class BorrowRequestController extends Controller
     }
 
     /** POST /borrow-requests/{id}/approve */
-    public function approve(int $id): JsonResponse
+    public function approve(Request $request, int $id): JsonResponse
     {
-        $borrowRequest = \App\Models\BorrowRequest::findOrFail($id);
-        $loan          = $this->borrowService->approve($borrowRequest, Auth::user()->uid);
+        $data = $request->validate(['copyBarcode' => ['sometimes', 'nullable', 'string', 'max:40']]);
+        $borrowRequest = BorrowRequest::findOrFail($id);
+        $loan = $this->borrowService->approve($borrowRequest, Auth::user()->uid, $data['copyBarcode'] ?? null);
 
         return response()->json(['message' => 'Request approved.', 'loan' => $loan]);
     }
 
     /** POST /borrow-requests/{id}/decline */
-    public function decline(int $id): JsonResponse
+    public function decline(Request $request, int $id): JsonResponse
     {
-        $borrowRequest = \App\Models\BorrowRequest::findOrFail($id);
-        $this->borrowService->decline($borrowRequest, Auth::user()->uid);
+        $data = $request->validate(['reason' => ['required', 'string', 'max:1000']]);
+        $borrowRequest = BorrowRequest::findOrFail($id);
+        $this->borrowService->decline($borrowRequest, Auth::user()->uid, $data['reason']);
 
         return response()->json(['message' => 'Request declined.']);
+    }
+
+    public function cancel(Request $request, int $id): JsonResponse
+    {
+        $this->borrowService->cancel(BorrowRequest::where('user_id', $request->user()->uid)->findOrFail($id), $request->user());
+
+        return response()->json(['message' => 'Request cancelled.']);
     }
 }

@@ -13,7 +13,7 @@ class RoleCheck
     {
         $user = Auth::user();
 
-        if (! $user || $user->role !== $role) {
+        if (! $user || ($user->role !== $role && ! ($role === 'librarian' && $user->role === 'admin'))) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 

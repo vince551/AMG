@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Loan;
 use App\Services\LoanService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,26 +15,36 @@ class LoanController extends Controller
     /** GET /loans — librarian */
     public function index(Request $request): JsonResponse
     {
-        $loans = \App\Models\Loan::orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 15));
+        $size = $this->perPage($request);
+        $request->validate(['user_id' => ['sometimes', 'uuid']]);
+        $query = Loan::with('bookCopy');
+        if ($request->is('api/v1/my/*')) {
+            $query->where('user_id', $request->user()->uid);
+        } elseif ($request->filled('user_id')) {
+            $query->where('user_id', $request->input('user_id'));
+        }
+        if ($request->input('status') === 'Overdue') {
+            $query->where('status', 'Borrowed')->where('due_at', '<', now());
+        } elseif ($request->input('status') === 'Unassigned') {
+            $query->where('status', 'Borrowed')->whereNull('book_copy_id');
+        } elseif ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        $this->search($query, $request, ['book_title', 'user_name']);
 
-        return response()->json($loans);
+        return response()->json($query->latest()->paginate($size));
     }
 
     /** GET /my/loans — member */
     public function myLoans(Request $request): JsonResponse
     {
-        $loans = \App\Models\Loan::where('user_id', Auth::user()->uid)
-            ->orderBy('created_at', 'desc')
-            ->paginate($request->integer('per_page', 15));
-
-        return response()->json($loans);
+        return $this->index($request);
     }
 
     /** POST /loans/{id}/return */
     public function returnLoan(int $id): JsonResponse
     {
-        $loan = \App\Models\Loan::findOrFail($id);
+        $loan = Loan::findOrFail($id);
         $this->loanService->returnLoan($loan, Auth::user()->uid);
 
         return response()->json(['message' => 'Book returned successfully.', 'loan' => $loan->fresh()]);

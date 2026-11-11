@@ -23,14 +23,16 @@ class Loan extends Model
         'returned_at',
         'issued_by',
         'returned_by',
+        'renewal_count',
     ];
 
     protected function casts(): array
     {
         return [
-            'borrowed_at'  => 'datetime',
-            'due_at'       => 'datetime',
-            'returned_at'  => 'datetime',
+            'renewal_count' => 'integer',
+            'borrowed_at' => 'datetime',
+            'due_at' => 'datetime',
+            'returned_at' => 'datetime',
         ];
     }
 

@@ -35,6 +35,10 @@ class User extends Authenticatable implements JWTSubject
         'approved_at',
         'denied_at',
         'decision_by',
+        'is_active',
+        'must_change_password',
+        'token_version',
+        'decision_reason',
     ];
 
     protected $hidden = [
@@ -44,16 +48,20 @@ class User extends Authenticatable implements JWTSubject
         'guardian_relation',
         'guardian_phone',
         'photo_storage_path',
+        'token_version',
     ];
 
     protected function casts(): array
     {
         return [
-            'password'         => 'hashed',
-            'is_approved'      => 'boolean',
+            'password' => 'hashed',
+            'is_approved' => 'boolean',
+            'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
+            'token_version' => 'integer',
             'starred_book_ids' => 'array',
-            'approved_at'      => 'datetime',
-            'denied_at'        => 'datetime',
+            'approved_at' => 'datetime',
+            'denied_at' => 'datetime',
         ];
     }
 
@@ -67,9 +75,15 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [
-            'uid'  => $this->uid,
+            'uid' => $this->uid,
             'role' => $this->role,
+            'ver' => (int) $this->token_version,
         ];
+    }
+
+    public function isStaff(): bool
+    {
+        return in_array($this->role, ['admin', 'librarian'], true);
     }
 
     // ── Relationships ────────────────────────────────────────────────────────

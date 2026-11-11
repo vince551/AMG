@@ -19,12 +19,16 @@ class Book extends Model
         'cover_url',
         'cover_storage_path',
         'description',
+        'archived_at',
     ];
+
+    protected $hidden = ['cover_storage_path'];
 
     protected function casts(): array
     {
         return [
-            'quantity'  => 'integer',
+            'archived_at' => 'datetime',
+            'quantity' => 'integer',
             'available' => 'integer',
         ];
     }

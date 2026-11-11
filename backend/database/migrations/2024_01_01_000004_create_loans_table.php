@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('book_copy_id')->nullable()->constrained('book_copies')->nullOnDelete();
             $table->enum('status', ['Borrowed', 'Returned'])->default('Borrowed');
             $table->timestamp('borrowed_at')->useCurrent();
-            $table->timestamp('due_at');
+            $table->dateTime('due_at');
             $table->timestamp('returned_at')->nullable();
             $table->string('issued_by', 36)->nullable();
             $table->string('returned_by', 36)->nullable();

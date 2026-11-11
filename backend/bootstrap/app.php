@@ -1,15 +1,18 @@
 <?php
 
 use App\Exceptions\ConflictException;
+use App\Http\Middleware\JwtAuthenticate;
 use App\Http\Middleware\RoleCheck;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,8 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'jwt.auth' => \App\Http\Middleware\JwtAuthenticate::class,
-            'role'     => RoleCheck::class,
+            'jwt.auth' => JwtAuthenticate::class,
+            'role' => RoleCheck::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -35,7 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->json([
                     'message' => $e->getMessage(),
-                    'errors'  => $e->errors(),
+                    'errors' => $e->errors(),
                 ], 422);
             }
         });
@@ -69,9 +72,16 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // 500 — generic, no stack trace
-        $exceptions->render(function (\Throwable $e, Request $request) {
+        $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
+                if ($e instanceof HttpExceptionInterface && $e->getStatusCode() < 500) {
+                    return response()->json(['message' => $e->getMessage() ?: 'Request could not be completed.'], $e->getStatusCode(), $e->getHeaders());
+                }
+                if ($e instanceof AuthorizationException) {
+                    return response()->json(['message' => $e->getMessage()], 403);
+                }
                 report($e);
+
                 return response()->json(['message' => 'An unexpected error occurred.'], 500);
             }
         });

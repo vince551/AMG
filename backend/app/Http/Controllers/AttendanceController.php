@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Services\AttendanceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,9 +39,22 @@ class AttendanceController extends Controller
     /** GET /attendance */
     public function index(Request $request): JsonResponse
     {
-        $records = \App\Models\AttendanceRecord::orderBy('check_in_at', 'desc')
-            ->paginate($request->integer('per_page', 15));
+        $size = $this->perPage($request);
+        $query = AttendanceRecord::query();
+        if ($request->is('api/v1/my/*')) {
+            $query->where('uid', $request->user()->uid);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        if ($request->filled('from')) {
+            $query->whereDate('check_in_at', '>=', $request->input('from'));
+        }
+        if ($request->filled('to')) {
+            $query->whereDate('check_in_at', '<=', $request->input('to'));
+        }
+        $this->search($query, $request, ['member_name', 'library_number']);
 
-        return response()->json($records);
+        return response()->json($query->latest('check_in_at')->paginate($size));
     }
 }

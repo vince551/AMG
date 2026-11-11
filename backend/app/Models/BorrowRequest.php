@@ -21,13 +21,14 @@ class BorrowRequest extends Model
         'processed_at',
         'processed_by',
         'returned_at',
+        'reason',
     ];
 
     protected function casts(): array
     {
         return [
             'processed_at' => 'datetime',
-            'returned_at'  => 'datetime',
+            'returned_at' => 'datetime',
         ];
     }
 
