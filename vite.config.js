@@ -21,7 +21,7 @@ export default defineConfig({
             "firebase/firestore",
             "firebase/storage",
             "firebase/functions"
-          ],u8``
+          ],
           libraries: ["html2canvas", "jsbarcode", "qrcode"]
         }
       }
